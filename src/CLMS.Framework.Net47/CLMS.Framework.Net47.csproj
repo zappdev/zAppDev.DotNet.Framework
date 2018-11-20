@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
+    <AssemblyName>CLMS.Framework</AssemblyName>
+    <RootNamespace>CLMS.Framework</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -41,16 +43,16 @@
 
   <ItemGroup>
     <Reference Include="CLMS.AppDev.Cache">
-      <HintPath>..\Lib\CLMS.AppDev.Cache.dll</HintPath>
+      <HintPath>..\..\Lib\CLMS.AppDev.Cache.dll</HintPath>
     </Reference>
     <Reference Include="CLMS.ApplicationModelling.MetaSourceCode">
-      <HintPath>..\Lib\CLMS.ApplicationModelling.MetaSourceCode.dll</HintPath>
+      <HintPath>..\..\Lib\CLMS.ApplicationModelling.MetaSourceCode.dll</HintPath>
     </Reference>
     <Reference Include="CLMS.MetaCodeGenerator">
-      <HintPath>..\Lib\CLMS.MetaCodeGenerator.dll</HintPath>
+      <HintPath>..\..\Lib\CLMS.MetaCodeGenerator.dll</HintPath>
     </Reference>
     <Reference Include="CLMS.PDF.Helper">
-      <HintPath>..\Lib\CLMS.PDF.Helper.dll</HintPath>
+      <HintPath>..\..\Lib\CLMS.PDF.Helper.dll</HintPath>
     </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.ApplicationServices" />
