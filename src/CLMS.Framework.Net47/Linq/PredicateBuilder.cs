@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Collections.Generic;
 
 namespace CLMS.Framework.Linq
 {
-	public static class PredicateBuilder
+    public static class PredicateBuilder
 	{
 		public static Expression<Func<T, bool>> True<T>() { return f => true; }
 		public static Expression<Func<T, bool>> False<T>() { return f => false; }

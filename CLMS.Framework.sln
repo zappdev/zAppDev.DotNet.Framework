@@ -15,6 +15,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CLMS.Framework.Test", "test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CLMS.Framework.Tests.Net47", "tests\CLMS.Framework.Tests.Net47\CLMS.Framework.Tests.Net47.csproj", "{35850FBB-4471-417A-9D2F-5F9D6C6A8E1D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{5770D99E-FFF4-461D-9ECB-A3E7E629153A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoProject", "DemoProject\DemoProject.csproj", "{69EDB049-F9CE-4783-B749-0EC1F80CEE9D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +41,10 @@ Global
 		{35850FBB-4471-417A-9D2F-5F9D6C6A8E1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35850FBB-4471-417A-9D2F-5F9D6C6A8E1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35850FBB-4471-417A-9D2F-5F9D6C6A8E1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69EDB049-F9CE-4783-B749-0EC1F80CEE9D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69EDB049-F9CE-4783-B749-0EC1F80CEE9D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69EDB049-F9CE-4783-B749-0EC1F80CEE9D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69EDB049-F9CE-4783-B749-0EC1F80CEE9D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +54,7 @@ Global
 		{18F71740-87B8-4B5E-9052-182E4E2728E8} = {A33C3486-DA10-4CD4-8146-26A128275620}
 		{1F5AF672-C01B-45BE-B1A4-EF02F691EB38} = {880E5AD8-9ACD-4941-B7EB-27AFE355B14C}
 		{35850FBB-4471-417A-9D2F-5F9D6C6A8E1D} = {880E5AD8-9ACD-4941-B7EB-27AFE355B14C}
+		{69EDB049-F9CE-4783-B749-0EC1F80CEE9D} = {5770D99E-FFF4-461D-9ECB-A3E7E629153A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {79E5869A-D5D9-46DA-97A9-2093AEB430E5}
