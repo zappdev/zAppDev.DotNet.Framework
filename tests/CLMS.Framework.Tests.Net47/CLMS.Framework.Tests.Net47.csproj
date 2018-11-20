@@ -5,7 +5,7 @@
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="coverlet.msbuild" Version="2.3.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -19,6 +19,38 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\CLMS.Framework.Net47\CLMS.Framework.Net47.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\CLMS.Framework.Test\Auditing\NHAuditTrailServiceTest.cs" Link="Auditing\NHAuditTrailServiceTest.cs" />    
+    <Compile Include="..\CLMS.Framework.Test\Collections\IndexedCollectionTest.cs" Link="Collections\IndexedCollectionTest.cs" />
+    <Compile Include="..\CLMS.Framework.Test\Data\LocalTest.cs" Link="Data\LocalTest.cs" />
+    <Compile Include="..\CLMS.Framework.Test\Drawing\ImagingTest.cs" Link="Drawing\ImagingTest.cs" />
+
+    <Compile Include="..\CLMS.Framework.Test\Linq\PredicateBuilderTest.cs" Link="Linq\PredicateBuilderTest.cs" />
+    <Compile Include="..\CLMS.Framework.Test\LinqRuntimeTypeBuilder\LinqRuntimeTypeBuilderTest.cs" Link="LinqRuntimeTypeBuilder\LinqRuntimeTypeBuilderTest.cs" />
+    <Compile Include="..\CLMS.Framework.Test\Logging\RabbitMQMessagingLoggerTest.cs" Link="Logging\RabbitMQMessagingLoggerTest.cs" />
+    <Compile Include="..\CLMS.Framework.Test\Powershell\UnitTest.cs" Link="Powershell\UnitTest.cs" />
+    <Compile Include="..\CLMS.Framework.Test\Profiling\ProfilerTest.cs" Link="Profiling\ProfilerTest.cs" />
+    <Compile Include="..\CLMS.Framework.Test\SecurityDataDtos\SecurityDataDtosTest.cs" Link="SecurityDataDtos\SecurityDataDtosTest.cs" />
+    <Compile Include="..\CLMS.Framework.Test\Serialization\UseNetDataContractSerializerTest.cs" Link="Serialization\UseNetDataContractSerializerTest.cs" />
+    <Compile Include="..\CLMS.Framework.Test\Services\CacheKeyHasherTest.cs" Link="Services\CacheKeyHasherTest.cs" />
+    <Compile Include="..\CLMS.Framework.Test\Sockets\BufferManagerTest.cs" Link="Sockets\BufferManagerTest.cs" />
+    <Compile Include="..\CLMS.Framework.Test\Threading\ParallelTaskTest.cs" Link="Threading\ParallelTaskTest.cs" />
+    <Compile Include="..\CLMS.Framework.Test\Tools\ThereBeDragonsAttributeTest.cs" Link="Tools\ThereBeDragonsAttributeTest.cs" />
+    <Compile Include="..\CLMS.Framework.Test\Utilities\ApplicationCacheTest.cs" Link="Utilities\ApplicationCacheTest.cs" />
+    
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="coveragereport\**" />
+    <EmbeddedResource Remove="coveragereport\**" />
+    <None Remove="coveragereport\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="coverage.cobertura.xml" />
   </ItemGroup>
 
   <ItemGroup>
