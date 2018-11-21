@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Text;
 
 namespace CLMS.Framework.Utilities
@@ -25,7 +26,7 @@ namespace CLMS.Framework.Utilities
             }
             catch (Exception ex) 
             {
-                log4net.LogManager.GetLogger("EncodingUtilities").Debug($"Could not Parse : {encoding} to Encoding", ex);
+                log4net.LogManager.GetLogger(Assembly.GetEntryAssembly(), "EncodingUtilities").Debug($"Could not Parse : {encoding} to Encoding", ex);
                 throw new Exception($"Encoding with name '{encoding}' is invalid");
             }
 
