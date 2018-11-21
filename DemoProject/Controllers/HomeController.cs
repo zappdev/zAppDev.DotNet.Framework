@@ -22,6 +22,8 @@ namespace DemoProject.Controllers
 
         public IActionResult Index()
         {
+            DebugHelper.Log(DebugMessageType.Error, "Index", "Test");
+
             return View();
         }
 
@@ -34,10 +36,11 @@ namespace DemoProject.Controllers
 
             try
             {
+                var email = Email.FetchSMTPSettings();
                 throw new Exception();
             } catch (Exception ex)
             {
-                ViewData["Message"] = errr.HandleException(ex).OriginalExceptionMessage;
+                ViewData["Message"] = "webRootPath" + errr.HandleException(ex).OriginalExceptionMessage;
             }
 
             return View();
