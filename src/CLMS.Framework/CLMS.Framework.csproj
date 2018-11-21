@@ -8,6 +8,8 @@
     <Compile Include="..\CLMS.Framework.Net47\Linq\PredicateBuilder.cs" Link="Linq\PredicateBuilder.cs" />
     <Compile Include="..\CLMS.Framework.Net47\SecurityDataDtos\SecurityDataDtos.cs" Link="SecurityDataDtos\SecurityDataDtos.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Utilities\MailMessage.cs" Link="Utilities\MailMessage.cs" />
+    <Compile Include="..\CLMS.Framework.Net47\Utilities\NHibernateContractResolver.cs" Link="Utilities\NHibernateContractResolver.cs" />
+    <Compile Include="..\CLMS.Framework.Net47\Utilities\Serializer.cs" Link="Utilities\Serializer.cs" />
   </ItemGroup>
 
   <ItemGroup>

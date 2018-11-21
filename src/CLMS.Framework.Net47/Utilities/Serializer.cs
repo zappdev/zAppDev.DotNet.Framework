@@ -2,14 +2,11 @@
 using System.Xml.Serialization;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace CLMS.Framework.Utilities
 {
-	public class Serializer<T>
+    public class Serializer<T>
 	{
         public class Utf8StringWriter : StringWriter
         {
@@ -26,9 +23,9 @@ namespace CLMS.Framework.Utilities
 			{
 				PreserveReferencesHandling = preventCircles ? 
                     PreserveReferencesHandling.All : PreserveReferencesHandling.None,
-                ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore,
-                NullValueHandling = ignoreNullValues ? 
-                    Newtonsoft.Json.NullValueHandling.Ignore : Newtonsoft.Json.NullValueHandling.Include,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                NullValueHandling = ignoreNullValues ?
+                    NullValueHandling.Ignore : NullValueHandling.Include,
                 ContractResolver = new NHibernateContractResolver(true),
                 //DateTimeZoneHandling = DateTimeZoneHandling.Unspecified
 			});
