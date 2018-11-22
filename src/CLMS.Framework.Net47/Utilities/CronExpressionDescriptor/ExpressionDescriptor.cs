@@ -5,6 +5,7 @@ using System.Threading;
 using System.Text.RegularExpressions;
 using System.Globalization;
 using log4net;
+using System.Reflection;
 
 namespace CLMS.Framework.Utilities.CronExpressionDescriptor
 {
@@ -748,7 +749,7 @@ namespace CLMS.Framework.Utilities.CronExpressionDescriptor
         /// <returns>The cron expression description</returns>
         public static string GetDescription(string expression)
         {
-            var log = LogManager.GetLogger("CronExpressionDescriptor");
+            var log = LogManager.GetLogger(Assembly.GetEntryAssembly(), "CronExpressionDescriptor");
             try
             {
                 return GetDescription(expression, new Options());
