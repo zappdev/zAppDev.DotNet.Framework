@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\CLMS.Framework.Net47\Collections\IndexedCollection.cs" Link="Collections\IndexedCollection.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Linq\PredicateBuilder.cs" Link="Linq\PredicateBuilder.cs" />
     <Compile Include="..\CLMS.Framework.Net47\SecurityDataDtos\SecurityDataDtos.cs" Link="SecurityDataDtos\SecurityDataDtos.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Utilities\Encoding.cs" Link="Utilities\Encoding.cs" />
@@ -12,6 +13,8 @@
     <Compile Include="..\CLMS.Framework.Net47\Utilities\MailMessage.cs" Link="Utilities\MailMessage.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Utilities\NHibernateContractResolver.cs" Link="Utilities\NHibernateContractResolver.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Utilities\Serializer.cs" Link="Utilities\Serializer.cs" />
+    <Compile Include="..\CLMS.Framework.Net47\Utilities\SqlHelper.cs" Link="Utilities\SqlHelper.cs" />
+    <Compile Include="..\CLMS.Framework.Net47\Utilities\ThreadLocalStorage.cs" Link="Utilities\ThreadLocalStorage.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Utilities\WeekTools.cs" Link="Utilities\WeekTools.cs" />
   </ItemGroup>
 
