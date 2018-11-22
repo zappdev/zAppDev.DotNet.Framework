@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CLMS.Framework.Tests.Data
 {
+    [TestClass]
     public class LinqRuntimeTypeBuilderTest
     {
+        [TestMethod()]
+        public void PredicateTest()
+        {
+            var id = LinqRuntimeTypeBuilder.LinqRuntimeTypeBuilder.SanitizeCSharpIdentifier("true");
+
+        }
     }
 }

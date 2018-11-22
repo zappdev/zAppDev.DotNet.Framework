@@ -3,6 +3,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
+using CLMS.Framework.Utilities;
 using log4net;
 using Microsoft.AspNetCore.Owin;
 using NHibernate;
@@ -117,7 +118,7 @@ namespace CLMS.Framework.Data
         public static MiniSessionManager InstanceSafe => 
             HttpContext.Current?.Items["owin.Environment"] == null
             ? _manager
-            : HttpContext.Current?.GetOwinContext()?.Get<MiniSessionManager>();
+            : ServiceLocator.Current.GetInstance<MiniSessionManager>();
 
         public static MiniSessionManager Instance
         {
@@ -130,7 +131,7 @@ namespace CLMS.Framework.Data
 
                 if (HttpContext.Current?.Items["owin.Environment"] != null)
                 {
-                    var manager = HttpContext.Current?.GetOwinContext()?.Get<MiniSessionManager>();
+                    var manager = ServiceLocator.Current.GetInstance<MiniSessionManager>();
                     if (manager == null)
                     {
                         throw new ApplicationException("Could not find MiniSessionManager in OWIN context!");

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using System.Text.RegularExpressions;
 
 namespace System.Web
@@ -24,6 +25,8 @@ namespace System.Web
 
         internal static void Configure(IHostingEnvironment hostingEnvironment)
         {
+            var serviceCollection = new Microsoft.Extensions.DependencyInjection.ServiceCollection();
+
             WebRootPath = hostingEnvironment.WebRootPath;
             ContentRootPath = hostingEnvironment.ContentRootPath;
         }

@@ -9,7 +9,6 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.CSharp;
 
 namespace CLMS.Framework.LinqRuntimeTypeBuilder
@@ -33,10 +32,9 @@ namespace CLMS.Framework.LinqRuntimeTypeBuilder
 
         static LinqRuntimeTypeBuilder()
         {
-            ModuleBuilder =
-                Thread.GetDomain()
-                    .DefineDynamicAssembly(AssemblyName, AssemblyBuilderAccess.Run)
-                    .DefineDynamicModule(AssemblyName.Name);
+            ModuleBuilder = AssemblyBuilder
+                .DefineDynamicAssembly(AssemblyName, AssemblyBuilderAccess.Run)
+                .DefineDynamicModule(AssemblyName.Name);
         }
 
         private static string GetTypeKey(Dictionary<string, Type> fields, Type type, Dictionary<string, Type> selectFields = null)

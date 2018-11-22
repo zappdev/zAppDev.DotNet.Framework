@@ -5,7 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\CLMS.Framework.Net47\Auditing\INHAuditTrailManager.cs" Link="Auditing\INHAuditTrailManager.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Collections\IndexedCollection.cs" Link="Collections\IndexedCollection.cs" />
+    <Compile Include="..\CLMS.Framework.Net47\LinqRuntimeTypeBuilder\LinqRuntimeTypeBuilder.cs" Link="LinqRuntimeTypeBuilder\LinqRuntimeTypeBuilder.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Linq\PredicateBuilder.cs" Link="Linq\PredicateBuilder.cs" />
     
     <Compile Include="..\CLMS.Framework.Net47\Powershell\Adapter.cs" Link="Powershell\Adapter.cs" />
