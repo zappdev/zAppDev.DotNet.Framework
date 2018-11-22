@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using log4net;
 using NHibernate;
 using NHibernate.Collection;
@@ -42,8 +43,7 @@ namespace CLMS.Framework.Data
             {
                 foreach (var o in currentState)
                 {
-                    var collection = o as IPersistentCollection;
-                    if (collection != null && collection.IsDirty)
+                    if (o is IPersistentCollection collection && collection.IsDirty)
                     {
                         return true;
                     }
@@ -81,7 +81,7 @@ namespace CLMS.Framework.Data
             }
             catch (Exception e)
             {
-                LogManager.GetLogger("NH Extensions").Error("IsDirtyProperty error!", e);
+                LogManager.GetLogger(Assembly.GetEntryAssembly(), "NH Extensions").Error("IsDirtyProperty error!", e);
             }
             return false;
         }

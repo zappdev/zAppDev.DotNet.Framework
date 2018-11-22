@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using CLMS.Framework.Data;
-using CLMS.Framework.Tools;
 using log4net;
 
 namespace CLMS.Framework.Threading

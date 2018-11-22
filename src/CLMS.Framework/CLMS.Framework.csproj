@@ -7,11 +7,26 @@
   <ItemGroup>
     <Compile Include="..\CLMS.Framework.Net47\Collections\IndexedCollection.cs" Link="Collections\IndexedCollection.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Linq\PredicateBuilder.cs" Link="Linq\PredicateBuilder.cs" />
+    
     <Compile Include="..\CLMS.Framework.Net47\Powershell\Adapter.cs" Link="Powershell\Adapter.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Powershell\Commander.cs" Link="Powershell\Commander.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Powershell\Contracts.cs" Link="Powershell\Contracts.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Powershell\Converter.cs" Link="Powershell\Converter.cs" />
+    
+    <Compile Include="..\CLMS.Framework.Net47\Data\Local.cs" Link="Data\Local.cs" />
+    <Compile Include="..\CLMS.Framework.Net47\Data\RepositoryAction.cs" Link="Data\RepositoryAction.cs" />
+    <Compile Include="..\CLMS.Framework.Net47\Data\ObjectGraphWalker.cs" Link="Data\ObjectGraphWalker.cs" />
+    <Compile Include="..\CLMS.Framework.Net47\Data\NHExtensions.cs" Link="Data\NHExtensions.cs" />
+
+    <!--<Compile Include="..\CLMS.Framework.Net47\Logging\IAPILogger.cs" Link="Logging\IAPILogger.cs" />-->
+    <!--<Compile Include="..\CLMS.Framework.Net47\Logging\LogMessage.cs" Link="Logging\LogMessage.cs" />-->
+    <Compile Include="..\CLMS.Framework.Net47\Logging\NHStatisticsLogger.cs" Link="Logging\NHStatisticsLogger.cs" />
+    <!--<Compile Include="..\CLMS.Framework.Net47\Logging\RabbitMQMessagingLogger.cs" Link="Logging\RabbitMQMessagingLogger.cs" />-->
+    
     <Compile Include="..\CLMS.Framework.Net47\SecurityDataDtos\SecurityDataDtos.cs" Link="SecurityDataDtos\SecurityDataDtos.cs" />
+    
+    <Compile Include="..\CLMS.Framework.Net47\Threading\ParallelTask.cs" Link="Threading\ParallelTask.cs" />
+    
     <Compile Include="..\CLMS.Framework.Net47\Utilities\CronExpressionDescriptor\ExpressionDescriptor.cs" Link="Utilities\CronExpressionDescriptor\ExpressionDescriptor.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Utilities\CronExpressionDescriptor\ExpressionParser.cs" Link="Utilities\CronExpressionDescriptor\ExpressionParser.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Utilities\CronExpressionDescriptor\Glossary.cs" Link="Utilities\CronExpressionDescriptor\Glossary.cs" />
@@ -20,6 +35,7 @@
     <Compile Include="..\CLMS.Framework.Net47\Utilities\ExcelTools.cs" Link="Utilities\ExcelTools.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Utilities\MailMessage.cs" Link="Utilities\MailMessage.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Utilities\NHibernateContractResolver.cs" Link="Utilities\NHibernateContractResolver.cs" />
+    <Compile Include="..\CLMS.Framework.Net47\Utilities\RegExHelper.cs" Link="Utilities\RegExHelper.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Utilities\Serializer.cs" Link="Utilities\Serializer.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Utilities\SqlHelper.cs" Link="Utilities\SqlHelper.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Utilities\ThreadLocalStorage.cs" Link="Utilities\ThreadLocalStorage.cs" />
@@ -34,6 +50,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Owin" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.0.4" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.1.1" />
@@ -43,10 +60,12 @@
     <PackageReference Include="ncrontab" Version="3.3.0" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="NHibernate" Version="5.1.3" />
+    <PackageReference Include="RabbitMQ.Client" Version="5.1.0" />
     <PackageReference Include="RSG.Promise.Core" Version="3.0.0" />
     <PackageReference Include="S22.Imap.Core" Version="3.6.1" />
     <PackageReference Include="System.CodeDom" Version="4.5.0" />
     <PackageReference Include="System.Management.Automation" Version="6.1.1" />
+    <PackageReference Include="VerbalExpressions-netstandard16" Version="0.2.0" />
   </ItemGroup>
 
   <ItemGroup>

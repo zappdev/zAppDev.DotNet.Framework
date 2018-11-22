@@ -4,7 +4,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
 using log4net;
-using Microsoft.AspNet.Identity.Owin;
+using Microsoft.AspNetCore.Owin;
 using NHibernate;
 using NHibernate.Cfg;
 
