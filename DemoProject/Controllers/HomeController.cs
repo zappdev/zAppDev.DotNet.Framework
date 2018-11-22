@@ -40,7 +40,7 @@ namespace DemoProject.Controllers
                 throw new Exception();
             } catch (Exception ex)
             {
-                ViewData["Message"] = "webRootPath" + errr.HandleException(ex).OriginalExceptionMessage;
+                ViewData["Message"] = $"{errr.HandleException(ex).OriginalExceptionMessage} webRootPath";
             }
 
             return View();
@@ -48,7 +48,7 @@ namespace DemoProject.Controllers
 
         public IActionResult Contact()
         {
-            ViewData["Message"] = "Your contact page.";
+            ViewData["Message"] = $"{System.Web.HttpContext.ContentRootPath} Your contact page.";
 
             return View();
         }

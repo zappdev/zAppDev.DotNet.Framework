@@ -2,23 +2,40 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using System.Threading.Tasks;
 
 namespace CLMS.Framework
 {
-    public static class StaticHttpContextExtensions
+    public class HttpContextMiddleware
     {
-        public static void AddHttpContextAccessor(this IServiceCollection services)
+        private readonly RequestDelegate _next;
+
+        public HttpContextMiddleware(RequestDelegate next)
         {
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            _next = next;
         }
 
+        public async Task Invoke(HttpContext context)
+        {
+            // Do something with context near the beginning of request processing.
+            System.Web.HttpContext.Configure(context);
+
+            await _next.Invoke(context);
+
+            // Clean up.
+        }
+    }
+
+    public static class StaticHttpContextExtensions
+    {
         public static IApplicationBuilder UseStaticHttpContext(this IApplicationBuilder app)
         {
             var httpContextAccessor = app.ApplicationServices.GetRequiredService<IHttpContextAccessor>();
             var hostingEnvironment = app.ApplicationServices.GetRequiredService<IHostingEnvironment>();
 
-            System.Web.HttpContext.Configure(httpContextAccessor, hostingEnvironment);
-            return app;
+            System.Web.HttpContext.Configure(hostingEnvironment);
+
+            return app.UseMiddleware<HttpContextMiddleware>();
         }
     }
 }
