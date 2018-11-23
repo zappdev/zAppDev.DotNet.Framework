@@ -53,7 +53,7 @@ namespace CLMS.Framework.LinqRuntimeTypeBuilder
         public static string SanitizeCSharpIdentifier(string name, string replacementChar = "")
         {
             string className = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(name);
-            bool isValid = Microsoft.CSharp.CSharpCodeProvider.CreateProvider("C#").IsValidIdentifier(className);
+            bool isValid = CodeDomProvider.CreateProvider("C#").IsValidIdentifier(className);
             if (!isValid)
             {
                 System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex(@"\W");
@@ -418,7 +418,7 @@ namespace CLMS.Framework.LinqRuntimeTypeBuilder
         }        
     }
 
-    class ParameterReplaceVisitor : ExpressionVisitor
+    public class ParameterReplaceVisitor : ExpressionVisitor
     {
         private readonly ParameterExpression _from, _to;
         public ParameterReplaceVisitor(ParameterExpression from, ParameterExpression to)
