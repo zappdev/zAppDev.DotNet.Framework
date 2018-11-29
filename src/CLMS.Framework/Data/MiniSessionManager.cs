@@ -5,7 +5,6 @@ using System.Linq;
 using System.Web;
 using CLMS.Framework.Utilities;
 using log4net;
-using Microsoft.AspNetCore.Owin;
 using NHibernate;
 using NHibernate.Cfg;
 
@@ -16,6 +15,7 @@ namespace CLMS.Framework.Data
         public const string SessionKeyName = "NHibernateSession";
 
         private readonly ILog _log = LogManager.GetLogger(typeof(MiniSessionManager));
+
         [ThreadStatic]
         private static MiniSessionManager _manager;
         private static ISessionFactory _sessionFactory;
@@ -26,11 +26,13 @@ namespace CLMS.Framework.Data
             get;
             private set;
         }
+
         public static string UpdateDbErrors
         {
             get;
             private set;
         }
+
         public static string OwinKey
         {
             get
