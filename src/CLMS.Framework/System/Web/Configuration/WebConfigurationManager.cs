@@ -8,7 +8,7 @@ namespace System.Web.Configuration
         internal static IConfiguration OpenWebConfiguration(string applicationPath)
         {
             var builder = new ConfigurationBuilder()
-                .AddXmlFile(Path.Join(applicationPath, "webapp.config"));
+                .AddXmlFile(Path.Combine(applicationPath, "webapp.config"));
 
             return builder.Build();
         }
