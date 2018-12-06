@@ -10,7 +10,7 @@ using NHibernate.Cfg;
 
 namespace CLMS.Framework.Data
 {
-    public class MiniSessionManager:IDisposable
+    public class MiniSessionManager: IDisposable
     {
         public const string SessionKeyName = "NHibernateSession";
 
