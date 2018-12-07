@@ -1,10 +1,10 @@
-﻿using CLMS.Framework.LinqRuntimeTypeBuilder;
+﻿using Builder = CLMS.Framework.LinqRuntimeTypeBuilder;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace CLMS.Framework.Tests.Data
+namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
 {
     [TestClass]
     public class LinqRuntimeTypeBuilderTest
@@ -12,38 +12,38 @@ namespace CLMS.Framework.Tests.Data
         [TestMethod()]
         public void SanitizeCSharpIdentifierTest()
         {
-            var id = LinqRuntimeTypeBuilder.LinqRuntimeTypeBuilder.SanitizeCSharpIdentifier("true");
+            var id = Builder.LinqRuntimeTypeBuilder.SanitizeCSharpIdentifier("true");
             Assert.AreEqual(id, "True");
 
-            id = LinqRuntimeTypeBuilder.LinqRuntimeTypeBuilder.SanitizeCSharpIdentifier("_test");
+            id = Builder.LinqRuntimeTypeBuilder.SanitizeCSharpIdentifier("_test");
             Assert.AreEqual(id, "_Test");
 
-            id = LinqRuntimeTypeBuilder.LinqRuntimeTypeBuilder.SanitizeCSharpIdentifier("if");
+            id = Builder.LinqRuntimeTypeBuilder.SanitizeCSharpIdentifier("if");
             Assert.AreEqual(id, "If");
 
-            id = LinqRuntimeTypeBuilder.LinqRuntimeTypeBuilder.SanitizeCSharpIdentifier("Name");
+            id = Builder.LinqRuntimeTypeBuilder.SanitizeCSharpIdentifier("Name");
             Assert.AreEqual(id, "Name");
 
-            id = LinqRuntimeTypeBuilder.LinqRuntimeTypeBuilder.SanitizeCSharpIdentifier("1Name");
+            id = Builder.LinqRuntimeTypeBuilder.SanitizeCSharpIdentifier("1Name");
             Assert.AreEqual(id, "_1Name");
         }
 
         [TestMethod]
         public void CSharpNameTest()
         {
-            var id = LinqRuntimeTypeBuilder.LinqRuntimeTypeBuilder.CSharpName(typeof(LinqRuntimeTypeBuilderTest));
+            var id = Builder.LinqRuntimeTypeBuilder.CSharpName(typeof(LinqRuntimeTypeBuilderTest));
             Assert.AreEqual(id, "LinqRuntimeTypeBuilderTest");
 
-            id = LinqRuntimeTypeBuilder.LinqRuntimeTypeBuilder.CSharpName(typeof(LinqRuntimeTypeBuilderTest), false);
+            id = Builder.LinqRuntimeTypeBuilder.CSharpName(typeof(LinqRuntimeTypeBuilderTest), false);
             Assert.AreEqual(id, "LinqRuntimeTypeBuilderTest");
 
-            id = LinqRuntimeTypeBuilder.LinqRuntimeTypeBuilder.CSharpName(typeof(List<int>), false);
+            id = Builder.LinqRuntimeTypeBuilder.CSharpName(typeof(List<int>), false);
             Assert.AreEqual(id, "ListInt32");
 
-            id = LinqRuntimeTypeBuilder.LinqRuntimeTypeBuilder.CSharpName(null, false);
+            id = Builder.LinqRuntimeTypeBuilder.CSharpName(null, false);
             Assert.AreEqual(id, "");
 
-            id = LinqRuntimeTypeBuilder.LinqRuntimeTypeBuilder.CSharpName(typeof(List<int>), true);
+            id = Builder.LinqRuntimeTypeBuilder.CSharpName(typeof(List<int>), true);
             Assert.AreEqual(id, "List<Int32>");
         }
 
@@ -52,7 +52,7 @@ namespace CLMS.Framework.Tests.Data
         {
             Expression<System.Func<int, object>> p = (a) => null;
 
-            var test = new FieldDefinition<int>
+            var test = new Builder.FieldDefinition<int>
             {
                 Name = "Name",
                 Type = typeof(string),
@@ -69,7 +69,7 @@ namespace CLMS.Framework.Tests.Data
         {
             var p1 = Expression.Parameter(typeof(int));
 
-            var param = new ParameterReplaceVisitor(p1, p1);
+            var param = new Builder.ParameterReplaceVisitor(p1, p1);
 
             Expression<System.Func<int, object>> p = (a) => null;
 
@@ -92,7 +92,7 @@ namespace CLMS.Framework.Tests.Data
                 { "stringVar", typeof(string)}
             };
 
-            var p1 = LinqRuntimeTypeBuilder.LinqRuntimeTypeBuilder.GetDynamicTypes(groupField, selectField, typeof(bool));
+            var p1 = Builder.LinqRuntimeTypeBuilder.GetDynamicTypes(groupField, selectField, typeof(bool));
 
         }
 
@@ -109,7 +109,7 @@ namespace CLMS.Framework.Tests.Data
             {
             };
 
-            LinqRuntimeTypeBuilder.LinqRuntimeTypeBuilder.GetDynamicTypes(groupField, selectField, typeof(bool));
+            Builder.LinqRuntimeTypeBuilder.GetDynamicTypes(groupField, selectField, typeof(bool));
         }
 
         [TestMethod]
@@ -125,7 +125,7 @@ namespace CLMS.Framework.Tests.Data
             {
             };
 
-            LinqRuntimeTypeBuilder.LinqRuntimeTypeBuilder.GetDynamicTypes(groupField, selectField, typeof(bool));
+            Builder.LinqRuntimeTypeBuilder.GetDynamicTypes(groupField, selectField, typeof(bool));
         }
 
         [TestMethod]
@@ -139,7 +139,7 @@ namespace CLMS.Framework.Tests.Data
 
             Dictionary<string, Type> groupField = null;
 
-            LinqRuntimeTypeBuilder.LinqRuntimeTypeBuilder.GetDynamicTypes(groupField, selectField, typeof(bool));
+            Builder.LinqRuntimeTypeBuilder.GetDynamicTypes(groupField, selectField, typeof(bool));
         }
 
         [TestMethod]
@@ -153,7 +153,7 @@ namespace CLMS.Framework.Tests.Data
 
             Dictionary<string, Type> selectField = null;
 
-            LinqRuntimeTypeBuilder.LinqRuntimeTypeBuilder.GetDynamicTypes(groupField, selectField, typeof(bool));
+            Builder.LinqRuntimeTypeBuilder.GetDynamicTypes(groupField, selectField, typeof(bool));
         }
     }
 }

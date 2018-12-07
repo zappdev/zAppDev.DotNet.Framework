@@ -38,7 +38,7 @@
     <Compile Include="..\CLMS.Framework.Test\Sockets\BufferManagerTest.cs" Link="Sockets\BufferManagerTest.cs" />
     <Compile Include="..\CLMS.Framework.Test\Threading\ParallelTaskTest.cs" Link="Threading\ParallelTaskTest.cs" />
     <Compile Include="..\CLMS.Framework.Test\Tools\ThereBeDragonsAttributeTest.cs" Link="Tools\ThereBeDragonsAttributeTest.cs" />
-    <Compile Include="..\CLMS.Framework.Test\Utilities\ApplicationCacheTest.cs" Link="Utilities\ApplicationCacheTest.cs" />
+    <Compile Include="..\CLMS.Framework.Test\Utilities\CronExpressionDescriptor\OptionsTest.cs" Link="Utilities\CronExpressionDescriptor\OptionsTest.cs" />
     
 
   </ItemGroup>

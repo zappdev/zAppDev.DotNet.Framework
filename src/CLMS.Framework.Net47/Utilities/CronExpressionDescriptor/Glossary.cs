@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using log4net;
 
 namespace CLMS.Framework.Utilities.CronExpressionDescriptor
 {

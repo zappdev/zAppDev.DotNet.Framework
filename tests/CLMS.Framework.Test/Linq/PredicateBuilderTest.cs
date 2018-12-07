@@ -3,7 +3,7 @@ using CLMS.Framework.Linq;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CLMS.Framework.Tests.Data
+namespace CLMS.Framework.Tests.Linq
 {
     public class PredicateBuilderTest
     {

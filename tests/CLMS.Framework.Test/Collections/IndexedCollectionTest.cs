@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 
-namespace CLMS.Framework.Tests.Data
+namespace CLMS.Framework.Tests.Collections
 {
     [TestClass]
     public class IndexedCollectionTest

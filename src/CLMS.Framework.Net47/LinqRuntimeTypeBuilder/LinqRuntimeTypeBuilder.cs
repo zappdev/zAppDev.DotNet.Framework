@@ -428,7 +428,7 @@ namespace CLMS.Framework.LinqRuntimeTypeBuilder
         }        
     }
 
-    class ParameterReplaceVisitor : ExpressionVisitor
+    public class ParameterReplaceVisitor : ExpressionVisitor
     {
         private readonly ParameterExpression _from, _to;
         public ParameterReplaceVisitor(ParameterExpression from, ParameterExpression to)
