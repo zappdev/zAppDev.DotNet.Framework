@@ -2,27 +2,29 @@
 using System.Collections.Generic;
 using static CLMS.Framework.Utilities.ExcelTools;
 
+using CLMS.Framework.Utilities;
+
 namespace CLMS.Framework.Test.Utilities
 {
     [TestClass]
-    public class ExcelTools
+    public class ExcelToolsTest
     {
         [TestMethod]
         public void ExportExcelOptionsTest()
         {
             var option = new ExportExcelOptions
             {
-                Columns = new List<object>(),
+                Columns = { "Col1", "Col2" },
                 Values = new List<List<object>> {
-                    new List<object> { "0", "1" },
-                    new List<object> { "2", "3" }
+                    new List<object> { 0, 1 },
+                    new List<object> { 2, 3 }
                 },
                 ColumnFormattings = { "Col1", "Col2" },
-                Title = "Info.xls",
+                Title = "Info",
                 Author = "George Theofilis"
             };
 
-            Assert.AreEqual("Info.xls", option.Title);
+            Assert.AreEqual("Info", option.Title);
             Assert.AreEqual("George Theofilis", option.Author);
             Assert.AreEqual(null, option.Path);
 
@@ -31,6 +33,12 @@ namespace CLMS.Framework.Test.Utilities
             option.Path = "";
 
             Assert.AreEqual(false, option.IsValid);
+
+            option.Path = "Book.xlsx";
+
+            Assert.AreEqual(true, option.IsValid);
+
+            ExportExcelFile(option);
         }
     }
 }
