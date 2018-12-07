@@ -30,6 +30,16 @@ namespace CLMS.Framework.LinqRuntimeTypeBuilder
             }
         }
 
+		/*
+		Introduced a _monitorLock object reflecting the BuildTypes Dictionary for Locking Purposes, to avoid the SynchronizationLockException. Check the reason here: 
+		
+		https://docs.microsoft.com/en-us/dotnet/api/system.threading.monitor?redirectedfrom=MSDN&view=netframework-4.7.2
+		Each task throws a SynchronizationLockException exception because the nTasks 
+		variable is boxed before the call to the Monitor.Enter method in each task. 
+		In other words, each method call is passed a separate variable that is independent of the others.[...]
+		*/
+		private static object _monitorLock = BuiltTypes;		
+		
         static LinqRuntimeTypeBuilder()
         {
             ModuleBuilder = AssemblyBuilder
@@ -53,7 +63,7 @@ namespace CLMS.Framework.LinqRuntimeTypeBuilder
         public static string SanitizeCSharpIdentifier(string name, string replacementChar = "")
         {
             string className = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(name);
-            bool isValid = CodeDomProvider.CreateProvider("C#").IsValidIdentifier(className);
+            bool isValid = Microsoft.CSharp.CSharpCodeProvider.CreateProvider("C#").IsValidIdentifier(className);
             if (!isValid)
             {
                 System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex(@"\W");
@@ -97,9 +107,9 @@ namespace CLMS.Framework.LinqRuntimeTypeBuilder
             if (0 == selectFields.Count)
                 throw new ArgumentOutOfRangeException(nameof(selectFields), "selectFields must have at least 1 field definition");
 
+            Monitor.Enter(_monitorLock);			
             try
             {
-                Monitor.Enter(BuiltTypes);
                 string groupClassName = GetTypeKey(groupFields, resultSetType);
                 string selectClassName = GetTypeKey(selectFields, resultSetType, groupFields);
 				//This is to ensure that the built groupby and selector expressions reside in the same
@@ -199,7 +209,7 @@ namespace CLMS.Framework.LinqRuntimeTypeBuilder
             }
             finally
             {
-                Monitor.Exit(BuiltTypes);
+                Monitor.Exit(_monitorLock);
             }
         }
 
@@ -418,7 +428,7 @@ namespace CLMS.Framework.LinqRuntimeTypeBuilder
         }        
     }
 
-    public class ParameterReplaceVisitor : ExpressionVisitor
+    class ParameterReplaceVisitor : ExpressionVisitor
     {
         private readonly ParameterExpression _from, _to;
         public ParameterReplaceVisitor(ParameterExpression from, ParameterExpression to)

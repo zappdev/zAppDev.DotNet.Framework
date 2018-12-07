@@ -33,7 +33,6 @@
     <PackageReference Include="Owin" Version="1.0" />
     <PackageReference Include="Purplelight.Framework.Autofac.Integration.WebApi" Version="0.2.2" />
     <PackageReference Include="RabbitMQ.Client" Version="5.1.0" />
-    <PackageReference Include="RSG.Promise" Version="3.0.1" />
     <PackageReference Include="S22.Imap" Version="3.6.0.0" />
     <PackageReference Include="Strathweb.CacheOutput.WebApi2" Version="0.11.0" />
     <PackageReference Include="System.IO.Compression" Version="4.3.0" />

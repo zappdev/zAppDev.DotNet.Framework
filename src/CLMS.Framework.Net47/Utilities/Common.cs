@@ -11,7 +11,7 @@ using System.Xml.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NHibernate.Util;
-using RSG;
+
 using AppDevCache = CLMS.AppDev.Cache;
 
 namespace CLMS.Framework.Utilities
@@ -548,7 +548,7 @@ namespace CLMS.Framework.Utilities
             }
             var zipPath = System.IO.Path.Combine(path, "downloaded.zip");
             //(new System.Net.WebClient()).DownloadFile(url, zipPath);
-			using (var wc = new System.Net.WebClient())
+            using (var wc = new System.Net.WebClient())
             {
                 wc.DownloadFile(url, zipPath);
             }
@@ -624,6 +624,14 @@ namespace CLMS.Framework.Utilities
                 stream.Write(data, 0, data.Length);
             }
         }
+        public static string GetApplicationTempFolderPath()
+        {
+            var appTempPath = System.Web.Hosting.HostingEnvironment.MapPath("~/App_Data/Temp/");
+            if (!Directory.Exists(appTempPath))
+                Directory.CreateDirectory(appTempPath);
+            return appTempPath;
+        }
+
         public static void SetLastError(Exception ex)
         {
             var key = $"{HttpContext.Current.Session.SessionID}LastError";
@@ -1108,23 +1116,6 @@ namespace CLMS.Framework.Utilities
             return linesRead;
         }
 
-        public static IPromise<T> WrapToPromise<T>(Func<T> cb)
-        {
-            var promise = new Promise<T>();
-
-            try
-            {
-                promise.Resolve(cb.Invoke());
-            }
-            catch (Exception e)
-            {
-                promise.Reject(e);
-                throw;
-            }
-
-            return promise;
-        }
-
         public static string RunExecutable(string filename, string arguments = null)
         {
             System.Diagnostics.ProcessStartInfo information;
@@ -1152,6 +1143,41 @@ namespace CLMS.Framework.Utilities
         {
             var cronSchedule = NCrontab.CrontabSchedule.Parse(cronExpression);
             return cronSchedule.GetNextOccurrence(dt);
+        }
+
+        public static string SmoothRead(string path)
+        {
+            var contents = "";
+            using (FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            {
+                using (StreamReader streamReader = new StreamReader(fileStream))
+                {
+                    contents = streamReader.ReadToEnd();
+                }
+            }
+            return contents;
+        }
+
+        public static byte[] SmoothReadBinary(string path)
+        {
+            byte[] result = null;
+            using (FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            {
+                //Read carefully the file (and not the whole thing at once, 'cause it might be bigger than 2GB and the int.MaxValue might blow us up
+                result = new byte[fileStream.Length];
+                var bytesLeftToRead = (int)fileStream.Length;
+                var alreadyRead = 0;
+
+                while (bytesLeftToRead > 0)
+                {
+                    var currentBytes = fileStream.Read(result, alreadyRead, bytesLeftToRead);
+                    if (currentBytes == 0) break;
+
+                    alreadyRead += currentBytes;
+                    bytesLeftToRead -= currentBytes;
+                }
+            }
+            return result;
         }
     }
 }
