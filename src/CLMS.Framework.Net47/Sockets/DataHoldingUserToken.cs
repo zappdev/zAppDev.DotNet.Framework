@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Net.Sockets;
-using System.Text;
 
 namespace CLMS.Framework.Sockets
 {
@@ -10,8 +8,8 @@ namespace CLMS.Framework.Sockets
 
         private string idOfThisObject; //for testing only
 
-        internal Int32 bytesAlreadyRead = 0;
-        internal Int32 receiveMessageOffset = 0;
+        internal int bytesAlreadyRead = 0;
+        internal int receiveMessageOffset = 0;
         internal byte[] messageDelimiter;
         public Func<byte[], bool> onReceive;
 

@@ -6,13 +6,13 @@ namespace CLMS.Framework.Sockets
 {
     public class BufferManager
     {
-        Int32 m_numBytes;
+        int m_numBytes;
         byte[] m_buffer;
         Stack<int> m_freeIndexPool;
-        Int32 m_currentIndex;
-        Int32 m_bufferSize;
+        int m_currentIndex;
+        int m_bufferSize;
 
-        public BufferManager(int totalBytes, Int32 bufferSize)
+        public BufferManager(int totalBytes, int bufferSize)
         {
             m_numBytes = totalBytes;
             m_currentIndex = 0;
