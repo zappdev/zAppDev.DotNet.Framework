@@ -33,6 +33,7 @@
     <Compile Include="..\CLMS.Framework.Net47\Utilities\CronExpressionDescriptor\ExpressionParser.cs" Link="Utilities\CronExpressionDescriptor\ExpressionParser.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Utilities\CronExpressionDescriptor\Glossary.cs" Link="Utilities\CronExpressionDescriptor\Glossary.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Utilities\CronExpressionDescriptor\Options.cs" Link="Utilities\CronExpressionDescriptor\Options.cs" />
+    <Compile Include="..\CLMS.Framework.Net47\Utilities\DataAccessContext.cs" Link="Utilities\DataAccessContext.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Utilities\Encoding.cs" Link="Utilities\Encoding.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Utilities\ExcelTools.cs" Link="Utilities\ExcelTools.cs" />
     <Compile Include="..\CLMS.Framework.Net47\Utilities\MailMessage.cs" Link="Utilities\MailMessage.cs" />

@@ -11,15 +11,15 @@ namespace CLMS.Framework.Utilities
     {
         public class ExportExcelOptions
         {
-            public List<object> Columns { get; set; }
-            public List<List<object>> Values { get; set; }
-            public List<string> ColumnFormattings { get; set; }
+            public List<object> Columns { get; set; } = new List<object>();
+            public List<List<object>> Values { get; set; } = new List<List<object>>();
+            public List<string> ColumnFormattings { get; set; } = new List<string>();
 
             public string Title { get; set; }
             public string Author { get; set; }
             public string Path { get; set; }
               
-            public bool IsValid => Columns != null && Values != null && Path != null;
+            public bool IsValid => Columns != null && Values != null && !string.IsNullOrEmpty(Path);
 
             public FileInfo FileInfo
             {
