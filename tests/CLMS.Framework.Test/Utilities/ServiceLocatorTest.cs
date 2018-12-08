@@ -1,9 +1,11 @@
-﻿using CLMS.Framework.Utilities;
+﻿#if NETFRAMEWORK
+#else
+using CLMS.Framework.Utilities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace CLMS.Framework.Test.Utilities
+namespace CLMS.Framework.Tests.Utilities
 {
 
     [TestClass]
@@ -45,3 +47,4 @@ namespace CLMS.Framework.Test.Utilities
         }
     }
 }
+#endif

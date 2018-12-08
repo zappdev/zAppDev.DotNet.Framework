@@ -14,14 +14,22 @@ namespace CLMS.Framework.Utilities
     {
         public static string GetClientIp()
         {
+#if NETFRAMEWORK
             var ip = HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
             ip = string.IsNullOrEmpty(ip) == false ? ip.Split(',')[0].Trim() : HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"];
             return ip;
+#else
+            throw new NotImplementedException();
+#endif
         }
 
         public static bool IsUserInRole(string roleName)
         {
+#if NETFRAMEWORK
             return HttpContext.Current.User.IsInRole(roleName);
+#else
+            throw new NotImplementedException();
+#endif
         }
 
         public static bool IsInControllerAction(string action)
@@ -29,9 +37,10 @@ namespace CLMS.Framework.Utilities
             return GetFormArgument("_currentControllerAction") == action;
         }
 
-		
+
         public static string GetQuery()
         {
+#if NETFRAMEWORK
             var query = "";
             var routeData = "";
 
@@ -48,7 +57,7 @@ namespace CLMS.Framework.Utilities
             }
 
             //Good for links such as:  ~/GoTo/5/xaxa
-            if(HttpContext.Current.Request.RequestContext.RouteData?.Values?.Count > 0)
+            if (HttpContext.Current.Request.RequestContext.RouteData?.Values?.Count > 0)
             {
                 var foundControllerKey = false;
                 var foundActionKey = false;
@@ -60,7 +69,7 @@ namespace CLMS.Framework.Utilities
                         Usually, the first keys are 'controller' and 'action'. However, I don't wanna ignore them COMPLETELY. Just the first ones.
                         'Cause maybe a controller action has an 'action' parameter. Don't wanna lose that.
                     */
-                    if((!foundControllerKey) && (string.Compare(key, "controller", true) == 0))
+                    if ((!foundControllerKey) && (string.Compare(key, "controller", true) == 0))
                     {
                         foundControllerKey = true;
                         continue;
@@ -79,10 +88,14 @@ namespace CLMS.Framework.Utilities
             }
 
             return routeData + query;
-        }		
-		
+#else
+            throw new NotImplementedException();
+#endif
+        }
+
         public static string GetFormArgument(string argname)
         {
+#if NETFRAMEWORK
             //Good for links such as: ~/GoTo?aNumber=5&astring=xaxa
             if (!string.IsNullOrEmpty(HttpContext.Current.Request.QueryString[argname]))
             {
@@ -112,15 +125,23 @@ namespace CLMS.Framework.Utilities
             }
 
             return string.Empty;
+#else
+            throw new NotImplementedException();
+#endif
         }
 
         public static string GetRequestHeader(string header)
         {
-            return HttpContext.Current?.Request?.Headers?.Get(header);                                    
+#if NETFRAMEWORK
+            return HttpContext.Current?.Request?.Headers?.Get(header);
+#else
+            throw new NotImplementedException();
+#endif
         }
 
         public static string GetReturnUrl()
         {
+#if NETFRAMEWORK
             if (!string.IsNullOrEmpty(HttpContext.Current.Request.QueryString["returnUrl"]))
             {
                 return HttpContext.Current.Request.QueryString["returnUrl"];
@@ -132,16 +153,22 @@ namespace CLMS.Framework.Utilities
 
                 return HttpUtility.ParseQueryString(query)["returnUrl"];
             }
-
             return string.Empty;
+#else
+        throw new NotImplementedException();
+#endif
         }
 
         public static bool IsUser(string username)
         {
+#if NETFRAMEWORK
             return HttpContext.Current.User.Identity.Name == username;
+#else
+throw new NotImplementedException();
+#endif
         }
-		
-		// Serialization Sanitization entries
+
+        // Serialization Sanitization entries
         // This replaces weird character sequences inside serialized objects
         // that cause asp.net mvc to crash when NormalizeJQueryToMvc internal method is invoked
         public static Dictionary<string, string> SerializationSanitizationEntries = new Dictionary<string, string>()
@@ -150,29 +177,30 @@ namespace CLMS.Framework.Utilities
         };
 
         private static ServerRole _serverRole;
-		public static ServerRole CurrentServerRole => _serverRole == ServerRole.None ? GetCurrentServerRole() : _serverRole;
+        public static ServerRole CurrentServerRole => _serverRole == ServerRole.None ? GetCurrentServerRole() : _serverRole;
 
         private static ServerRole GetCurrentServerRole()
-        {            	
+        {
             try
             {
-				var role = ConfigurationManager.AppSettings["ServerRole"];
-								
-                _serverRole = string.IsNullOrWhiteSpace(role) 
-					? ServerRole.Combined
-					: (ServerRole)Enum.Parse(typeof(ServerRole), role);
-								
+                var role = ConfigurationManager.AppSettings["ServerRole"];
+
+                _serverRole = string.IsNullOrWhiteSpace(role)
+                    ? ServerRole.Combined
+                    : (ServerRole)Enum.Parse(typeof(ServerRole), role);
+
             }
             catch
             {
                 _serverRole = ServerRole.Combined;
             }
-			
-			return _serverRole;
+
+            return _serverRole;
         }
-        
+
         public static string MapPath(string path)
         {
+#if NETFRAMEWORK
             try
             {
                 return System.Web.HttpContext.Current.Server.MapPath(path);
@@ -181,6 +209,9 @@ namespace CLMS.Framework.Utilities
             {
                 return System.Web.Hosting.HostingEnvironment.MapPath(path);
             }
+#else
+            throw new NotImplementedException();
+#endif
         }
 
         public class Session
@@ -194,6 +225,7 @@ namespace CLMS.Framework.Utilities
 
             private static string GetSessionId()
             {
+#if NETFRAMEWORK
                 var sessionId = HttpContext.Current.Session?.SessionID;
                 if (!string.IsNullOrWhiteSpace(sessionId)) return sessionId;
 
@@ -204,6 +236,9 @@ namespace CLMS.Framework.Utilities
                 }
 
                 return httpRequestMessage.GetCorrelationId().ToString();
+#else
+                throw new NotImplementedException();
+#endif
             }
 
             public static object Get(string key)
@@ -233,9 +268,9 @@ namespace CLMS.Framework.Utilities
 
         public enum ServerRole
         {
-			None,
-			Combined,
-			Application,
+            None,
+            Combined,
+            Application,
             Web
         }
     }

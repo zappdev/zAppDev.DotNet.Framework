@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if NETFRAMEWORK
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
@@ -464,3 +465,4 @@ namespace CLMS.Framework.Services
     }
 
 }
+#endif

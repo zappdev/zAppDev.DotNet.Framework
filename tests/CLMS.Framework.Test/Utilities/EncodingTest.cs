@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 
-namespace CLMS.Framework.Test.Utilities
+namespace CLMS.Framework.Tests.Utilities
 {
     [TestClass]
     public class EncodingTest

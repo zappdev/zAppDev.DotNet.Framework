@@ -1,6 +1,7 @@
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace CLMS.Framework.Utilities
 {
@@ -38,7 +39,7 @@ namespace CLMS.Framework.Utilities
                     }
             catch
             {
-                log4net.LogManager.GetLogger(logger).Error($"Error parsing Log Message type to number!");
+                log4net.LogManager.GetLogger(Assembly.GetEntryAssembly(), logger).Error($"Error parsing Log Message type to number!");
                 //Hush....
             }
 
@@ -49,7 +50,7 @@ namespace CLMS.Framework.Utilities
         {
             if (logger != null)
             {
-                log4net.ILog _logger = log4net.LogManager.GetLogger(logger);
+                log4net.ILog _logger = log4net.LogManager.GetLogger(Assembly.GetEntryAssembly(), logger);
                 switch (messageType)
                 {
                     case DebugMessageType.Debug:

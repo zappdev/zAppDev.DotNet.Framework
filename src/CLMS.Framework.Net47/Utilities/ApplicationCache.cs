@@ -1,4 +1,5 @@
-﻿using Autofac;
+﻿#if NETFRAMEWORK
+using Autofac;
 using Autofac.Integration.WebApi;
 using CacheManager.Core;
 using System.Web.Http;
@@ -92,3 +93,4 @@ namespace CLMS.Framework.Utilities
         }
     }
 }
+#endif

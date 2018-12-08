@@ -1,4 +1,5 @@
-﻿using Glimpse.Core.Message;
+﻿#if NETFRAMEWORK
+using Glimpse.Core.Message;
 using System;
 
 namespace CLMS.Framework.Profiling
@@ -24,3 +25,4 @@ namespace CLMS.Framework.Profiling
         public int Time { get; internal set; }
     }
 }
+#endif

@@ -1,6 +1,11 @@
 using System;
-using System.Web.Http;
 using CLMS.Framework.Data;
+
+#if NETFRAMEWORK            
+using System.Web.Http;
+#else
+using CLMS.Framework.Utilities;
+#endif
 
 namespace CLMS.Framework.Auditing
 {
@@ -8,7 +13,11 @@ namespace CLMS.Framework.Auditing
     {
         public static INHAuditTrailManager GetInstance()
         {
+            #if NETFRAMEWORK            
             return GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(INHAuditTrailManager)) as INHAuditTrailManager;
+            #else
+            return ServiceLocator.Current.GetInstance<INHAuditTrailManager>();
+            #endif
         }
 
         public static void ExecuteWithoutAuditTrail(Func<object, object> action)

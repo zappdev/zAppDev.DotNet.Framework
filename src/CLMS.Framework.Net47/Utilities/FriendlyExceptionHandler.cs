@@ -19,10 +19,14 @@ namespace CLMS.Framework.Utilities
             if (MapsParsed) return;
 
             Maps = new List<Map>();
+#if NETFRAMEWORK
             ParseMapFiles(HttpContext.Current.Server.MapPath("~/App_Data/CodeMap.js"));
+#else
+throw new NotImplementedException();
+#endif
         }
 
-		public string GetFriendlyMessageEntriesHTML(Exception e)
+        public string GetFriendlyMessageEntriesHTML(Exception e)
         {
 			if(e == null) return "";
             var result = "";

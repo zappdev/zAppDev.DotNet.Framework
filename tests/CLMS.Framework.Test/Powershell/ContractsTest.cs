@@ -2,7 +2,7 @@
 using CLMS.Framework.Powershell;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace CLMS.Framework.Test.Powershell
+namespace CLMS.Framework.Tests.Powershell
 {
     
     [TestClass]

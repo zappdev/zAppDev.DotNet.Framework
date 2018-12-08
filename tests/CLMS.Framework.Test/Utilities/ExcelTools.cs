@@ -4,7 +4,7 @@ using static CLMS.Framework.Utilities.ExcelTools;
 
 using CLMS.Framework.Utilities;
 
-namespace CLMS.Framework.Test.Utilities
+namespace CLMS.Framework.Tests.Utilities
 {
     [TestClass]
     public class ExcelToolsTest

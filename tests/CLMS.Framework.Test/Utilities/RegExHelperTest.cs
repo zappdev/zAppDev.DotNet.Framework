@@ -1,8 +1,10 @@
-﻿using CLMS.Framework.Utilities;
+﻿#if NETFRAMEWORK
+#else
+using CLMS.Framework.Utilities;
 using CSharpVerbalExpressions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace CLMS.Framework.Test.Utilities
+namespace CLMS.Framework.Tests.Utilities
 {
     [TestClass]
     public class RegExHelperTest
@@ -54,3 +56,4 @@ namespace CLMS.Framework.Test.Utilities
         }
     }
 }
+#endif

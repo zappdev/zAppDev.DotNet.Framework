@@ -4,9 +4,12 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
 using log4net;
-using Microsoft.AspNet.Identity.Owin;
 using NHibernate;
 using NHibernate.Cfg;
+
+#if NETFRAMEWORK
+using Microsoft.AspNet.Identity.Owin;
+#endif
 
 namespace CLMS.Framework.Data
 {
@@ -109,6 +112,7 @@ namespace CLMS.Framework.Data
             }
         }
 
+        #if NETFRAMEWORK
         public static MiniSessionManager TryGetInstance()
         {
             return InstanceSafe;
@@ -119,6 +123,8 @@ namespace CLMS.Framework.Data
             ? _manager
             : HttpContext.Current?.GetOwinContext()?.Get<MiniSessionManager>();
 
+        #endif
+
         public static MiniSessionManager Instance
         {
             get
@@ -128,6 +134,7 @@ namespace CLMS.Framework.Data
                     return _manager;
                 }
 
+                #if NETFRAMEWORK
                 if (HttpContext.Current?.Items["owin.Environment"] != null)
                 {
                     var manager = HttpContext.Current?.GetOwinContext()?.Get<MiniSessionManager>();
@@ -137,7 +144,7 @@ namespace CLMS.Framework.Data
                     }
                     return manager;
                 }
-
+                #endif
                 throw new ApplicationException("There is no Instance of MiniSessionManager!!!");
             }
             private set

@@ -1,4 +1,5 @@
-﻿using Glimpse.Core.Extensibility;
+﻿#if NETFRAMEWORK
+using Glimpse.Core.Extensibility;
 using Glimpse.Core.Extensions;
 using Glimpse.Core.Tab.Assist;
 using System;
@@ -72,3 +73,4 @@ namespace CLMS.Framework.Profiling.Glimpse
         }
     }
 }
+#endif

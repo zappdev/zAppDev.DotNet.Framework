@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if NETFRAMEWORK
+using System;
 using System.Collections.Generic;
 using System.Net.Mail;
 using System.Threading;
@@ -608,3 +609,4 @@ namespace CLMS.Framework.Utilities
 
 
 }
+#endif

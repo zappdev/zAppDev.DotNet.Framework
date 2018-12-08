@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if NETFRAMEWORK
+using System;
 using System.ServiceModel.Channels;
 using System.ServiceModel.Description;
 using System.ServiceModel.Dispatcher;
@@ -84,3 +85,4 @@ namespace CLMS.Framework.Serialization
 		#endregion
 	}
 }
+#endif

@@ -1,4 +1,5 @@
-﻿using CLMS.Framework.Profiling.Glimpse;
+﻿#if NETFRAMEWORK
+using CLMS.Framework.Profiling.Glimpse;
 using System;
 
 namespace CLMS.Framework.Profiling
@@ -18,3 +19,4 @@ namespace CLMS.Framework.Profiling
         }
     }
 }
+#endif

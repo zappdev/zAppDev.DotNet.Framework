@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if NETFRAMEWORK
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.ServiceModel.Description;
@@ -56,3 +57,4 @@ namespace CLMS.Framework.Serialization
 		}
 	}
 }
+#endif

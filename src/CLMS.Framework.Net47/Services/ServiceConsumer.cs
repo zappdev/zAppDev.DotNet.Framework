@@ -1,4 +1,5 @@
-﻿using CacheManager.Core;
+﻿#if NETFRAMEWORK
+using CacheManager.Core;
 using CLMS.Framework.Logging;
 using Newtonsoft.Json;
 using System;
@@ -271,3 +272,4 @@ namespace CLMS.Framework.Services
         }
     }
 }
+#endif

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if NETFRAMEWORK
+using System;
 using System.Web.Http.Controllers;
 using WebApi.OutputCache.V2;
 
@@ -108,3 +109,5 @@ namespace CLMS.Framework.Services
 
     }//end GenericCacheKeyGenerator class
 }//end namespace
+
+#endif

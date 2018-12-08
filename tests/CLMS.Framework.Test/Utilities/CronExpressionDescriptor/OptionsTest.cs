@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CLMS.Framework.Utilities.CronExpressionDescriptor;
 
-namespace CLMS.Framework.Test.Utilities.CronExpressionDescriptor
+namespace CLMS.Framework.Tests.Utilities.CronExpressionDescriptor
 {
     [TestClass]
     public class OptionsTest

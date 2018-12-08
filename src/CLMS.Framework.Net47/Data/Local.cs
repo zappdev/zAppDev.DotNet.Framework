@@ -19,6 +19,7 @@ namespace CLMS.Framework.Data
         {
             get
             {
+#if NETFRAMEWORK
                 if (!RunningInWeb)
                 {
                     if (_localData == null)
@@ -32,6 +33,9 @@ namespace CLMS.Framework.Data
                     HttpContext.Current.Items[LocalDataHashtableKey] = web_hashtable;
                 }
                 return web_hashtable;
+#else
+throw new NotImplementedException();
+#endif
             }
         }
 
@@ -54,6 +58,16 @@ namespace CLMS.Framework.Data
             LocalHashtable.Clear();
         }
 
-        public static bool RunningInWeb => HttpContext.Current != null;
+        public static bool RunningInWeb
+        {
+            get
+            {
+#if NETFRAMEWORK
+                return HttpContext.Current != null;
+#else
+                throw new NotImplementedException();
+#endif
+            }
+        }
     }
 }

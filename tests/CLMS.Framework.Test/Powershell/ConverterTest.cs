@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
-namespace CLMS.Framework.Test.Powershell
+namespace CLMS.Framework.Tests.Powershell
 {
     internal class ParameterObject
     {

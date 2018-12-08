@@ -1,3 +1,4 @@
+#if NETFRAMEWORK
 using System;
 using System.IO;
 using System.Net;
@@ -252,3 +253,4 @@ namespace CLMS.Framework.Logging
         }
     }
 }
+#endif

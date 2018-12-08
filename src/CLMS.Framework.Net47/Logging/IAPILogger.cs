@@ -1,3 +1,4 @@
+#if NETFRAMEWORK
 using System;
 using System.Net;
 using System.Web.Http.Controllers;
@@ -20,3 +21,4 @@ namespace CLMS.Framework.Logging
         void Log(string apiType, string apiTitle, LogMessage message, bool throwOnError);
     }
 }
+#endif

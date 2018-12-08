@@ -9,8 +9,11 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading;
-using CLMS.Framework.Service;
+#if NETFRAMEWORK
+#else
+using CLMS.Framework.Services;
 using CLMS.Framework.Utilities;
+#endif
 using Microsoft.CSharp;
 
 namespace CLMS.Framework.LinqRuntimeTypeBuilder

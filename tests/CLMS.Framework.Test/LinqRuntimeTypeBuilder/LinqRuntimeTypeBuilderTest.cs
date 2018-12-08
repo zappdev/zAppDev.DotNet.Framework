@@ -1,14 +1,16 @@
-﻿using System;
+﻿#if NETFRAMEWORK
+#else
+using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using CLMS.Framework.Service;
+using CLMS.Framework.Services;
 using CLMS.Framework.Utilities;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Builder = CLMS.Framework.LinqRuntimeTypeBuilder;
 
-namespace CLMS.Framework.Test.LinqRuntimeTypeBuilder
+namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
 {
     [TestClass]
     public class LinqRuntimeTypeBuilderTest
@@ -174,3 +176,4 @@ namespace CLMS.Framework.Test.LinqRuntimeTypeBuilder
         }
     }
 }
+#endif

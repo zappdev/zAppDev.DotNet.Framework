@@ -9,7 +9,7 @@ using Newtonsoft.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Distributed;
 
-namespace CLMS.Framework.Service
+namespace CLMS.Framework.Services
 {
     public interface ICacheWrapperService
     {

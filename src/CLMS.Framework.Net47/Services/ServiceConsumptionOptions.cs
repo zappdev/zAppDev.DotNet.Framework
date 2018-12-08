@@ -1,4 +1,5 @@
-﻿using CacheManager.Core;
+﻿#if NETFRAMEWORK
+using CacheManager.Core;
 using System.Collections.Generic;
 using System.Web.Http.Controllers;
 
@@ -57,3 +58,4 @@ namespace CLMS.Framework.Services
 
 
 }
+#endif

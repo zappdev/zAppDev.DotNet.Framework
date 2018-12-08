@@ -1,4 +1,5 @@
-﻿using Autofac;
+﻿#if NETFRAMEWORK
+using Autofac;
 using Autofac.Integration.WebApi;
 using CacheManager.Core;
 using Newtonsoft.Json;
@@ -253,3 +254,4 @@ namespace CLMS.Framework.Utilities
         }
     }
 }
+#endif

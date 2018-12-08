@@ -1,9 +1,11 @@
-﻿using CLMS.Framework.Service;
+﻿#if NETFRAMEWORK
+#else
+using CLMS.Framework.Services;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace CLMS.Framework.Test.Services
+namespace CLMS.Framework.Tests.Services
 {
     [TestClass]
     public class CacheWrapperServiceTest
@@ -38,3 +40,4 @@ namespace CLMS.Framework.Test.Services
         }        
     }
 }
+#endif
