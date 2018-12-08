@@ -3,19 +3,21 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
-using CLMS.Framework.Utilities;
 using log4net;
 using NHibernate;
 using NHibernate.Cfg;
 
+#if NETFRAMEWORK
+using Microsoft.AspNet.Identity.Owin;
+#endif
+
 namespace CLMS.Framework.Data
 {
-    public class MiniSessionManager: IDisposable
+    public class MiniSessionManager:IDisposable
     {
         public const string SessionKeyName = "NHibernateSession";
 
         private readonly ILog _log = LogManager.GetLogger(typeof(MiniSessionManager));
-
         [ThreadStatic]
         private static MiniSessionManager _manager;
         private static ISessionFactory _sessionFactory;
@@ -26,13 +28,11 @@ namespace CLMS.Framework.Data
             get;
             private set;
         }
-
         public static string UpdateDbErrors
         {
             get;
             private set;
         }
-
         public static string OwinKey
         {
             get
@@ -112,6 +112,7 @@ namespace CLMS.Framework.Data
             }
         }
 
+        #if NETFRAMEWORK
         public static MiniSessionManager TryGetInstance()
         {
             return InstanceSafe;
@@ -120,7 +121,9 @@ namespace CLMS.Framework.Data
         public static MiniSessionManager InstanceSafe => 
             HttpContext.Current?.Items["owin.Environment"] == null
             ? _manager
-            : ServiceLocator.Current.GetInstance<MiniSessionManager>();
+            : HttpContext.Current?.GetOwinContext()?.Get<MiniSessionManager>();
+
+        #endif
 
         public static MiniSessionManager Instance
         {
@@ -131,16 +134,17 @@ namespace CLMS.Framework.Data
                     return _manager;
                 }
 
+                #if NETFRAMEWORK
                 if (HttpContext.Current?.Items["owin.Environment"] != null)
                 {
-                    var manager = ServiceLocator.Current.GetInstance<MiniSessionManager>();
+                    var manager = HttpContext.Current?.GetOwinContext()?.Get<MiniSessionManager>();
                     if (manager == null)
                     {
                         throw new ApplicationException("Could not find MiniSessionManager in OWIN context!");
                     }
                     return manager;
                 }
-
+                #endif
                 throw new ApplicationException("There is no Instance of MiniSessionManager!!!");
             }
             private set

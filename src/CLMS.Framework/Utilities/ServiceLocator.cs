@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿#if NETFRAMEWORK
+#else
+using Microsoft.Extensions.DependencyInjection;
 using System;
 
 namespace CLMS.Framework.Utilities
@@ -8,7 +10,7 @@ namespace CLMS.Framework.Utilities
     /// </summary>
     public class ServiceLocator
     {
-        private ServiceProvider _currentServiceProvider;
+        private readonly ServiceProvider _currentServiceProvider;
         private static ServiceProvider _serviceProvider;
 
         public ServiceLocator(ServiceProvider currentServiceProvider)
@@ -16,13 +18,7 @@ namespace CLMS.Framework.Utilities
             _currentServiceProvider = currentServiceProvider;
         }
 
-        public static ServiceLocator Current
-        {
-            get
-            {
-                return new ServiceLocator(_serviceProvider);
-            }
-        }
+        public static ServiceLocator Current => new ServiceLocator(_serviceProvider);
 
         public static void SetLocatorProvider(ServiceProvider serviceProvider)
         {
@@ -40,3 +36,4 @@ namespace CLMS.Framework.Utilities
         }
     }
 }
+#endif

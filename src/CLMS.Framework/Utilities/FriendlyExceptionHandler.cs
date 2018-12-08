@@ -19,12 +19,16 @@ namespace CLMS.Framework.Utilities
             if (MapsParsed) return;
 
             Maps = new List<Map>();
-            ParseMapFiles(HttpContext.MapPath("~/App_Data/CodeMap.js"));
+#if NETFRAMEWORK
+            ParseMapFiles(HttpContext.Current.Server.MapPath("~/App_Data/CodeMap.js"));
+#else
+throw new NotImplementedException();
+#endif
         }
 
         public string GetFriendlyMessageEntriesHTML(Exception e)
         {
-            if (e == null) return "";
+			if(e == null) return "";
             var result = "";
 
             var friendlyMessageDTO = HandleException(e);
@@ -61,7 +65,7 @@ namespace CLMS.Framework.Utilities
                 return friendlyMessageDTO;
             }
 
-            if (e is NHibernate.StaleObjectStateException)
+            if(e is NHibernate.StaleObjectStateException)
             {
                 friendlyMessageDTO.Title = e.Data["ZAPPDEV_TITLE"].ToString();
                 friendlyMessageDTO.OriginalExceptionMessage = e.Data["ZAPPDEV_MESSAGE"].ToString();
@@ -72,10 +76,10 @@ namespace CLMS.Framework.Utilities
                 string[] stringSeparators = new string[] { "\r\n" };
                 string[] lines = e.Message.Split(stringSeparators, StringSplitOptions.None);
 
-                foreach (var line in lines)
+                foreach(var line in lines)
                 {
                     if (line.Trim() == "") continue;
-                    if (line == lines.First())
+                    if(line == lines.First())
                     {
                         friendlyMessageDTO.Title = line;
                         continue;
@@ -100,7 +104,7 @@ namespace CLMS.Framework.Utilities
 
                 friendlyMessageDTO.Entries.Add(FriendlyMessageEntry);
             }
-
+           
             return friendlyMessageDTO;
         }
 

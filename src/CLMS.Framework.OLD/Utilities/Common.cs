@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +11,7 @@ using System.Xml.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NHibernate.Util;
-
+using RSG;
 using AppDevCache = CLMS.AppDev.Cache;
 
 namespace CLMS.Framework.Utilities
@@ -358,19 +358,15 @@ namespace CLMS.Framework.Utilities
 
         public static string RegisterUser(string username, string password, string email = "", bool isApproved = true)
         {
-#if NETFRAMEWORK
-            var status = System.Web.Security.MembershipCreateStatus.Success;
-            using (var sc = new System.Transactions.TransactionScope(System.Transactions.TransactionScopeOption.Suppress))
-            {
-                var user = System.Web.Security.Membership.CreateUser(username, password, email, null, null, isApproved, out status); sc.Complete();
-            };
+            //var status = System.Web.Security.MembershipCreateStatus.Success;
+            //using (var sc = new System.Transactions.TransactionScope(System.Transactions.TransactionScopeOption.Suppress))
+            //{
+            //    var user = System.Web.Security.Membership.CreateUser(username, password, email, null, null, isApproved, out status); sc.Complete();
+            //};
 
-            if (status != System.Web.Security.MembershipCreateStatus.Success) return status.ToString();
+            //if (status != System.Web.Security.MembershipCreateStatus.Success) return status.ToString();
 
             return null;
-#else
-            throw new NotImplementedException();
-#endif
         }
 
         public static Random Random = new Random();
@@ -383,7 +379,7 @@ namespace CLMS.Framework.Utilities
             }
             catch (Exception x)
             {
-                log4net.LogManager.GetLogger(Assembly.GetEntryAssembly(), "SafeCast").Debug($"Could not directly cast: {obj.GetType()} to {typeof(T)}", x);
+                log4net.LogManager.GetLogger(typeof(Common)).Debug($"Could not directly cast: {obj.GetType()} to {typeof(T)}", x);
                 try
                 {
                     var typeT = typeof(T);
@@ -484,7 +480,7 @@ namespace CLMS.Framework.Utilities
                 }
                 catch (Exception convertException)
                 {
-                    log4net.LogManager.GetLogger(Assembly.GetEntryAssembly(), "SafeCast").Debug($"Could not Convert : {obj.GetType()} to {typeof(T)}", convertException);
+                    log4net.LogManager.GetLogger(typeof(Common)).Debug($"Could not Convert : {obj.GetType()} to {typeof(T)}", convertException);
                     return default(T);
                 }
             }
@@ -506,7 +502,7 @@ namespace CLMS.Framework.Utilities
                 }
                 catch (Exception ex)
                 {
-                    log4net.LogManager.GetLogger(Assembly.GetEntryAssembly(), "TryParseXml").Debug($"Could not Parse : {strInput} to {typeof(T)}", ex);
+                    log4net.LogManager.GetLogger(typeof(Common)).Debug($"Could not Parse : {strInput} to {typeof(T)}", ex);
                     obj = default(T);
                     return false;
                 }
@@ -531,7 +527,7 @@ namespace CLMS.Framework.Utilities
                 }
                 catch (Exception ex) //some other exception
                 {
-                    log4net.LogManager.GetLogger(Assembly.GetEntryAssembly(), "TryParseJson").Debug($"Could not Parse : {strInput} to {typeof(T)}", ex);
+                    log4net.LogManager.GetLogger(typeof(Common)).Debug($"Could not Parse : {strInput} to {typeof(T)}", ex);
                     obj = default(T);
                     return false;
                 }
@@ -545,9 +541,7 @@ namespace CLMS.Framework.Utilities
 
         public static string DownloadAndExtractZip(string url, string path = null)
         {
-#if NETFRAMEWORK
-
-            path = path ?? System.Web.HttpContext.Current.Server.MapPath(Path.Combine("~/App_Data/temp", Guid.NewGuid().ToString()));
+            path = path ?? System.Web.HttpContext.MapPath(Path.Combine("~/App_Data/temp", Guid.NewGuid().ToString()));
             if (((System.IO.Directory.Exists(path)) == false))
             {
                 System.IO.Directory.CreateDirectory(path);
@@ -563,9 +557,6 @@ namespace CLMS.Framework.Utilities
             System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, extractPath);
 
             return extractPath;
-#else
-throw new NotImplementedException();
-#endif
         }
 
         public static void MoveFile(string src, string dest, bool overwrite = false)
@@ -633,39 +624,16 @@ throw new NotImplementedException();
                 stream.Write(data, 0, data.Length);
             }
         }
-        public static string GetApplicationTempFolderPath()
-        {
-#if NETFRAMEWORK
-
-            var appTempPath = System.Web.Hosting.HostingEnvironment.MapPath("~/App_Data/Temp/");
-            if (!Directory.Exists(appTempPath))
-                Directory.CreateDirectory(appTempPath);
-            return appTempPath;
-#else
-throw new NotImplementedException();
-#endif
-        }
-
         public static void SetLastError(Exception ex)
         {
-#if NETFRAMEWORK
-
-            var key = $"{HttpContext.Current.Session.SessionID}LastError";
+            var key = $"{HttpContext.Current.Session.Id}LastError";
             AppDevCache.CacheManager.Current.Set(key, new MambaError(ex));
-#else
-            throw new NotImplementedException();
-#endif
         }
 
         public static MambaError GetLastError()
         {
-#if NETFRAMEWORK
-
-            var key = $"{HttpContext.Current.Session.SessionID}LastError";
+            var key = $"{HttpContext.Current.Session.Id}LastError";
             return AppDevCache.CacheManager.Current.Get(key, new MambaError());
-#else
-            throw new NotImplementedException();
-#endif
         }
 
         public static string GetConfigurationKey(string key)
@@ -1140,6 +1108,23 @@ throw new NotImplementedException();
             return linesRead;
         }
 
+        public static IPromise<T> WrapToPromise<T>(Func<T> cb)
+        {
+            var promise = new Promise<T>();
+
+            try
+            {
+                promise.Resolve(cb.Invoke());
+            }
+            catch (Exception e)
+            {
+                promise.Reject(e);
+                throw;
+            }
+
+            return promise;
+        }
+
         public static string RunExecutable(string filename, string arguments = null)
         {
             System.Diagnostics.ProcessStartInfo information;
@@ -1167,41 +1152,6 @@ throw new NotImplementedException();
         {
             var cronSchedule = NCrontab.CrontabSchedule.Parse(cronExpression);
             return cronSchedule.GetNextOccurrence(dt);
-        }
-
-        public static string SmoothRead(string path)
-        {
-            var contents = "";
-            using (FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            {
-                using (StreamReader streamReader = new StreamReader(fileStream))
-                {
-                    contents = streamReader.ReadToEnd();
-                }
-            }
-            return contents;
-        }
-
-        public static byte[] SmoothReadBinary(string path)
-        {
-            byte[] result = null;
-            using (FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            {
-                //Read carefully the file (and not the whole thing at once, 'cause it might be bigger than 2GB and the int.MaxValue might blow us up
-                result = new byte[fileStream.Length];
-                var bytesLeftToRead = (int)fileStream.Length;
-                var alreadyRead = 0;
-
-                while (bytesLeftToRead > 0)
-                {
-                    var currentBytes = fileStream.Read(result, alreadyRead, bytesLeftToRead);
-                    if (currentBytes == 0) break;
-
-                    alreadyRead += currentBytes;
-                    bytesLeftToRead -= currentBytes;
-                }
-            }
-            return result;
         }
     }
 }

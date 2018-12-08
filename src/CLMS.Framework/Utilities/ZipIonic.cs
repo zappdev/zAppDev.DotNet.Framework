@@ -3,7 +3,7 @@ using System.Text;
 
 namespace CLMS.Framework.Utilities
 {
-    public static class ZipIonic
+    public class ZipIonic
     {
         public static string Compress(string str)
         {

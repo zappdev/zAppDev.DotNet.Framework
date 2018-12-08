@@ -37,7 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\CLMS.Framework.Net47\CLMS.Framework.csproj" />
+    <ProjectReference Include="..\..\src\CLMS.Framework\CLMS.Framework.csproj" />
   </ItemGroup>
 
 </Project>

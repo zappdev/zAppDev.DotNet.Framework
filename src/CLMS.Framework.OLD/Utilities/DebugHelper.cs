@@ -1,4 +1,3 @@
-using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
@@ -31,16 +30,16 @@ namespace CLMS.Framework.Utilities
 
             try
             {
-                var numberToBeParsed = parameters.Count > 0 ? parameters[0] : "0";                
+                var numberToBeParsed = parameters.Count > 0 ? parameters[0] : "0";
                 int.TryParse(parameters[0], out intMessageType);
                 debugMessageType = (DebugMessageType)intMessageType;
 
                 message = parameters.Count > 1 ? parameters[1] : "";
-                    }
+            }
             catch
             {
                 log4net.LogManager.GetLogger(Assembly.GetEntryAssembly(), logger).Error($"Error parsing Log Message type to number!");
-                //Hush....
+                // Hush....
             }
 
             Log(debugMessageType, logger, message);
@@ -79,8 +78,8 @@ namespace CLMS.Framework.Utilities
             if ((logger == null) && (!showInDebugConsole)) return;
 
             var messageTypeStr = messageType.ToString();
-            var messageDataString = 
-				Newtonsoft.Json.JsonConvert.SerializeObject(message, new Newtonsoft.Json.JsonSerializerSettings
+            var messageDataString =
+                Newtonsoft.Json.JsonConvert.SerializeObject(message, new Newtonsoft.Json.JsonSerializerSettings
                 {
                     PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.Objects
                 });

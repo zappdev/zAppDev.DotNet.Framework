@@ -1,18 +1,20 @@
-﻿using System;
+﻿#if NETFRAMEWORK
+using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Web.UI;
 
 namespace CLMS.Framework.Drawing
 {
 	public class Imaging
 	{
-		public static string GetImageSource(object imagedata)
+		public static string GetImageSource(object imagedata, Page page)
 		{
-			return GetImageSource(imagedata, string.Empty);
+			return GetImageSource(imagedata, string.Empty, page);
 		}
 
-		public static string GetImageSource(object imagedata, string imagename)
+		public static string GetImageSource(object imagedata, string imagename, Page page)
 		{
 			if (imagedata == null)
 				return "";
@@ -26,9 +28,9 @@ namespace CLMS.Framework.Drawing
 
 		        // Save large image
 		        //string filepath = "~/Temp/Images/" + Path.GetRandomFileName();
-		        string filepath = "~/Temp/" + System.Web.HttpContext.Current.Session.Id + "/Images";
-		        if (!Directory.Exists(System.Web.HttpContext.MapPath(filepath)))
-		            Directory.CreateDirectory(System.Web.HttpContext.MapPath(filepath));
+		        string filepath = "~/Temp/" + System.Web.HttpContext.Current.Session.SessionID + "/Images";
+		        if (!Directory.Exists(page.Server.MapPath(filepath)))
+		            Directory.CreateDirectory(page.Server.MapPath(filepath));
 
 		        string tmpfilename = imagename;
 		        //Image dbImage;
@@ -69,7 +71,7 @@ namespace CLMS.Framework.Drawing
 
 		        string filefullpath = filepath + "/" + tmpfilename;
 
-		        using (FileStream strm = new FileStream(System.Web.HttpContext.MapPath(filefullpath), FileMode.Create))
+		        using (FileStream strm = new FileStream(page.Server.MapPath(filefullpath), FileMode.Create))
 		        {
 		            byte[] byteArrToWrite = imagestream.ToArray();
 		            strm.Write(byteArrToWrite, 0, byteArrToWrite.Length);
@@ -77,7 +79,7 @@ namespace CLMS.Framework.Drawing
 		            strm.Close();
 		        }
 
-                return ""; // page.ResolveClientUrl(filefullpath);
+		        return page.ResolveClientUrl(filefullpath);
 		    }
 		    finally
 		    {
@@ -87,12 +89,12 @@ namespace CLMS.Framework.Drawing
             }
 		}
 
-		public static string GetThumbnailImageSource(object imagedata)
+		public static string GetThumbnailImageSource(object imagedata, Page page)
 		{
-			return GetThumbnailImageSource(imagedata, string.Empty);
+			return GetThumbnailImageSource(imagedata, string.Empty, page);
 		}
 
-		public static string GetThumbnailImageSource(object imagedata, string imagename)
+		public static string GetThumbnailImageSource(object imagedata, string imagename, Page page)
 		{
 			if (imagedata == null)
 				return "";
@@ -154,9 +156,9 @@ namespace CLMS.Framework.Drawing
 
 		        // Save Thumbnail image
 		        //string filepath = "~/Temp/Images/" + Path.GetRandomFileName();
-		        string filepath = "~/Temp/" + System.Web.HttpContext.Current.Session.Id + "/Images";
-		        if (!Directory.Exists(System.Web.HttpContext.MapPath(filepath)))
-		            Directory.CreateDirectory(System.Web.HttpContext.MapPath(filepath));
+		        string filepath = "~/Temp/" + System.Web.HttpContext.Current.Session.SessionID + "/Images";
+		        if (!Directory.Exists(page.Server.MapPath(filepath)))
+		            Directory.CreateDirectory(page.Server.MapPath(filepath));
 
 		        string tmpfilename = imagename;
 		        if (string.IsNullOrEmpty(tmpfilename))
@@ -169,7 +171,7 @@ namespace CLMS.Framework.Drawing
 
 		        string filefullpath = filepath + "/tbn_" + tmpfilename;
 
-		        using (FileStream strm = new FileStream(System.Web.HttpContext.MapPath(filefullpath), FileMode.Create))
+		        using (FileStream strm = new FileStream(page.Server.MapPath(filefullpath), FileMode.Create))
 		        {
 		            byte[] thumbnailArr = imagestream.ToArray();
 		            strm.Write(thumbnailArr, 0, thumbnailArr.Length);
@@ -177,7 +179,7 @@ namespace CLMS.Framework.Drawing
 		            strm.Close();
 		        }
 
-                return ""; // page.ResolveClientUrl(filefullpath);
+		        return page.ResolveClientUrl(filefullpath);
 		    }
 		    finally 
 		    {
@@ -229,3 +231,4 @@ namespace CLMS.Framework.Drawing
 		}
 	}
 }
+#endif

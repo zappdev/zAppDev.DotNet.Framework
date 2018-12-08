@@ -1,5 +1,4 @@
-﻿#if NETFRAMEWORK
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Mail;
 using System.Threading;
@@ -9,6 +8,9 @@ using System.Web;
 using log4net;
 using S22.Imap;
 using System.IO;
+using System.Reflection;
+using System.Net.Configuration;
+using Microsoft.Extensions.Configuration;
 
 namespace CLMS.Framework.Utilities
 {
@@ -28,9 +30,9 @@ namespace CLMS.Framework.Utilities
 
             }
 
-            public IMAPSettings(System.Net.Configuration.MailSettingsSectionGroup smtpSettings)
+            public IMAPSettings(MailSettingsSectionGroup smtpSettings)
             {
-                var log = LogManager.GetLogger("Email");
+                var log = LogManager.GetLogger(Assembly.GetEntryAssembly(), "Email");
 
                 var prefix = "IMAP:";
 
@@ -88,11 +90,10 @@ namespace CLMS.Framework.Utilities
         }
         #endregion
 
-        public static System.Net.Configuration.MailSettingsSectionGroup FetchSMTPSettings()
+        public static MailSettingsSectionGroup FetchSMTPSettings()
         {
-            var config = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration(HttpContext.Current.Request.ApplicationPath);
-            var settings = (System.Net.Configuration.MailSettingsSectionGroup)config.GetSectionGroup("system.net/mailSettings");
-            return settings;
+            var config = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration(HttpContext.ContentRootPath);            
+            return config.GetSection("system.net:mailSettings").Get<MailSettingsSectionGroup>();
         }
 
         #region SMTP: Sending E-Mails
@@ -100,7 +101,6 @@ namespace CLMS.Framework.Utilities
         {            
             if (string.IsNullOrEmpty(message.From))
             {
-                var config = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration(HttpContext.Current.Request.ApplicationPath);
                 var settings = FetchSMTPSettings();
 
                 if (settings == null)
@@ -149,7 +149,7 @@ namespace CLMS.Framework.Utilities
 	    /// <param name="sendAsync">Send the mail asynchronously</param>
 	    public static void SendMail(string subject, string body, string to, string cc = "", string bcc = "", string fromAddress = "", List<Attachment> attachments = null, bool sendAsync = false)
         {
-            var log = LogManager.GetLogger("Email");
+            var log = LogManager.GetLogger(Assembly.GetEntryAssembly(), "Email");
 
             log.Debug("Start");
 
@@ -243,7 +243,7 @@ namespace CLMS.Framework.Utilities
 
 		private static void SendMail(MailMessage message, bool sendAsync = false)
 		{
-			var log = LogManager.GetLogger("Email");
+			var log = LogManager.GetLogger(Assembly.GetEntryAssembly(), "Email");
             SmtpClient client = null;
 			try
 			{
@@ -609,4 +609,3 @@ namespace CLMS.Framework.Utilities
 
 
 }
-#endif
