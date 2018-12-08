@@ -1,14 +1,31 @@
-﻿using Builder = CLMS.Framework.LinqRuntimeTypeBuilder;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using CLMS.Framework.Service;
+using CLMS.Framework.Utilities;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Builder = CLMS.Framework.LinqRuntimeTypeBuilder;
 
-namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
+namespace CLMS.Framework.Test.LinqRuntimeTypeBuilder
 {
     [TestClass]
     public class LinqRuntimeTypeBuilderTest
     {
+        public LinqRuntimeTypeBuilderTest()
+        {
+            var services = new ServiceCollection();
+
+            services.AddDistributedMemoryCache();
+
+            var provider = services.BuildServiceProvider();
+            
+            services.AddSingleton<ICacheWrapperService>(new CacheWrapperService(provider.GetService<IDistributedCache>(), null));
+
+            ServiceLocator.SetLocatorProvider(services.BuildServiceProvider());
+        }
+        
         [TestMethod()]
         public void SanitizeCSharpIdentifierTest()
         {

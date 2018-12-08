@@ -47,6 +47,9 @@
     <Reference Include="CLMS.ApplicationModelling.MetaSourceCode">
       <HintPath>..\..\Lib\CLMS.ApplicationModelling.MetaSourceCode.dll</HintPath>
     </Reference>
+    <Reference Include="CLMS.Framework, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\DemoProject\bin\Debug\netcoreapp2.1\CLMS.Framework.dll</HintPath>
+    </Reference>
     <Reference Include="CLMS.MetaCodeGenerator">
       <HintPath>..\..\Lib\CLMS.MetaCodeGenerator.dll</HintPath>
     </Reference>

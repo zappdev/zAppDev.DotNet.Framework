@@ -13,11 +13,13 @@ namespace CLMS.Framework.Service
         T Get<T>(string key);
 
         void Set<T>(string key, T value);
+        
+        bool Contains(string key);
     }
 
     public class CacheWrapperService : ICacheWrapperService
     {
-        internal static readonly JsonSerializerSettings config = new JsonSerializerSettings
+        private static readonly JsonSerializerSettings config = new JsonSerializerSettings
         {
             PreserveReferencesHandling = PreserveReferencesHandling.Objects,
             MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
@@ -25,7 +27,7 @@ namespace CLMS.Framework.Service
             ReferenceLoopHandling = ReferenceLoopHandling.Serialize
         };
 
-        private IDistributedCache _cache;
+        private readonly IDistributedCache _cache;
         private readonly ILogger _logger;
 
         public CacheWrapperService(
@@ -39,16 +41,14 @@ namespace CLMS.Framework.Service
         public T Get<T>(string key)
         {
             // Look for cache key.
-            var cacheEntry = _cache.Get(key);
+            var cacheEntry = _cache?.Get(key);
 
-            if (cacheEntry != null)
-            {
-                var raw = Encoding.UTF8.GetString(cacheEntry);
-                _logger.LogInformation(1001, "Getting item {ID}", raw);
-                return JsonConvert.DeserializeObject<T>(raw, config);
-            }
+            if (cacheEntry == null) return default(T);
+            
+            var raw = Encoding.UTF8.GetString(cacheEntry);
+            _logger?.LogInformation(1001, "Getting item {ID}", raw);
+            return JsonConvert.DeserializeObject<T>(raw, config);
 
-            return default(T);
         }
 
         public void Set<T>(string key, T value)
@@ -57,8 +57,14 @@ namespace CLMS.Framework.Service
 
             var options = new DistributedCacheEntryOptions()
                 .SetSlidingExpiration(TimeSpan.FromSeconds(20));
-            byte[] encodedCurrentTimeUTC = Encoding.UTF8.GetBytes(serializedObject);
-            _cache.Set(key, encodedCurrentTimeUTC, options);
+            var encodedCurrentTimeUtc = Encoding.UTF8.GetBytes(serializedObject);
+            _cache?.Set(key, encodedCurrentTimeUtc, options);
+        }
+
+        public bool Contains(string key)
+        {
+            var cacheEntry = _cache?.Get(key);
+            return cacheEntry != null;
         }
     }
 }

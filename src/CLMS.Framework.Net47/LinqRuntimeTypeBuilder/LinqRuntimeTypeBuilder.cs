@@ -9,6 +9,8 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading;
+using CLMS.Framework.Service;
+using CLMS.Framework.Utilities;
 using Microsoft.CSharp;
 
 namespace CLMS.Framework.LinqRuntimeTypeBuilder
@@ -22,11 +24,19 @@ namespace CLMS.Framework.LinqRuntimeTypeBuilder
         {
             get
             {
-                if (CLMS.AppDev.Cache.CacheManager.Current.Contains("BuiltTypes"))
-                    return CLMS.AppDev.Cache.CacheManager.Current.Get<Dictionary<string, Type>>("BuiltTypes");
-                var builtTypes = new Dictionary<string, Type>();
-                CLMS.AppDev.Cache.CacheManager.Current.Set("BuiltTypes", builtTypes);
-                return builtTypes;
+                #if NETFRAMEWORK
+                    if (CLMS.AppDev.Cache.CacheManager.Current.Contains("BuiltTypes"))
+                        return CLMS.AppDev.Cache.CacheManager.Current.Get<Dictionary<string, Type>>("BuiltTypes");
+                    var builtTypes = new Dictionary<string, Type>();
+                    CLMS.AppDev.Cache.CacheManager.Current.Set("BuiltTypes", builtTypes);
+                    return builtTypes;
+                #else
+                    var cacheManager = ServiceLocator.Current.GetInstance<ICacheWrapperService>();
+                    if (cacheManager.Contains("BuiltTypes")) return cacheManager.Get<Dictionary<string, Type>>("BuiltTypes");
+                    var builtTypes = new Dictionary<string, Type>();
+                    cacheManager.Set("BuiltTypes", builtTypes);
+                    return builtTypes;
+                #endif
             }
         }
 
@@ -50,7 +60,7 @@ namespace CLMS.Framework.LinqRuntimeTypeBuilder
         private static string GetTypeKey(Dictionary<string, Type> fields, Type type, Dictionary<string, Type> selectFields = null)
         {
             //TODO: optimize the type caching -- if fields are simply reordered, that doesn't mean that they're actually different types, so this needs to be smarter
-            string key = CSharpName(type, false) + "_";
+            var key = CSharpName(type, false) + "_";
             foreach (var field in fields)
                 key += SanitizeCSharpIdentifier(field.Key) + "_" + CSharpName(field.Value, false) + "_";
 
@@ -62,11 +72,11 @@ namespace CLMS.Framework.LinqRuntimeTypeBuilder
         }
         public static string SanitizeCSharpIdentifier(string name, string replacementChar = "")
         {
-            string className = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(name);
-            bool isValid = Microsoft.CSharp.CSharpCodeProvider.CreateProvider("C#").IsValidIdentifier(className);
+            var className = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(name);
+            var isValid = Microsoft.CSharp.CSharpCodeProvider.CreateProvider("C#").IsValidIdentifier(className);
             if (!isValid)
             {
-                System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex(@"\W");
+                var regex = new System.Text.RegularExpressions.Regex(@"\W");
                 className = regex.Replace(className, replacementChar);
                 if (!char.IsLetter(className, 0))
                 {
@@ -110,8 +120,8 @@ namespace CLMS.Framework.LinqRuntimeTypeBuilder
             Monitor.Enter(_monitorLock);			
             try
             {
-                string groupClassName = GetTypeKey(groupFields, resultSetType);
-                string selectClassName = GetTypeKey(selectFields, resultSetType, groupFields);
+                var groupClassName = GetTypeKey(groupFields, resultSetType);
+                var selectClassName = GetTypeKey(selectFields, resultSetType, groupFields);
 				//This is to ensure that the built groupby and selector expressions reside in the same
 				//DummyAssembly in the dictionary. The Dictionary value should be changed to Tuple<Type, Type>
 				//and store the groupby and selectors together
@@ -223,7 +233,7 @@ namespace CLMS.Framework.LinqRuntimeTypeBuilder
             try
             {
                 Monitor.Enter(BuiltTypes);
-                string className = GetTypeKey(fields, type);
+                var className = GetTypeKey(fields, type);
 
                 if (BuiltTypes.ContainsKey(className))
                     return BuiltTypes[className];
