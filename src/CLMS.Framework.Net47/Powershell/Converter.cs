@@ -8,7 +8,7 @@ namespace CLMS.Framework.Powershell
 {
     public static class Convertor
     {
-        public static JsonSerializerSettings DefaultSerializationSettingsWithCycles = new JsonSerializerSettings
+        public static readonly JsonSerializerSettings DefaultSerializationSettingsWithCycles = new JsonSerializerSettings
         {
             PreserveReferencesHandling = PreserveReferencesHandling.Objects,
             MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
@@ -21,14 +21,15 @@ namespace CLMS.Framework.Powershell
             return JsonConvert.DeserializeObject<T>(data, DefaultSerializationSettingsWithCycles);
         }
 
-        public static List<T> Convert<T>(this Collection<PSObject> psObjects)
+        public static List<T> Convert<T>(this IEnumerable<PSObject> psObjects)
         {
             return psObjects.Select(x => x.Convert<T>()).ToList();
         }
 
         public static T Convert<T>(this PSObject psObject)
         {
-            var serialized = JsonConvert.SerializeObject(psObject.Properties.Where(x => x.Value != null || true).ToDictionary(k => k.Name, v => v.Value));
+            var serialized = JsonConvert.SerializeObject(
+                psObject.Properties.Where(x => x.Value != null || true).ToDictionary(k => k.Name, v => v.Value));
             var deserialized = JsonConvert.DeserializeObject<T>(serialized);
             return deserialized;
         }

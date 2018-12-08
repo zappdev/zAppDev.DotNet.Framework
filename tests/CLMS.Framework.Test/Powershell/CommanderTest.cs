@@ -39,7 +39,8 @@ namespace CLMS.Framework.Test.Powershell
             Assert.AreEqual(2, result.Count);
             Assert.AreEqual("False", result[0]);
             Assert.AreEqual("", result[1]);
-            
+
+            Assert.AreEqual(true, result.SingleObject());
             
             result = Commander.RunPowerShellScript("TestScript.ps1", new Dictionary<string, object> { {"in", "test"} });
             

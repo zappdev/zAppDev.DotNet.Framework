@@ -1,12 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Management.Automation;
+﻿using CLMS.Framework.Powershell;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
 namespace CLMS.Framework.Test.Powershell
 {
+    internal class ParameterObject
+    {
+        public int Age { get; set; }
+    }
+    
     [TestClass]
     public class ConvertorTest
     {
@@ -21,18 +23,15 @@ namespace CLMS.Framework.Test.Powershell
         [TestMethod]
         public void GetJsonSerializerSettingsTest()
         {
-            
+            Assert.AreEqual(_defaultSerializationSettingsWithCycles.PreserveReferencesHandling, 
+                Convertor.DefaultSerializationSettingsWithCycles.PreserveReferencesHandling);
         }
         
         [TestMethod]
         public void DeserializeTest()
         {
-            
-        }
-
-        [TestMethod]
-        public void Convert()
-        {
+            var obj = Convertor.Deserialize<ParameterObject>(@"{""Age"": 10}");            
+            Assert.AreEqual(10, obj.Age);
         }
 
         [TestMethod]
