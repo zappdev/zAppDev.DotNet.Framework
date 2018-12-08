@@ -68,7 +68,7 @@ namespace CLMS.Framework.Powershell
                     throw new Exception("Exception caught while Opening Powershell Runspace: " + ex.ToString(), ex);
                 }
 
-                using (Pipeline pipeline = runspace.CreatePipeline())
+                using (var pipeline = runspace.CreatePipeline())
                 {
                     var command = new Command(commandString, true);
                     if (scriptArguments != null && scriptArguments.Any())
@@ -106,13 +106,13 @@ namespace CLMS.Framework.Powershell
 
         public static Collection<PSObject> RunPowerShellScript(string scriptName, WSManConnectionInfo wsManconnectionInfo, Dictionary<string, object> scriptArguments = null)
         {
-            Runspace runspace = RunspaceFactory.CreateRunspace(wsManconnectionInfo);
+            var runspace = RunspaceFactory.CreateRunspace(wsManconnectionInfo);
             return RunPowerShellScript(scriptName, runspace, scriptArguments);
         }//end RunPowerShellScript()
 
         public static Collection<PSObject> RunPowerShellScript(string scriptName, Dictionary<string, object> scriptArguments = null)
         {
-            Runspace runspace = RunspaceFactory.CreateRunspace();
+            var runspace = RunspaceFactory.CreateRunspace();
 
             return RunPowerShellScript(scriptName, runspace, scriptArguments);
         }//end RunPowerShellScript()

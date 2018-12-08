@@ -10,6 +10,12 @@
     <Compile Remove="coveragereport\**" />
     <EmbeddedResource Remove="coveragereport\**" />
     <None Remove="coveragereport\**" />
+    <None Update="TestScript.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="EmptyScript.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

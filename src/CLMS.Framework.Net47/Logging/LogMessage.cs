@@ -243,7 +243,7 @@ namespace CLMS.Framework.Logging
 
                         return JObject.Parse(readToEnd);
                     }
-                    catch (System.Exception e)
+                    catch (Exception)
                     {
                         return readToEnd;
                     }

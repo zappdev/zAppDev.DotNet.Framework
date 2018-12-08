@@ -192,7 +192,7 @@ namespace CLMS.Framework.Logging
                 Initialize(true);
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return false;
             }

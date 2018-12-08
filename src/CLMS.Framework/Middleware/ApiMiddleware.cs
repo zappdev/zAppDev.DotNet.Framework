@@ -13,7 +13,7 @@ namespace CLMS.Framework.Middleware
         }
 
         public async Task Invoke(HttpContext context)
-        {
+        {             
             await _next(context);
         }
     }

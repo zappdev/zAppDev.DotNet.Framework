@@ -191,7 +191,7 @@ namespace CLMS.Framework.Data
                 return Session;
             }
             var session = SessionFactory.OpenSession();
-            session.FlushMode = FlushMode.Never;
+            session.FlushMode = FlushMode.Manual;
             Session = session;
             return session;
         }
