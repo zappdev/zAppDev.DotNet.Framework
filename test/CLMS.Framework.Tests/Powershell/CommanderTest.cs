@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Management.Automation.Runspaces;
 using CLMS.Framework.Powershell;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CLMS.Framework.Tests.Powershell
@@ -37,16 +38,17 @@ namespace CLMS.Framework.Tests.Powershell
             var result = Commander.RunPowerShellScript("TestScript.ps1");
             
             Assert.AreEqual(2, result.Count);
-            Assert.AreEqual("False", result[0]);
-            Assert.AreEqual("", result[1]);
+            Assert.AreEqual(false, result[0].BaseObject);
+
+            Assert.AreEqual("", result[1].BaseObject);
 
             Assert.AreEqual(true, result.SingleObject());
             
             result = Commander.RunPowerShellScript("TestScript.ps1", new Dictionary<string, object> { {"in", "test"} });
             
             Assert.AreEqual(2, result.Count);
-            Assert.AreEqual("False", result[0]);
-            Assert.AreEqual("test", result[1]);
+            Assert.AreEqual(false, result[0].BaseObject);
+            Assert.AreEqual("test", result[1].BaseObject);
             
             Assert.ThrowsException<Exception>((() => 
                 Commander.RunPowerShellScript("TestScript.ps1", new Dictionary<string, object> { {"in", "raiseError"} })));

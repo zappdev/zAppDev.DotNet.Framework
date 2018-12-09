@@ -26,7 +26,8 @@ namespace CLMS.Framework.Utilities
             }
             catch (Exception ex) 
             {
-                log4net.LogManager.GetLogger(Assembly.GetEntryAssembly(), "EncodingUtilities").Debug($"Could not Parse : {encoding} to Encoding", ex);
+                log4net.LogManager.GetLogger(typeof(Encoding))
+                    .Debug($"Could not Parse : {encoding} to Encoding", ex);
                 throw new Exception($"Encoding with name '{encoding}' is invalid");
             }
 

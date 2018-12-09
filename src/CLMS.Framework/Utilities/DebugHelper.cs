@@ -1,7 +1,8 @@
-using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
+using log4net;
+using Newtonsoft.Json;
 
 namespace CLMS.Framework.Utilities
 {
@@ -18,7 +19,8 @@ namespace CLMS.Framework.Utilities
     {
         public delegate void RaiseDebugEventCallBack(string type, string message);
 
-        public static void Log(DebugMessageType messageType, RaiseDebugEventCallBack raiseEvent, object message, bool showInDebugConsole = false)
+        public static void Log(DebugMessageType messageType, RaiseDebugEventCallBack raiseEvent, object message,
+            bool showInDebugConsole = false)
         {
             Log(messageType, null, raiseEvent, message, showInDebugConsole);
         }
@@ -31,15 +33,16 @@ namespace CLMS.Framework.Utilities
 
             try
             {
-                var numberToBeParsed = parameters.Count > 0 ? parameters[0] : "0";                
+                var numberToBeParsed = parameters.Count > 0 ? parameters[0] : "0";
                 int.TryParse(parameters[0], out intMessageType);
-                debugMessageType = (DebugMessageType)intMessageType;
+                debugMessageType = (DebugMessageType) intMessageType;
 
                 message = parameters.Count > 1 ? parameters[1] : "";
-                    }
+            }
             catch
             {
-                log4net.LogManager.GetLogger(Assembly.GetEntryAssembly(), logger).Error($"Error parsing Log Message type to number!");
+                LogManager.GetLogger(Assembly.GetEntryAssembly(), logger)
+                    .Error("Error parsing Log Message type to number!");
                 //Hush....
             }
 
@@ -50,7 +53,7 @@ namespace CLMS.Framework.Utilities
         {
             if (logger != null)
             {
-                log4net.ILog _logger = log4net.LogManager.GetLogger(Assembly.GetEntryAssembly(), logger);
+                var _logger = LogManager.GetLogger(Assembly.GetEntryAssembly(), logger);
                 switch (messageType)
                 {
                     case DebugMessageType.Debug:
@@ -68,29 +71,25 @@ namespace CLMS.Framework.Utilities
                     case DebugMessageType.IDEF0Trace:
                         Trace.WriteLine(message);
                         break;
-                    default:
-                        break;
                 }
             }
         }
 
-        public static void Log(DebugMessageType messageType, string logger, RaiseDebugEventCallBack raiseEvent, object message, bool showInDebugConsole = false)
+        public static void Log(DebugMessageType messageType, string logger, RaiseDebugEventCallBack raiseEvent,
+            object message, bool showInDebugConsole = false)
         {
-            if ((logger == null) && (!showInDebugConsole)) return;
+            if (logger == null && !showInDebugConsole) return;
 
             var messageTypeStr = messageType.ToString();
-            var messageDataString = 
-				Newtonsoft.Json.JsonConvert.SerializeObject(message, new Newtonsoft.Json.JsonSerializerSettings
+            var messageDataString =
+                JsonConvert.SerializeObject(message, new JsonSerializerSettings
                 {
-                    PreserveReferencesHandling = Newtonsoft.Json.PreserveReferencesHandling.Objects
+                    PreserveReferencesHandling = PreserveReferencesHandling.Objects
                 });
 
             Log(messageType, logger, messageDataString);
 
-            if (showInDebugConsole)
-            {
-                raiseEvent(messageTypeStr, messageDataString);
-            }
+            if (showInDebugConsole) raiseEvent(messageTypeStr, messageDataString);
         }
     }
 }

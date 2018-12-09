@@ -1,6 +1,7 @@
 ﻿using CLMS.Framework.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Reflection;
 
 namespace CLMS.Framework.Tests.Utilities
 {
