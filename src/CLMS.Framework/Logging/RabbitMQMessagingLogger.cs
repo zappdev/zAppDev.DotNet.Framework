@@ -1,4 +1,3 @@
-#if NETFRAMEWORK
 using System;
 using System.Configuration;
 using System.Net;
@@ -6,7 +5,9 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
+#if NETFRAMEWORK
 using System.Web.Http.Controllers;
+#endif
 using CLMS.Framework.Services;
 using log4net;
 using Newtonsoft.Json;
@@ -16,11 +17,12 @@ namespace CLMS.Framework.Logging
 {
     public class RabbitMQMessagingLogger : IAPILogger, IDisposable
     {
+        private IConnection _connection;
+        private IModel _channel;
+#if NETFRAMEWORK
         private readonly string _exchange;
         private bool _initialized;
         private ConnectionFactory _connectionFactory;
-        private IConnection _connection;
-        private IModel _channel;
 
         public RabbitMQMessagingLogger(string host, int port, string vhost, string username, string password, string exchange = "")
         {
@@ -199,6 +201,7 @@ namespace CLMS.Framework.Logging
             }
         }
 
+#endif
         public void Dispose()
         {
             _connection?.Dispose();
@@ -206,4 +209,3 @@ namespace CLMS.Framework.Logging
         }
     }
 }
-#endif

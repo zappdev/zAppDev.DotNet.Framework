@@ -1,17 +1,19 @@
-#if NETFRAMEWORK
 using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Web;
 using CLMS.Framework.Services;
+#if NETFRAMEWORK
 using Microsoft.Owin;
+#endif
 using Newtonsoft.Json.Linq;
 
 namespace CLMS.Framework.Logging
 {
     public class LogMessage
     {
+#if NETFRAMEWORK
         public LogMessage()
         {
 
@@ -251,6 +253,6 @@ namespace CLMS.Framework.Logging
                 }
             }
         }
+#endif
     }
 }
-#endif
