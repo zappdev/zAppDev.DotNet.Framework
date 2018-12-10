@@ -330,7 +330,7 @@ namespace CLMS.Framework.Utilities
         public static long? ToUnixTime(DateTime? datetime)
         {
             return
-                System.Convert.ToInt64((datetime - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc))?.TotalSeconds);
+                Convert.ToInt64((datetime - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc))?.TotalSeconds);
         }
 
         public static DateTime? ParseExactDate(string date, string format, System.Globalization.CultureInfo culture)
@@ -383,7 +383,7 @@ namespace CLMS.Framework.Utilities
             }
             catch (Exception x)
             {
-                log4net.LogManager.GetLogger(Assembly.GetEntryAssembly(), "SafeCast").Debug($"Could not directly cast: {obj.GetType()} to {typeof(T)}", x);
+                log4net.LogManager.GetLogger(Assembly.GetEntryAssembly() ?? Assembly.GetCallingAssembly(), "SafeCast").Debug($"Could not directly cast: {obj.GetType()} to {typeof(T)}", x);
                 try
                 {
                     var typeT = typeof(T);
