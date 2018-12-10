@@ -19,6 +19,9 @@
     <Compile Remove="coveragereport\**" />
     <EmbeddedResource Remove="coveragereport\**" />
     <None Remove="coveragereport\**" />
+    <None Update="Data\Mappings\User.hbm.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="hibernate.cfg.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -50,6 +53,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\CLMS.Framework\CLMS.Framework.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\Mappings\" />
   </ItemGroup>
 
 </Project>

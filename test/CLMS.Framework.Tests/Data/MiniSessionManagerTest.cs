@@ -1,4 +1,5 @@
-﻿using CLMS.Framework.Data;
+﻿using System;
+using CLMS.Framework.Data;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CLMS.Framework.Tests.Data
@@ -27,6 +28,9 @@ namespace CLMS.Framework.Tests.Data
             var manager = new MiniSessionManager();
             Assert.IsNotNull(manager.InstanceId);
 
+            manager = MiniSessionManager.Create();
+            Assert.IsNotNull(manager.InstanceId);
+
             manager.WillFlush = false;
             Assert.IsFalse(manager.WillFlush);
 
@@ -37,10 +41,76 @@ namespace CLMS.Framework.Tests.Data
         }
 
         [TestMethod]
+        public void FlowTest()
+        {
+            var manager = new MiniSessionManager();
+
+            var session = manager.OpenSession();
+
+            var sessionNew = manager.OpenSession();
+
+            Assert.AreSame(session, sessionNew);
+
+            manager.LastAction = RepositoryAction.INSERT;
+            Assert.AreEqual(RepositoryAction.INSERT, manager.LastAction);
+            manager.BeginTransaction();
+            manager.WillFlush = true;
+            manager.CommitChanges();
+        }
+
+        [TestMethod]
+        public void ExecuteInTransactionTest()
+        {
+            var manager = new MiniSessionManager();
+
+            manager.ExecuteInTransaction(() => { });
+
+            Assert.ThrowsException<Exception>(() =>
+            {
+                manager.ExecuteInTransaction(() => { throw new Exception(); });
+            });
+        }
+
+        [TestMethod]
+        public void FlowExceptionTest()
+        {
+            var manager = new MiniSessionManager
+            {
+                Session = null
+            };
+
+            Assert.ThrowsException<ApplicationException>(() => { manager.CommitChanges(); });
+            manager.CommitChanges(new Exception());
+
+            var session = manager.OpenSession();
+
+            var sessionNew = manager.OpenSession();
+
+            Assert.AreSame(session, sessionNew);
+
+            manager.BeginTransaction();
+
+            manager.CommitChanges(new Exception());
+        }
+
+
+        [TestMethod]
         public void SessionFactoryTest()
         {
             Assert.IsNotNull(MiniSessionManager.SessionFactory);
         }
 
+        [TestMethod]
+        public void ExecuteInUoWTest()
+        {
+            var manager = new MiniSessionManager();
+
+            MiniSessionManager.ExecuteInUoW((mgr) => { });
+
+            Assert.ThrowsException<Exception>(() =>
+            {
+                MiniSessionManager.ExecuteInUoW((mgr) => { throw new Exception(); });
+            });
+        }
     }
 }
