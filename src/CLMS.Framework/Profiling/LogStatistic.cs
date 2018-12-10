@@ -1,13 +1,14 @@
-﻿#if NETFRAMEWORK
+﻿using System;
+
+#if NETFRAMEWORK
 using Glimpse.Core.Message;
-using System;
+#endif
 
 namespace CLMS.Framework.Profiling
 {
+#if NETFRAMEWORK
     public class LogStatistic : IMessage
     {
-        private readonly Guid _id = Guid.NewGuid();
-
         internal LogStatistic()
         {
 
@@ -17,12 +18,9 @@ namespace CLMS.Framework.Profiling
         public AppDevSymbolType SymbolType { get; set; }
         public string SymbolName { get; set; }
 
-        public Guid Id
-        {
-            get { return _id; }
-        }
+        public Guid Id { get; } = Guid.NewGuid();
 
         public int Time { get; internal set; }
     }
-}
 #endif
+}

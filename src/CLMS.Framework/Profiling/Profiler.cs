@@ -1,12 +1,12 @@
-﻿#if NETFRAMEWORK
-using CLMS.Framework.Profiling.Glimpse;
+﻿using CLMS.Framework.Profiling.Glimpse;
 using System;
 
 namespace CLMS.Framework.Profiling
 {
+#if NETFRAMEWORK
     public class Profiler : IDisposable
     {
-        private Logger _logger;
+        private readonly Logger _logger;
 
         public Profiler(string modelName, AppDevSymbolType type, string symbolName)
         {
@@ -18,5 +18,5 @@ namespace CLMS.Framework.Profiling
             _logger.Stop();
         }
     }
-}
 #endif
+}

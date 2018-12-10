@@ -22,33 +22,25 @@ namespace CLMS.Framework.Data
 #if NETFRAMEWORK
                 if (!RunningInWeb)
                 {
-                    if (_localData == null)
-                        _localData = new Hashtable();
-                    return _localData;
+                    return _localData ?? (_localData = new Hashtable());
                 }
-                var web_hashtable = HttpContext.Current.Items[LocalDataHashtableKey] as Hashtable;
-                if (web_hashtable == null)
+
+                if (!(HttpContext.Current.Items[LocalDataHashtableKey] is Hashtable web_hashtable))
                 {
                     web_hashtable = new Hashtable();
                     HttpContext.Current.Items[LocalDataHashtableKey] = web_hashtable;
                 }
                 return web_hashtable;
 #else
-throw new NotImplementedException();
+                throw new NotImplementedException();
 #endif
             }
         }
 
         public object this[object key]
         {
-            get
-            {
-                return LocalHashtable[key];
-            }
-            set
-            {
-                LocalHashtable[key] = value;
-            }
+            get => LocalHashtable[key];
+            set => LocalHashtable[key] = value;
         }
 
         public int Count => LocalHashtable.Count;

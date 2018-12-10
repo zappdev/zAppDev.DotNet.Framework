@@ -1,17 +1,15 @@
 ﻿#if NETFRAMEWORK
 using Glimpse.Core.Message;
+#endif
+
 using System;
 
 namespace CLMS.Framework.Profiling.Glimpse
 {
+#if NETFRAMEWORK
     public class AppDevTimelineMessage : ITimelineMessage
     {
-        private readonly Guid _id = Guid.NewGuid();
-
-        public Guid Id
-        {
-            get { return _id; }
-        }
+        public Guid Id { get; } = Guid.NewGuid();
 
         public TimeSpan Offset { get; set; }
 
@@ -25,12 +23,9 @@ namespace CLMS.Framework.Profiling.Glimpse
 
         public TimelineCategoryItem EventCategory
         {
-            get
-            {
-                return new TimelineCategoryItem("zAppDev", "#405064", "#dce2ea");
-            }
+            get => new TimelineCategoryItem("zAppDev", "#405064", "#dce2ea");
             set { }
         }
     }
-}
 #endif
+}

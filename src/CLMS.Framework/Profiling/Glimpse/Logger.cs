@@ -1,14 +1,17 @@
-﻿#if NETFRAMEWORK
+﻿using System;
+
+#if NETFRAMEWORK
 using Glimpse.Core.Extensibility;
-using System;
+#endif
 
 namespace CLMS.Framework.Profiling.Glimpse
 {
+#if NETFRAMEWORK
     public class Logger : IInspector
     {
-        private string modelName;
-        private AppDevSymbolType type;
-        private string symbolName;
+        private readonly string _modelName;
+        private readonly AppDevSymbolType _type;
+        private readonly string _symbolName;
 
         private static Func<RuntimePolicy> _runtime;
         private static Func<IExecutionTimer> _timerStrategy;
@@ -23,9 +26,9 @@ namespace CLMS.Framework.Profiling.Glimpse
 
         internal Logger(string modelName, AppDevSymbolType type, string symbolName)
         {
-            this.modelName = modelName;
-            this.type = type;
-            this.symbolName = symbolName;
+            _modelName = modelName;
+            _type = type;
+            _symbolName = symbolName;
         }
 
         public void Setup(IInspectorContext context)
@@ -66,9 +69,9 @@ namespace CLMS.Framework.Profiling.Glimpse
 
             var msg = new LogStatistic
             {
-                ModelName = modelName,
-                SymbolType = type,
-                SymbolName = symbolName,
+                ModelName = _modelName,
+                SymbolType = _type,
+                SymbolName = _symbolName,
                 Time = point.Duration.Milliseconds
             };
 
@@ -77,7 +80,7 @@ namespace CLMS.Framework.Profiling.Glimpse
                 Duration = point.Duration,
                 Offset = point.Offset,
                 StartTime = point.StartTime,
-                EventName = $"{type} {modelName}.{symbolName}",
+                EventName = $"{_type} {_modelName}.{_symbolName}",
                 EventSubText = msg.Id.ToString()
             };
             _messageBroker.Publish(pointTimelineMessage);
@@ -85,5 +88,5 @@ namespace CLMS.Framework.Profiling.Glimpse
             _messageBroker.Publish(msg);
         }
     }
-}
 #endif
+}
