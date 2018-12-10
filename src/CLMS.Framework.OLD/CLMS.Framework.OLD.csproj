@@ -3,56 +3,6 @@
     <PropertyGroup>
         <TargetFrameworks>netstandard2.0;</TargetFrameworks>
     </PropertyGroup>
-    
-    <ItemGroup>
-        <Compile Include="..\CLMS.Framework.Net47\Auditing\INHAuditTrailManager.cs" Link="Auditing\INHAuditTrailManager.cs" />
-
-        <Compile Include="..\CLMS.Framework.Net47\Collections\IndexedCollection.cs" Link="Collections\IndexedCollection.cs" />
-
-        <Compile Include="..\CLMS.Framework.Net47\LinqRuntimeTypeBuilder\LinqRuntimeTypeBuilder.cs" Link="LinqRuntimeTypeBuilder\LinqRuntimeTypeBuilder.cs" />
-        
-        <Compile Include="..\CLMS.Framework.Net47\Linq\PredicateBuilder.cs" Link="Linq\PredicateBuilder.cs" />
-
-        <Compile Include="..\CLMS.Framework.Net47\Powershell\Adapter.cs" Link="Powershell\Adapter.cs" />
-        <Compile Include="..\CLMS.Framework.Net47\Powershell\Commander.cs" Link="Powershell\Commander.cs" />
-        <Compile Include="..\CLMS.Framework.Net47\Powershell\Contracts.cs" Link="Powershell\Contracts.cs" />
-        <Compile Include="..\CLMS.Framework.Net47\Powershell\Converter.cs" Link="Powershell\Converter.cs" />
-
-        <Compile Include="..\CLMS.Framework.Net47\Data\Local.cs" Link="Data\Local.cs" />
-        <Compile Include="..\CLMS.Framework.Net47\Data\RepositoryAction.cs" Link="Data\RepositoryAction.cs" />
-        <Compile Include="..\CLMS.Framework.Net47\Data\ObjectGraphWalker.cs" Link="Data\ObjectGraphWalker.cs" />
-        <Compile Include="..\CLMS.Framework.Net47\Data\NHExtensions.cs" Link="Data\NHExtensions.cs" />
-
-        <!--<Compile Include="..\CLMS.Framework.Net47\Logging\IAPILogger.cs" Link="Logging\IAPILogger.cs" />-->
-        <!--<Compile Include="..\CLMS.Framework.Net47\Logging\LogMessage.cs" Link="Logging\LogMessage.cs" />-->
-        <Compile Include="..\CLMS.Framework.Net47\Logging\NHStatisticsLogger.cs" Link="Logging\NHStatisticsLogger.cs" />
-        <!--<Compile Include="..\CLMS.Framework.Net47\Logging\RabbitMQMessagingLogger.cs" Link="Logging\RabbitMQMessagingLogger.cs" />-->
-
-        <Compile Include="..\CLMS.Framework.Net47\SecurityDataDtos\SecurityDataDtos.cs" Link="SecurityDataDtos\SecurityDataDtos.cs" />
-
-        <Compile Include="..\CLMS.Framework.Net47\Sockets\BufferManager.cs" Link="Sockets\BufferManager.cs" />
-        <Compile Include="..\CLMS.Framework.Net47\Sockets\DataHolder.cs" Link="Sockets\DataHolder.cs" />
-        <Compile Include="..\CLMS.Framework.Net47\Sockets\DataHoldingUserToken.cs" Link="Sockets\DataHoldingUserToken.cs" />
-        <Compile Include="..\CLMS.Framework.Net47\Sockets\MessageHandler.cs" Link="Sockets\MessageHandler.cs" />
-        <Compile Include="..\CLMS.Framework.Net47\Sockets\SocketClient.cs" Link="Sockets\SocketClient.cs" />
-
-        <Compile Include="..\CLMS.Framework.Net47\Threading\ParallelTask.cs" Link="Threading\ParallelTask.cs" />
-
-        <Compile Include="..\CLMS.Framework.Net47\Utilities\CronExpressionDescriptor\ExpressionDescriptor.cs" Link="Utilities\CronExpressionDescriptor\ExpressionDescriptor.cs" />
-        <Compile Include="..\CLMS.Framework.Net47\Utilities\CronExpressionDescriptor\ExpressionParser.cs" Link="Utilities\CronExpressionDescriptor\ExpressionParser.cs" />
-        <Compile Include="..\CLMS.Framework.Net47\Utilities\CronExpressionDescriptor\Glossary.cs" Link="Utilities\CronExpressionDescriptor\Glossary.cs" />
-        <Compile Include="..\CLMS.Framework.Net47\Utilities\CronExpressionDescriptor\Options.cs" Link="Utilities\CronExpressionDescriptor\Options.cs" />
-        <Compile Include="..\CLMS.Framework.Net47\Utilities\DataAccessContext.cs" Link="Utilities\DataAccessContext.cs" />
-        <Compile Include="..\CLMS.Framework.Net47\Utilities\Encoding.cs" Link="Utilities\Encoding.cs" />
-        <Compile Include="..\CLMS.Framework.Net47\Utilities\ExcelTools.cs" Link="Utilities\ExcelTools.cs" />
-        <Compile Include="..\CLMS.Framework.Net47\Utilities\MailMessage.cs" Link="Utilities\MailMessage.cs" />
-        <Compile Include="..\CLMS.Framework.Net47\Utilities\NHibernateContractResolver.cs" Link="Utilities\NHibernateContractResolver.cs" />
-        <Compile Include="..\CLMS.Framework.Net47\Utilities\RegExHelper.cs" Link="Utilities\RegExHelper.cs" />
-        <Compile Include="..\CLMS.Framework.Net47\Utilities\Serializer.cs" Link="Utilities\Serializer.cs" />
-        <Compile Include="..\CLMS.Framework.Net47\Utilities\SqlHelper.cs" Link="Utilities\SqlHelper.cs" />
-        <Compile Include="..\CLMS.Framework.Net47\Utilities\ThreadLocalStorage.cs" Link="Utilities\ThreadLocalStorage.cs" />
-        <Compile Include="..\CLMS.Framework.Net47\Utilities\WeekTools.cs" Link="Utilities\WeekTools.cs" />
-    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="EPPlus" Version="4.5.2.1" />

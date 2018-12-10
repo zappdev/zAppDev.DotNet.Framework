@@ -1,6 +1,6 @@
-﻿#if NETFRAMEWORK
-#else
+﻿#if NETSTANDARD
 using Microsoft.Extensions.DependencyInjection;
+#endif
 using System;
 
 namespace CLMS.Framework.Utilities
@@ -10,6 +10,7 @@ namespace CLMS.Framework.Utilities
     /// </summary>
     public class ServiceLocator
     {
+#if NETSTANDARD
         private readonly ServiceProvider _currentServiceProvider;
         private static ServiceProvider _serviceProvider;
 
@@ -34,6 +35,6 @@ namespace CLMS.Framework.Utilities
         {
             return _currentServiceProvider.GetService<TService>();
         }
+#endif
     }
 }
-#endif

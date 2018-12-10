@@ -1,8 +1,9 @@
-﻿#if NETFRAMEWORK
-#else
+﻿
 using CLMS.Framework.Utilities;
+#if NETSTANDARD
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+#endif
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CLMS.Framework.Tests.Utilities
@@ -11,6 +12,7 @@ namespace CLMS.Framework.Tests.Utilities
     [TestClass]
     public class ServiceLocatorTest
     {
+#if NETSTANDARD
         private readonly ServiceProvider _serviceProvider;
 
         public ServiceLocatorTest()
@@ -45,6 +47,6 @@ namespace CLMS.Framework.Tests.Utilities
 
             Assert.IsInstanceOfType(logger, typeof(IHttpContextAccessor));
         }
+#endif
     }
 }
-#endif

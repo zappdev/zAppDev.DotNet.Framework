@@ -749,7 +749,7 @@ namespace CLMS.Framework.Utilities.CronExpressionDescriptor
         /// <returns>The cron expression description</returns>
         public static string GetDescription(string expression)
         {
-            var log = LogManager.GetLogger(Assembly.GetEntryAssembly(), "CronExpressionDescriptor");
+            var log = LogManager.GetLogger(typeof(ExpressionDescriptor));
             try
             {
                 return GetDescription(expression, new Options());

@@ -13,18 +13,19 @@ namespace CLMS.Framework.Auditing
     {
         public static INHAuditTrailManager GetInstance()
         {
-            #if NETFRAMEWORK            
+#if NETFRAMEWORK
             return GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(INHAuditTrailManager)) as INHAuditTrailManager;
-            #else
+#else
             return ServiceLocator.Current.GetInstance<INHAuditTrailManager>();
-            #endif
+#endif
         }
 
         public static void ExecuteWithoutAuditTrail(Func<object, object> action)
         {
             var audit = GetInstance();
 
-            try {
+            try
+            {
                 audit.IsTemporarilyDisabled = true;
 
                 MiniSessionManager.ExecuteInUoW(manager =>
@@ -33,7 +34,9 @@ namespace CLMS.Framework.Auditing
                 });
 
                 audit.IsTemporarilyDisabled = false;
-            } catch (Exception) {
+            }
+            catch (Exception)
+            {
                 audit.IsTemporarilyDisabled = false;
                 throw;
             }

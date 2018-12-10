@@ -101,6 +101,7 @@ namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
         [TestMethod]
         public void GetDynamicTypesTest()
         {
+#if NETFRAMEWORK
             var groupField = new Dictionary<string, Type>() {
                 { "intVar", typeof(int)},
                 { "stringVar", typeof(string)}
@@ -112,7 +113,7 @@ namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
             };
 
             var p1 = Builder.LinqRuntimeTypeBuilder.GetDynamicTypes(groupField, selectField, typeof(bool));
-
+#endif
         }
 
         [TestMethod]

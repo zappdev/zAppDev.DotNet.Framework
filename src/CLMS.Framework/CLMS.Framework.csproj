@@ -6,7 +6,15 @@
         <RootNamespace>CLMS.Framework</RootNamespace>
     </PropertyGroup>
 
-    <ItemGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
+    <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net472'">
+    <DefineConstants>$(DefineConstants);NETFRAMEWORK</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
         <PackageReference Include="EPPlus" Version="4.5.2.1" />
         <PackageReference Include="log4net" Version="2.0.8" />
         <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
