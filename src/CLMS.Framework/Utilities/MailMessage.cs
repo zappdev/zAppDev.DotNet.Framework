@@ -28,10 +28,7 @@ namespace CLMS.Framework.Utilities
     {
         public string Name
         {
-            get
-            {
-                return Attachment?.Name;
-            }
+            get => Attachment?.Name;
             set
             {
                 if (Attachment == null)

@@ -18,7 +18,7 @@ namespace CLMS.Framework.Utilities
 
         protected override JsonContract CreateContract(Type objectType)
         {
-            if (typeof(NHibernate.Proxy.INHibernateProxy).IsAssignableFrom(objectType))
+            if (typeof(INHibernateProxy).IsAssignableFrom(objectType))
                 return base.CreateContract(objectType.BaseType);
             
             return base.CreateContract(objectType);
