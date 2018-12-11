@@ -54,8 +54,8 @@ namespace CLMS.Framework.Tests.Powershell
                 Commander.RunPowerShellScript("TestScript.ps1", new Dictionary<string, object> { {"in", "raiseError"} })));
 
             Assert.ThrowsException<Exception>(() =>
-                Commander.RunPowerShellScript("TestScript.ps1", new WSManConnectionInfo
-                {                    
+                Commander.RunPowerShellScript("TestScript.ps1", new WSManConnectionInfo(new Uri("http://www.contoso.com/"))
+                {   
                     OperationTimeout = 1,
                     OpenTimeout = 1
                 }));
