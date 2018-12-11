@@ -98,7 +98,7 @@ throw new NotImplementedException();
                     (m.Border.Start.Line <= exceptionHelper.lineNo && m.Border.End.Line >= exceptionHelper.lineNo)).ToList());
             }
 
-            foreach (Map map in originalMaps.Distinct())
+            foreach (var map in originalMaps.Distinct())
             {
                 var FriendlyMessageEntry = new FriendlyMessageEntryDTO(map.AppDevIdentifier, map.AppDevSemantic.ToString());
 
@@ -176,9 +176,7 @@ throw new NotImplementedException();
             AppDevIdentifier = id;
             Nesting = nesting;
 
-            var appDevSemanticEnum = AppDevSemantic.None;
-
-            if (Enum.TryParse(appDevSemanticString, out appDevSemanticEnum))
+            if (Enum.TryParse(appDevSemanticString, out AppDevSemantic appDevSemanticEnum))
             {
                 AppDevSemantic = appDevSemanticEnum;
             }

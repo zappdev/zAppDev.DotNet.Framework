@@ -2,7 +2,7 @@
 using CLMS.Framework.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace CLMS.Framework.Tests.Data
+namespace CLMS.Framework.Tests.Logging
 {
     [TestClass]
     public class NHStatisticsLoggerTest

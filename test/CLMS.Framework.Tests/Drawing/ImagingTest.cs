@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CLMS.Framework.Tests.Data
+﻿namespace CLMS.Framework.Tests.Drawing
 {
     public class ImagingTest
     {
