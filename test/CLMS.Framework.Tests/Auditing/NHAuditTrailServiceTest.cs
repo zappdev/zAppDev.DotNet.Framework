@@ -24,6 +24,7 @@ namespace CLMS.Framework.Tests.Auditing
             Assert.IsNull(instance);
 #endif
 #if NETSTANDARD
+            ServiceLocator.SetLocatorProvider(null);
             Assert.ThrowsException<ArgumentNullException>(NHAuditTrailService.GetInstance);
 
             var services = new ServiceCollection();
