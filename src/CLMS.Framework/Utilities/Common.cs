@@ -469,8 +469,7 @@ namespace CLMS.Framework.Utilities
                     }
                     else
                     {
-                        var parseResult = default(T);
-                        if (!TryParseJson(obj?.ToString(), out parseResult))
+                        if (!TryParseJson(obj?.ToString(), out T parseResult))
                         {
                             if (!TryParseXml(obj?.ToString(), out parseResult))
                             {
@@ -484,7 +483,7 @@ namespace CLMS.Framework.Utilities
                 }
                 catch (Exception convertException)
                 {
-                    log4net.LogManager.GetLogger(Assembly.GetEntryAssembly(), "SafeCast").Debug($"Could not Convert : {obj.GetType()} to {typeof(T)}", convertException);
+                    log4net.LogManager.GetLogger(Assembly.GetEntryAssembly() ?? Assembly.GetCallingAssembly(), "SafeCast").Debug($"Could not Convert : {obj.GetType()} to {typeof(T)}", convertException);
                     return default(T);
                 }
             }
@@ -506,7 +505,7 @@ namespace CLMS.Framework.Utilities
                 }
                 catch (Exception ex)
                 {
-                    log4net.LogManager.GetLogger(Assembly.GetEntryAssembly(), "TryParseXml").Debug($"Could not Parse : {strInput} to {typeof(T)}", ex);
+                    log4net.LogManager.GetLogger(Assembly.GetEntryAssembly() ?? Assembly.GetCallingAssembly(), "TryParseXml").Debug($"Could not Parse : {strInput} to {typeof(T)}", ex);
                     obj = default(T);
                     return false;
                 }
@@ -531,7 +530,7 @@ namespace CLMS.Framework.Utilities
                 }
                 catch (Exception ex) //some other exception
                 {
-                    log4net.LogManager.GetLogger(Assembly.GetEntryAssembly(), "TryParseJson").Debug($"Could not Parse : {strInput} to {typeof(T)}", ex);
+                    log4net.LogManager.GetLogger(Assembly.GetEntryAssembly() ?? Assembly.GetCallingAssembly(), "TryParseJson").Debug($"Could not Parse : {strInput} to {typeof(T)}", ex);
                     obj = default(T);
                     return false;
                 }
