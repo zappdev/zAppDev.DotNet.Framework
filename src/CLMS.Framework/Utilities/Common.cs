@@ -13,6 +13,7 @@ using Newtonsoft.Json.Linq;
 using NHibernate.Util;
 
 using AppDevCache = CLMS.AppDev.Cache;
+using System.Text.RegularExpressions;
 
 namespace CLMS.Framework.Utilities
 {
@@ -76,6 +77,8 @@ namespace CLMS.Framework.Utilities
 
     public class Common
     {
+        public static string NormalizeLineEncoding(string originalString) => Regex.Replace(originalString, @"\r\n|\n\r|\n|\r", "\r\n");
+        
         public static string GetExcelFormat(List<string> columnNames, List<List<object>> values, string[] formatStrings = null,
            string sheetName = "Sheet1", bool showBorders = true, string headerBackgroundColor = "rgb(238, 233, 233)",
            string rowBackgroundColor = "rgb(238, 238, 224)", string alternateRowBackgroundColor = "rgb(255, 255, 255)")
@@ -192,7 +195,7 @@ namespace CLMS.Framework.Utilities
                 })}<td style='background-color: {aggregatorBackgroundColor}'>AVG</td></tr>";
             }
 
-            return $@"
+            return NormalizeLineEncoding($@"
 <html xmlns:x=""urn:schemas-microsoft-com:office:excel""> 
 <head> 
     <meta http-equiv=Content-Type content=""text/html; charset=utf-8""> 
@@ -229,7 +232,7 @@ namespace CLMS.Framework.Utilities
     </tfoot> 
 </table> 
 </body> 
-</html>";
+</html>");
         }
 
         public class MambaError

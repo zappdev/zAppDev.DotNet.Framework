@@ -52,14 +52,14 @@ namespace CLMS.Framework.Tests.Powershell
             
             Assert.ThrowsException<Exception>((() => 
                 Commander.RunPowerShellScript("TestScript.ps1", new Dictionary<string, object> { {"in", "raiseError"} })));
-
+#if OS_WINDOWS
             Assert.ThrowsException<Exception>(() =>
                 Commander.RunPowerShellScript("TestScript.ps1", new WSManConnectionInfo(new Uri("http://www.contoso.com/"))
                 {   
                     OperationTimeout = 1,
                     OpenTimeout = 1
                 }));
-
+#endif
         }
 
     }

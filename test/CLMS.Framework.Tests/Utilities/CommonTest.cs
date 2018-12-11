@@ -176,5 +176,13 @@ namespace CLMS.Framework.Tests.Utilities
 
             Assert.IsInstanceOfType(error.Exception, typeof(Exception));
         }
+
+        [TestMethod]
+        public void NormalizeLineEncodingTest()
+        {
+            Assert.AreEqual("Test\r\n", Common.NormalizeLineEncoding("Test\r\n"));
+            Assert.AreEqual("Test\r\n", Common.NormalizeLineEncoding("Test\n"));
+            Assert.AreEqual("Test\r\n", Common.NormalizeLineEncoding("Test\r"));
+        }
     }
 }
