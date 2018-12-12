@@ -1,4 +1,5 @@
-﻿using CLMS.Framework.Threading;
+﻿using System;
+using CLMS.Framework.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 
@@ -6,9 +7,9 @@ namespace CLMS.Framework.Tests.Threading
 {
     internal class Item
     {
-        public string Name { get; set; }
+        public string Name;
 
-        public string Last { get; set; }
+        public string Last;
     }
 
     [TestClass]
@@ -21,6 +22,11 @@ namespace CLMS.Framework.Tests.Threading
 
             ParallelTask.ForEach(items, (item, index) => {
 
+            });
+
+            Assert.ThrowsException<AggregateException>(() =>
+            {
+                ParallelTask.ForEach(items, (item, index) => throw new Exception());
             });
 
             Assert.AreEqual(1, 1);
