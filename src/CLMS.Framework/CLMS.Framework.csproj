@@ -1,107 +1,107 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFrameworks>net472;netstandard2.0</TargetFrameworks>
-        <AssemblyName>CLMS.Framework</AssemblyName>
-        <RootNamespace>CLMS.Framework</RootNamespace>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworks>net472;netstandard2.0;net462</TargetFrameworks>
+    <AssemblyName>CLMS.Framework</AssemblyName>
+    <RootNamespace>CLMS.Framework</RootNamespace>
+  </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
     <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'net472'">
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net472' OR '$(TargetFramework)' == 'net462'">
     <DefineConstants>$(DefineConstants);NETFRAMEWORK</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-        <PackageReference Include="EPPlus" Version="4.5.2.1" />
-        <PackageReference Include="log4net" Version="2.0.8" />
-        <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-        <PackageReference Include="NHibernate" Version="5.1.3" />
-        <PackageReference Include="RabbitMQ.Client" Version="5.1.0" />
-    </ItemGroup>
+    <PackageReference Include="EPPlus" Version="4.5.2.1" />
+    <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="NHibernate" Version="5.1.3" />
+    <PackageReference Include="RabbitMQ.Client" Version="5.1.0" />
+  </ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
-        <PackageReference Include="Ionic.Zip" Version="1.9.1.8" />
-        
-        <PackageReference Include="Autofac" Version="3.5.2" />
-        <PackageReference Include="CacheManager.Core" Version="1.1.2" />
-        <PackageReference Include="CacheManager.Serialization.Json" Version="1.1.2" />
-        <PackageReference Include="CacheManager.StackExchange.Redis" Version="1.1.2" />
-        <PackageReference Include="CacheManager.SystemRuntimeCaching" Version="1.1.2" />
-        <PackageReference Include="CSharpVerbalExpressions" Version="0.1.0" />
-        <PackageReference Include="Glimpse" Version="1.8.6" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'net472' OR '$(TargetFramework)' == 'net462'">
+    <PackageReference Include="Ionic.Zip" Version="1.9.1.8" />
 
-        <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
-        <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.4.0" />
-        <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.6" />
-        <PackageReference Include="Microsoft.AspNet.WebApi.WebHost" Version="5.2.6" />
-        <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
-        <PackageReference Include="Microsoft.Owin" Version="4.0.0" />
-        <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.0" />
-        <PackageReference Include="Microsoft.Owin.Security" Version="4.0.0" />
-        <PackageReference Include="NCrontab" Version="3.3.0" />
+    <PackageReference Include="Autofac" Version="3.5.2" />
+    <PackageReference Include="CacheManager.Core" Version="1.1.2" />
+    <PackageReference Include="CacheManager.Serialization.Json" Version="1.1.2" />
+    <PackageReference Include="CacheManager.StackExchange.Redis" Version="1.1.2" />
+    <PackageReference Include="CacheManager.SystemRuntimeCaching" Version="1.1.2" />
+    <PackageReference Include="CSharpVerbalExpressions" Version="0.1.0" />
+    <PackageReference Include="Glimpse" Version="1.8.6" />
 
-        <PackageReference Include="Autofac.WebApi2" Version="4.0.0" />
-        <PackageReference Include="NLog" Version="4.5.11" />
-        <PackageReference Include="Owin" Version="1.0" />
-        <PackageReference Include="Purplelight.Framework.Autofac.Integration.WebApi" Version="0.2.2" />
-        <PackageReference Include="S22.Imap" Version="3.6.0.0" />
-        <PackageReference Include="Strathweb.CacheOutput.WebApi2" Version="0.11.0" />
-        <PackageReference Include="System.IO.Compression" Version="4.3.0" />
-        <PackageReference Include="System.Management.Automation" Version="6.1.7601.17515" />
-        <PackageReference Include="System.Net.Http" Version="4.3.4" />
-    </ItemGroup>
+    <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
+    <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.4.0" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.6" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.WebHost" Version="5.2.6" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="Microsoft.Owin" Version="4.0.0" />
+    <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.0" />
+    <PackageReference Include="Microsoft.Owin.Security" Version="4.0.0" />
+    <PackageReference Include="NCrontab" Version="3.3.0" />
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-        <PackageReference Include="Iconic.Zlib.Netstandard" Version="1.0.0" />
-        <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
-        <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.1.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.1.1" />
-        <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.1.1" />
-        <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.1.1" />
-        <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="2.1.1" />
-        <PackageReference Include="Microsoft.AspNetCore.Owin" Version="2.1.1" />
-        <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.0.4" />
-        <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="2.1.1" />
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.1.1" />
-        <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.1.1" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.1.1" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.1.1" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.1" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="2.1.1" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.0" />
-        <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.1.1" />
-        <PackageReference Include="ncrontab" Version="3.3.0" />
-        <PackageReference Include="RSG.Promise.Core" Version="3.0.0" />
-        <PackageReference Include="S22.Imap.Core" Version="3.6.1" />
-        <PackageReference Include="System.CodeDom" Version="4.5.0" />
-        <PackageReference Include="System.Data.SqlClient" Version="4.6.0" />
-        <PackageReference Include="System.Management.Automation" Version="6.1.1" />
-        <PackageReference Include="System.Net.Http" Version="4.3.4" />
-        <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
-        <PackageReference Include="VerbalExpressions-netstandard16" Version="0.2.0" />
-    </ItemGroup>
+    <PackageReference Include="Autofac.WebApi2" Version="4.0.0" />
+    <PackageReference Include="NLog" Version="4.5.11" />
+    <PackageReference Include="Owin" Version="1.0" />
+    <PackageReference Include="Purplelight.Framework.Autofac.Integration.WebApi" Version="0.2.2" />
+    <PackageReference Include="S22.Imap" Version="3.6.0.0" />
+    <PackageReference Include="Strathweb.CacheOutput.WebApi2" Version="0.11.0" />
+    <PackageReference Include="System.IO.Compression" Version="4.3.0" />
+    <PackageReference Include="System.Management.Automation" Version="6.1.7601.17515" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+  </ItemGroup>
 
-    <ItemGroup>
-        <Reference Include="CLMS.AppDev.Cache">
-            <HintPath>..\..\Lib\CLMS.AppDev.Cache.dll</HintPath>
-        </Reference>
-    </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Iconic.Zlib.Netstandard" Version="1.0.0" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Owin" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.0" />
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.1.1" />
+    <PackageReference Include="ncrontab" Version="3.3.0" />
+    <PackageReference Include="RSG.Promise.Core" Version="3.0.0" />
+    <PackageReference Include="S22.Imap.Core" Version="3.6.1" />
+    <PackageReference Include="System.CodeDom" Version="4.5.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.6.0" />
+    <PackageReference Include="System.Management.Automation" Version="6.1.1" />
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
+    <PackageReference Include="VerbalExpressions-netstandard16" Version="0.2.0" />
+  </ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
-        <Reference Include="CLMS.ApplicationModelling.MetaSourceCode">
-            <HintPath>..\..\Lib\CLMS.ApplicationModelling.MetaSourceCode.dll</HintPath>
-        </Reference>
-        <Reference Include="CLMS.MetaCodeGenerator">
-            <HintPath>..\..\Lib\CLMS.MetaCodeGenerator.dll</HintPath>
-        </Reference>
-        <Reference Include="CLMS.PDF.Helper">
-            <HintPath>..\..\Lib\CLMS.PDF.Helper.dll</HintPath>
-        </Reference>
-        <Reference Include="System.Web" />
-        <Reference Include="System.Web.ApplicationServices" />
-    </ItemGroup>
+  <ItemGroup>
+    <Reference Include="CLMS.AppDev.Cache">
+      <HintPath>..\..\Lib\CLMS.AppDev.Cache.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net472' OR '$(TargetFramework)' == 'net462'">
+    <Reference Include="CLMS.ApplicationModelling.MetaSourceCode">
+      <HintPath>..\..\Lib\CLMS.ApplicationModelling.MetaSourceCode.dll</HintPath>
+    </Reference>
+    <Reference Include="CLMS.MetaCodeGenerator">
+      <HintPath>..\..\Lib\CLMS.MetaCodeGenerator.dll</HintPath>
+    </Reference>
+    <Reference Include="CLMS.PDF.Helper">
+      <HintPath>..\..\Lib\CLMS.PDF.Helper.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.ApplicationServices" />
+  </ItemGroup>
 
 </Project>

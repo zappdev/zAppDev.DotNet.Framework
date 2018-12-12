@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CLMS.Framework.Utilities;
-using Moq;
 using Newtonsoft.Json.Linq;
 
 namespace CLMS.Framework.Tests.Utilities
