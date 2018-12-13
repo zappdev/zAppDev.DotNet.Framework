@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
@@ -27,21 +28,20 @@ namespace CLMS.Framework.Utilities
 
         public static void Log(List<string> parameters, string logger)
         {
-            var intMessageType = 0;
             var debugMessageType = DebugMessageType.Debug;
             var message = "";
 
             try
             {
                 var numberToBeParsed = parameters.Count > 0 ? parameters[0] : "0";
-                int.TryParse(parameters[0], out intMessageType);
+                int.TryParse(parameters[0], out var intMessageType);
                 debugMessageType = (DebugMessageType) intMessageType;
 
                 message = parameters.Count > 1 ? parameters[1] : "";
             }
             catch
             {
-                LogManager.GetLogger(Assembly.GetEntryAssembly(), logger)
+                LogManager.GetLogger(Assembly.GetEntryAssembly() ?? Assembly.GetCallingAssembly(), logger)
                     .Error("Error parsing Log Message type to number!");
                 //Hush....
             }
@@ -51,27 +51,28 @@ namespace CLMS.Framework.Utilities
 
         public static void Log(DebugMessageType messageType, string logger, object message)
         {
-            if (logger != null)
+            if (logger == null) return;
+
+            var loggerManager = LogManager.GetLogger(Assembly.GetEntryAssembly() ?? Assembly.GetCallingAssembly(), logger);
+            switch (messageType)
             {
-                var _logger = LogManager.GetLogger(Assembly.GetEntryAssembly(), logger);
-                switch (messageType)
-                {
-                    case DebugMessageType.Debug:
-                        _logger.Debug(message);
-                        break;
-                    case DebugMessageType.Info:
-                        _logger.Info(message);
-                        break;
-                    case DebugMessageType.Warning:
-                        _logger.Warn(message);
-                        break;
-                    case DebugMessageType.Error:
-                        _logger.Error(message);
-                        break;
-                    case DebugMessageType.IDEF0Trace:
-                        Trace.WriteLine(message);
-                        break;
-                }
+                case DebugMessageType.Debug:
+                    loggerManager.Debug(message);
+                    break;
+                case DebugMessageType.Info:
+                    loggerManager.Info(message);
+                    break;
+                case DebugMessageType.Warning:
+                    loggerManager.Warn(message);
+                    break;
+                case DebugMessageType.Error:
+                    loggerManager.Error(message);
+                    break;
+                case DebugMessageType.IDEF0Trace:
+                    Trace.WriteLine(message);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(messageType), messageType, null);
             }
         }
 
