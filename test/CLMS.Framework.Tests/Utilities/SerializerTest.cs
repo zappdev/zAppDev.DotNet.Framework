@@ -20,8 +20,8 @@ namespace CLMS.Framework.Tests.Utilities
 
             var serializer = new Serializer<ApplicationPermission>();
 
-            Assert.AreEqual("9d28e27cf9b133fe544dd4814f353cb7", Common.GetMD5Hash(serializer.ToJson(operation)));
-            Assert.AreEqual("bcffc577e102a9f370c86814f335a3b5", Common.GetMD5Hash(serializer.ToXml(operation)));
+            Assert.AreEqual("9d28e27cf9b133fe544dd4814f353cb7", Common.GetMD5Hash(serializer.ToJson(operation, true)));
+            Assert.AreEqual("9ba3c150bf0668ae3456b30f8f37fa77", Common.GetMD5Hash(serializer.ToXml(operation, true)));
 
             var jsonStr = serializer.ToJson(operation);
             var xmlStr = serializer.ToXml(operation);

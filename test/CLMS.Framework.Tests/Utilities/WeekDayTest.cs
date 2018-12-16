@@ -6,7 +6,7 @@ using System.Globalization;
 namespace CLMS.Framework.Tests.Utilities
 {
     [TestClass]
-    public class WebToolsTest
+    public class WeekDayTest
     {
         [TestMethod]
         public void FromIndexTest()
@@ -50,6 +50,18 @@ namespace CLMS.Framework.Tests.Utilities
 
             Assert.AreEqual("Tuesday", day.GetName());
             Assert.AreEqual("Dienstag", day.GetName(CultureInfo.GetCultureInfo("de")));
+
+            day = WeekDay.FromIndex(3);
+
+            Assert.AreEqual(3, day.Index);
+            Assert.AreEqual(DayOfWeek.Wednesday, day.Value);
+            Assert.AreEqual(false, day.IsWeekEnd);
+            Assert.AreEqual(true, day == Week.Wednesday);
+            Assert.AreEqual("Wed", day.GetShortName());
+            Assert.AreEqual("Mi", day.GetShortName(CultureInfo.GetCultureInfo("de")));
+
+            Assert.AreEqual("Wednesday", day.GetName());
+            Assert.AreEqual("Mittwoch", day.GetName(CultureInfo.GetCultureInfo("de")));
         }
 
     }
