@@ -1,43 +1,23 @@
-﻿#if NETFRAMEWORK
-#else
 using CLMS.Framework.Services;
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CLMS.Framework.Tests.Services
 {
     [TestClass]
-    public class CacheWrapperServiceTest
+    public class CacheKeyHasherTest
     {
-        private readonly CacheWrapperService _cacheWrapper;
-
-        public CacheWrapperServiceTest()
-        {
-            var services = new ServiceCollection();
-
-            services.AddDistributedMemoryCache();
-
-            var provider = services.BuildServiceProvider();
-
-            _cacheWrapper = new CacheWrapperService(provider.GetService<IDistributedCache>(), null);
-        }
-        
         [TestMethod]
-        public void ContainsTest()
+        public void PropertyTest() 
         {
-            const string key = "Key";
-            Assert.IsFalse(_cacheWrapper.Contains(key));
-            
-            _cacheWrapper.Set(key, 1);            
-            Assert.IsTrue(_cacheWrapper.Contains(key));
-            
-            var result = _cacheWrapper.Get<int>(key);            
-            Assert.AreEqual(1, result);
-            
-            result = _cacheWrapper.Get<int>("not");            
-            Assert.AreEqual(0, result); // 0 is the default value of int type
-        }        
+            var hasher = new CacheKeyHasher{
+                ApiName = "Api",
+                UserName = "theofilis",
+                Operation = "AddItem",
+                OriginalKey = "1"
+            };
+
+            Assert.AreEqual("Api|theofilis|AddItem|c4ca4238a0b923820dcc509a6f75849b", hasher.GetHashedKey());
+
+        }
     }
 }
-#endif
