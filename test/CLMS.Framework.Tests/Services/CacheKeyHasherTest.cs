@@ -1,3 +1,4 @@
+using System.Net.Http;
 using CLMS.Framework.Services;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -18,6 +19,17 @@ namespace CLMS.Framework.Tests.Services
 
             Assert.AreEqual("Api|theofilis|AddItem|c4ca4238a0b923820dcc509a6f75849b", hasher.GetHashedKey());
 
+        }
+
+        [TestMethod]
+        public void ServiceConsumptionContainerTest()
+        {
+            var context = new ServiceConsumptionContainer
+            {
+                HttpResponseMessage = new HttpResponseMessage()
+            };
+
+            Assert.IsNotNull(context.HttpResponseMessage);
         }
     }
 }

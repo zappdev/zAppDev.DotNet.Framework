@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #if NETSTANDARD
 using CLMS.Framework.Middleware;
@@ -15,13 +16,15 @@ namespace CLMS.Framework.Tests.Middleware
         [TestInitialize]
         public void Init()
         {
-            _middleware = new ApiMiddleware((next) => null);
+            _middleware = new ApiMiddleware(async (next) => { });
         }
 
         [TestMethod]
-        public void NextTest()
+        public async Task NextTest()
         {
-            Assert.IsNotNull(_middleware.Invoke(null));
+            var task = _middleware.Invoke(null);
+            await task;
+            Assert.IsNotNull(task);
         }
 #endif
     }
