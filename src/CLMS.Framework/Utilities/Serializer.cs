@@ -42,7 +42,7 @@ namespace CLMS.Framework.Utilities
 
         public string ToXml(T instance, bool utf8 = false)
         {
-            string result = string.Empty;
+            var result = string.Empty;
             if (instance != null)
             {
                 var serializer = new XmlSerializer(instance.GetType());
@@ -54,12 +54,12 @@ namespace CLMS.Framework.Utilities
                     result = sb.ToString();
                 }
             }
-            return result;
+            return Common.NormalizeLineEncoding(result);
         }
 
         public T FromXml(string data)
         {
-            T result = default(T);
+            var result = default(T);
             if (!string.IsNullOrEmpty(data))
             {
                 using (var reader = new StringReader(data))

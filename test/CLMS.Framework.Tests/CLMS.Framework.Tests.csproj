@@ -4,11 +4,11 @@
 
     <IsPackable>false</IsPackable>
 
-    <TargetFrameworks>net472;netcoreapp2.2;</TargetFrameworks>
+    <TargetFrameworks>net472;netcoreapp2.1;</TargetFrameworks>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.2'">
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
     <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
   </PropertyGroup>
 
@@ -18,8 +18,11 @@
 
   <ItemGroup>
     <Compile Remove="coveragereport\**" />
+    <Compile Remove="Coverage\**" />
     <EmbeddedResource Remove="coveragereport\**" />
+    <EmbeddedResource Remove="Coverage\**" />
     <None Remove="coveragereport\**" />
+    <None Remove="Coverage\**" />
     <None Update="Data\Mappings\User.hbm.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
