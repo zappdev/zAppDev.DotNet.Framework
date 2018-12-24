@@ -181,5 +181,50 @@ namespace CLMS.Framework.Tests.Utilities
             Assert.AreEqual("Test\r\n", Common.NormalizeLineEncoding("Test\n"));
             Assert.AreEqual("Test\r\n", Common.NormalizeLineEncoding("Test\r"));
         }
+
+        [TestMethod]
+        public void FromListTest()
+        {
+            Assert.AreEqual(null, Common.GetItemFromList<object>(null, 0));
+            Assert.ThrowsException<Exception>(() => Common.GetItemFromList(new List<string> { "red", "black" }, null));
+            Assert.AreEqual("red", Common.GetItemFromList(new List<string> { "red", "black" }, 0));
+
+            var items = new List<string> { "red", "black" };
+            Assert.ThrowsException<Exception>(() => Common.SetItemFromList<string>(items, null, null));
+            Assert.ThrowsException<Exception>(() => Common.SetItemFromList<object>(null, null, null));
+
+            items = new List<string> { "red", "black" };
+            Common.SetItemFromList(items, 0, "green");
+            Assert.AreEqual("green", Common.GetItemFromList(items, 0));
+        }
+
+        [TestMethod]
+        public void FromArrayTest()
+        {
+            var items = new string[] { "red", "black" };
+
+            Assert.AreEqual(null, Common.GetItemFromArray<object>(null, 0));
+            Assert.ThrowsException<Exception>(() => Common.GetItemFromArray(items, null));
+            Assert.AreEqual("red", Common.GetItemFromArray(items, 0));
+
+            Assert.ThrowsException<Exception>(() => Common.SetItemFromArray<string>(items, null, null));
+            Assert.ThrowsException<Exception>(() => Common.SetItemFromArray<object>(null, null, null));
+
+            Common.SetItemFromArray(items, 0, "green");
+            Assert.AreEqual("green", Common.GetItemFromArray(items, 0));
+        }
+
+        [TestMethod]
+        public void GetCultureInfoTest()
+        {
+            Assert.AreEqual("en-US", Common.GetCultureInfo(null).Name);
+            Assert.AreEqual("ar", Common.GetCultureInfo(1).Name);
+        }
+
+        [TestMethod]
+        public void ToUnixTimeTest()
+        {
+            Assert.AreEqual(1451606400, Common.ToUnixTime(new DateTime(2016, 1, 1)));
+        }
     }
 }
