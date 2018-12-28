@@ -588,6 +588,8 @@ throw new NotImplementedException();
 
         public static void WriteAllTo(string path, string text, int codepage)
         {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
             System.IO.File.WriteAllText(path, text, Encoding.GetEncoding(codepage));
         }
 

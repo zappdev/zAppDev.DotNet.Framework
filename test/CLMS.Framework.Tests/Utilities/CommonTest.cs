@@ -5,6 +5,7 @@ using System.Threading;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CLMS.Framework.Utilities;
+
 using Newtonsoft.Json.Linq;
 
 namespace CLMS.Framework.Tests.Utilities
@@ -17,6 +18,10 @@ namespace CLMS.Framework.Tests.Utilities
     [TestClass]
     public class CommonTest
     {
+        public string Property { get; set; }
+
+        public List<string> Items { get; set; }
+
         [TestMethod]
         public void SafeCastTest()
         {
@@ -226,5 +231,124 @@ namespace CLMS.Framework.Tests.Utilities
         {
             Assert.AreEqual(1451606400, Common.ToUnixTime(new DateTime(2016, 1, 1)));
         }
+
+        [TestMethod]
+        public void ParseExactDateTest()
+        {
+            var ci = Common.GetCultureInfo(null);
+
+            Assert.IsNull(Common.ParseExactDate("2017", "YYYY-MM-dd", ci));
+        }
+
+        [TestMethod]
+        public void DateHasValueTest()
+        {
+            var ci = Common.GetCultureInfo(null);
+            var date = Common.ParseExactDate("2017", "YYYY-MM-dd", ci);
+
+            Assert.IsFalse(Common.DateHasValue(date));        
+            Assert.IsFalse(Common.DateHasValue(new DateTime()));
+        }
+
+        [TestMethod]
+        public void RandomTest()
+        {
+            Assert.IsTrue(Common.Random.Next(1, 7) > 0);
+        }
+
+
+        [TestMethod]
+        public void FileTest()
+        {
+            Common.WriteAllTo("name.txt", "Example");
+            Common.WriteAllTo("name.txt", "Example", 1252);
+            Common.WriteAllTo("name.txt", "Example", true);
+            Common.WriteAllTo("name.txt", new List<byte> { 81 });
+            Common.WriteAllTo("name.txt", new byte[] { 81 });
+
+            Common.AppendAllTo("name.txt", "Example");
+            Common.AppendAllTo("name.txt", "Example", 1252);
+            Common.AppendAllTo("name.txt", "Example", true);
+            Common.AppendAllTo("name.txt", new List<byte> { 81 });
+            Common.AppendAllTo("name.txt", new byte[] { 81 });            
+        }
+
+        [TestMethod]
+        public void IsTypePrimitiveOrSimpleTest()
+        {
+            var info = typeof(CommonTest).GetProperty("Property");
+
+            var mambaType = new MambaRuntimeType(info);
+
+            Assert.IsTrue(Common.IsTypePrimitiveOrSimple(typeof(String)));
+            Assert.IsTrue(Common.IsTypePrimitiveOrSimple(typeof(int)));
+            Assert.IsTrue(Common.IsTypeCollection(typeof(List<string>)));
+
+            Assert.IsTrue(Common.IsPropertyPrimitiveOrSimple(info));
+            Assert.IsTrue(Common.IsPropertyPrimitiveOrSimple(mambaType));
+
+            info = typeof(CommonTest).GetProperty("Items");
+            mambaType = new MambaRuntimeType(info);
+
+            Assert.IsTrue(Common.IsPropertyCollection(info));
+            Assert.IsTrue(Common.IsPropertyCollection(mambaType));
+        }
+
+        [TestMethod]
+        public void ConvertTest()
+        {
+            var status = Common.ConvertToEnum<Status>("FAILED");
+            Assert.AreEqual(Status.FAILED, status);
+
+            status = Common.ConvertToEnum<Status>("F", false);
+            Assert.AreEqual(Status.FAILED, status);
+
+            Assert.ThrowsException<FormatException>(() => Common.ConvertToEnum<Status>("F", true));
+
+            Assert.AreEqual(0.1m, Common.ConvertToDecimal("0.1"));
+            Assert.AreEqual(0m, Common.ConvertToDecimal("d", false));
+            Assert.ThrowsException<FormatException>(() => Common.ConvertToDecimal("d", true));
+
+            Assert.AreEqual(0.1f, Common.ConvertToFloat("0.1"));
+            Assert.AreEqual(0f, Common.ConvertToFloat("d", false));
+            Assert.ThrowsException<FormatException>(() => Common.ConvertToFloat("d", true));
+
+            Assert.AreEqual("yyyy-MM-dd tt", Common.ConvertMomentFormat("YYYY-MM-DD a"));
+            Assert.AreEqual("yyyy", Common.ConvertMomentFormat("YYYY"));
+            Assert.AreEqual("MM-dd", Common.ConvertMomentFormat("MM-DD"));
+
+            Assert.AreEqual(2018, Common.ConvertToDateTime("2018-01-01").Year);
+            Assert.AreEqual(1, Common.ConvertToDateTime("d", false).Year);
+            Assert.ThrowsException<FormatException>(() => Common.ConvertToDateTime("d", true));
+
+            Assert.AreEqual(1, Common.ConvertToInt("1"));
+            Assert.AreEqual(0, Common.ConvertToInt("d", false));
+            Assert.ThrowsException<FormatException>(() => Common.ConvertToInt("d", true));
+
+            Assert.AreEqual(1l, Common.ConvertToLong("1"));
+            Assert.AreEqual(0l, Common.ConvertToLong("d", false));
+            Assert.ThrowsException<FormatException>(() => Common.ConvertToLong("d", true));
+
+            Assert.AreEqual(true, Common.ConvertToBool("true"));
+            Assert.AreEqual(false, Common.ConvertToBool("d", false));
+            Assert.ThrowsException<FormatException>(() => Common.ConvertToBool("d", true));
+
+            Assert.AreEqual(0.1d, Common.ConvertToDouble("0.1"));
+            Assert.AreEqual(0.0d, Common.ConvertToDouble("d", false));
+            Assert.ThrowsException<FormatException>(() => Common.ConvertToDouble("d", true));
+
+            Assert.AreEqual(0b1, Common.ConvertToByte("1"));
+            Assert.AreEqual(0b0, Common.ConvertToByte("d", false));
+            Assert.ThrowsException<FormatException>(() => Common.ConvertToByte("d", true));
+
+            Assert.IsNotNull(Common.ConvertToGuid("9081ef78-2ee8-48df-a9af-4fc71fabfcc0"));
+            Assert.IsNotNull(Common.ConvertToGuid("d", false));
+            Assert.ThrowsException<FormatException>(() => Common.ConvertToGuid("d", true));
+        }
+    }
+
+    enum Status {
+        FAILED,
+        COMPLETED
     }
 }
