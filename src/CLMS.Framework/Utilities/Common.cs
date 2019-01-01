@@ -1075,6 +1075,8 @@ throw new NotImplementedException();
 
         public static List<string> ReadLinesFrom(string path, int startAtLine, int numberOfLinesToRead, int codepage)
         {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
             var lineNumber = 0;
             var linesRead = new List<string>();
 
@@ -1100,6 +1102,8 @@ throw new NotImplementedException();
 
         public static List<string> ExtractLinesFrom(string path, int numberOfLinesToRead, int codepage)
         {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
             var tempFile = Path.GetTempFileName();
             var lineNumber = 0;
             long numOfRemainingLines = 0;

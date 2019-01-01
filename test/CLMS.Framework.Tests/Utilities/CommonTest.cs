@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
@@ -307,10 +308,12 @@ namespace CLMS.Framework.Tests.Utilities
 
             Assert.AreEqual(0.1m, Common.ConvertToDecimal("0.1"));
             Assert.AreEqual(0m, Common.ConvertToDecimal("d", false));
+            Assert.IsNull(Common.ConvertToNullableDecimal("d"));
             Assert.ThrowsException<FormatException>(() => Common.ConvertToDecimal("d", true));
 
             Assert.AreEqual(0.1f, Common.ConvertToFloat("0.1"));
             Assert.AreEqual(0f, Common.ConvertToFloat("d", false));
+            Assert.IsNull(Common.ConvertToNullableFloat("d"));
             Assert.ThrowsException<FormatException>(() => Common.ConvertToFloat("d", true));
 
             Assert.AreEqual("yyyy-MM-dd tt", Common.ConvertMomentFormat("YYYY-MM-DD a"));
@@ -319,31 +322,83 @@ namespace CLMS.Framework.Tests.Utilities
 
             Assert.AreEqual(2018, Common.ConvertToDateTime("2018-01-01").Year);
             Assert.AreEqual(1, Common.ConvertToDateTime("d", false).Year);
+            Assert.IsNull(Common.ConvertToNullableDateTime("d"));
             Assert.ThrowsException<FormatException>(() => Common.ConvertToDateTime("d", true));
 
             Assert.AreEqual(1, Common.ConvertToInt("1"));
             Assert.AreEqual(0, Common.ConvertToInt("d", false));
+            Assert.IsNull(Common.ConvertToNullableInt("d"));
             Assert.ThrowsException<FormatException>(() => Common.ConvertToInt("d", true));
 
-            Assert.AreEqual(1l, Common.ConvertToLong("1"));
-            Assert.AreEqual(0l, Common.ConvertToLong("d", false));
+            Assert.AreEqual(1L, Common.ConvertToLong("1"));
+            Assert.AreEqual(0L, Common.ConvertToLong("d", false));
+            Assert.IsNull(Common.ConvertToNullableLong("d"));
             Assert.ThrowsException<FormatException>(() => Common.ConvertToLong("d", true));
 
             Assert.AreEqual(true, Common.ConvertToBool("true"));
             Assert.AreEqual(false, Common.ConvertToBool("d", false));
+            Assert.IsNull(Common.ConvertToNullableBool("d"));
             Assert.ThrowsException<FormatException>(() => Common.ConvertToBool("d", true));
 
             Assert.AreEqual(0.1d, Common.ConvertToDouble("0.1"));
             Assert.AreEqual(0.0d, Common.ConvertToDouble("d", false));
+            Assert.IsNull(Common.ConvertToNullableDouble("d"));
             Assert.ThrowsException<FormatException>(() => Common.ConvertToDouble("d", true));
 
             Assert.AreEqual(0b1, Common.ConvertToByte("1"));
             Assert.AreEqual(0b0, Common.ConvertToByte("d", false));
+            Assert.IsNull(Common.ConvertToNullableByte("d"));
             Assert.ThrowsException<FormatException>(() => Common.ConvertToByte("d", true));
 
             Assert.IsNotNull(Common.ConvertToGuid("9081ef78-2ee8-48df-a9af-4fc71fabfcc0"));
             Assert.IsNotNull(Common.ConvertToGuid("d", false));
+            Assert.IsNull(Common.ConvertToNullableGuid("d"));
             Assert.ThrowsException<FormatException>(() => Common.ConvertToGuid("d", true));
+        }
+
+        [TestMethod]
+        public void Base64Test() 
+        {
+            Assert.AreEqual("VGVzdA==", Common.Base64Encode("Test"));
+            Assert.AreEqual("UQ==", Common.Base64Encode(new byte []{ 81 }));
+            Assert.AreEqual("Test", Common.Base64Decode("VGVzdA=="));
+            Assert.AreEqual(81, Common.Base64DecodeAsByteArray("UQ==")[0]);
+        }
+
+        [TestMethod]
+        public void TypeTest()
+        {
+            Assert.AreEqual("CommonTest", Common.GetTypeName(typeof(CommonTest)));
+            Assert.AreEqual("CLMS.Framework.Tests.Utilities.CommonTest", Common.GetTypeName(typeof(CommonTest), true));
+            
+            Assert.AreEqual("Property", Common.GetProperty(typeof(CommonTest), "Property").Name);
+            Assert.AreEqual(null, Common.GetProperty(typeof(CommonTest), "Property", true));
+        }
+
+        [TestMethod]
+        public void ReadLinesFromTest() {
+            var lines = Common.ReadLinesFrom("./Line.csv", 2, 5, 1252);
+
+            Assert.AreEqual(2, lines.Count);
+            Assert.AreEqual("Apple", lines[0]);
+
+            Common.ReadLinesFrom("./Line.csv", 2, 1, 1252);
+        }
+
+        [TestMethod]
+        public void ExtractLinesFromTest() {
+            var lines = Common.ExtractLinesFrom("./Line.csv", 2, 1252);
+
+            Assert.AreEqual(2, lines.Count);
+            Assert.AreEqual("Test", lines[0]);
+            Common.ExtractLinesFrom("./Line.csv", 2, 1252);
+        }
+
+        [TestMethod]
+        public void RunExecutableTest() {          
+            Common.RunExecutable("./hello-world.dll");
+            Assert.ThrowsException<Win32Exception>(() => Common.RunExecutable("./hello.exe"));
+
         }
     }
 

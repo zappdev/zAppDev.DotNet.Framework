@@ -29,6 +29,12 @@
     <None Update="hibernate.cfg.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Line.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="hello-world.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="TestScript.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
