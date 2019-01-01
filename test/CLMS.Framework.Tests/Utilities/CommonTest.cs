@@ -376,7 +376,8 @@ namespace CLMS.Framework.Tests.Utilities
         }
 
         [TestMethod]
-        public void ReadLinesFromTest() {
+        public void ReadLinesFromTest() 
+        {
             var lines = Common.ReadLinesFrom("./Line.csv", 2, 5, 1252);
 
             Assert.AreEqual(2, lines.Count);
@@ -386,7 +387,8 @@ namespace CLMS.Framework.Tests.Utilities
         }
 
         [TestMethod]
-        public void ExtractLinesFromTest() {
+        public void ExtractLinesFromTest() 
+        {
             var lines = Common.ExtractLinesFrom("./Line.csv", 2, 1252);
 
             Assert.AreEqual(2, lines.Count);
@@ -395,10 +397,25 @@ namespace CLMS.Framework.Tests.Utilities
         }
 
         [TestMethod]
-        public void RunExecutableTest() {          
-            Common.RunExecutable("./hello-world.dll");
+        public void RunExecutableTest() 
+        {          
             Assert.ThrowsException<Win32Exception>(() => Common.RunExecutable("./hello.exe"));
+        }
 
+        [TestMethod]
+        public void GetNextExecutionTimeTest() 
+        {
+            Assert.AreEqual(5, Common.GetNextExecutionTime("*/5 * * * *", new DateTime(2018, 1, 1)).Minute);
+
+            DateTime? date = new DateTime(2018, 1, 1);
+            Assert.AreEqual(5, Common.GetNextExecutionTime("*/5 * * * *", date).Minute);
+        }
+
+        [TestMethod]
+        public void SmoothTest()
+        {
+            Assert.AreEqual("8c4996074e843911edcef4c7981c3a94", Common.GetMD5Hash(Common.SmoothRead("./JSON.ps1")));
+            Assert.AreEqual(31984, Common.SmoothReadBinary("./Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll").Length);
         }
     }
 
