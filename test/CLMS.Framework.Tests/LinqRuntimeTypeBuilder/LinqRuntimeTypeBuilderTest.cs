@@ -15,20 +15,30 @@ namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
 {
     [TestClass]
     public class LinqRuntimeTypeBuilderTest
-    {
-        public LinqRuntimeTypeBuilderTest()
+    {        
+        [TestInitialize]
+        public void Initialize() 
         {
+            var mock = new Mock<ICacheWrapperService>();
+
+            mock.Setup(foo => foo.Contains("BuiltTypes")).Returns(true);
+
+            var types = new Dictionary<string, Type>();
+
+            mock.Setup(foo => foo.Get<Dictionary<string, Type>>("BuiltTypes")).Returns(types);
+
             var services = new ServiceCollection();
-
-            services.AddDistributedMemoryCache();
-
-            var provider = services.BuildServiceProvider();
-            
-            services.AddSingleton<ICacheWrapperService>(new CacheWrapperService(provider.GetService<IDistributedCache>(), null));
+            services.AddSingleton<ICacheWrapperService>((ins) => mock.Object);
 
             ServiceLocator.SetLocatorProvider(services.BuildServiceProvider());
         }
-        
+
+        [TestCleanup]
+        public void Cleanup() 
+        {
+            ServiceLocator.SetLocatorProvider(null);
+        }
+
         [TestMethod]
         public void SanitizeCSharpIdentifierTest()
         {
@@ -102,19 +112,6 @@ namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
         [TestMethod]
         public void GetDynamicTypesTest()
         {
-            var mock = new Mock<ICacheWrapperService>();
-
-            mock.Setup(foo => foo.Contains("BuiltTypes")).Returns(true);
-
-            var types = new Dictionary<string, Type>();
-
-            mock.Setup(foo => foo.Get<Dictionary<string, Type>>("BuiltTypes")).Returns(types);
-
-            var services = new ServiceCollection();
-            services.AddSingleton<ICacheWrapperService>((ins) => mock.Object);
-
-            ServiceLocator.SetLocatorProvider(services.BuildServiceProvider());
-
             var groupField = new Dictionary<string, Type>() {
                 { "intVar", typeof(int)},
                 { "stringVar", typeof(string)}
@@ -126,6 +123,15 @@ namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
             };
 
             var p1 = Builder.LinqRuntimeTypeBuilder.GetDynamicTypes(groupField, selectField, typeof(bool));
+        
+            p1 = Builder.LinqRuntimeTypeBuilder.GetDynamicTypes(groupField, selectField, typeof(bool));
+
+            selectField = new Dictionary<string, Type>() {
+                { "linqVar", typeof(LinqRuntimeTypeBuilderTest)},
+                { "stringVar", typeof(string)}
+            };
+
+            Assert.ThrowsException<ApplicationException>(() => Builder.LinqRuntimeTypeBuilder.GetDynamicTypes(groupField, selectField, typeof(bool)));
         }
 
         [TestMethod]
@@ -187,6 +193,59 @@ namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
 
             Builder.LinqRuntimeTypeBuilder.GetDynamicTypes(groupField, selectField, typeof(bool));
         }
+
+        [TestMethod]
+        public void GetDynamicTypeTest()
+        {
+            var field = new Dictionary<string, Type>() {
+                { "intVar", typeof(int)},
+                { "stringVar", typeof(string)}
+            };
+
+            var p1 = Builder.LinqRuntimeTypeBuilder.GetDynamicType(field, typeof(bool));            
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void GetDynamicTypeThrow1Test()
+        {
+            var p1 = Builder.LinqRuntimeTypeBuilder.GetDynamicType(null, typeof(bool));            
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentOutOfRangeException))]
+        public void GetDynamicTypeThrow2Test()
+        {
+            var field = new Dictionary<string, Type>() { };
+            var p1 = Builder.LinqRuntimeTypeBuilder.GetDynamicType(field, typeof(bool));            
+        }
+
+        [TestMethod]
+        public void CreateGroupByAndSelectExpressionsTest() 
+        {
+            Expression<System.Func<int, object>> p = (a) => null;
+
+            var groupField = new List<FieldDefinition>() {
+                new Builder.FieldDefinition<int>
+                {
+                    Name = "Name",
+                    Type = typeof(string),
+                    Selector = p
+                }
+            };
+
+            var selectField = new List<FieldDefinition>() {
+                new Builder.FieldDefinition<int>
+                {
+                    Name = "Name",
+                    Type = typeof(string),
+                    Selector = p
+                }
+            };
+            
+            var exp = Builder.LinqRuntimeTypeBuilder.CreateGroupByAndSelectExpressions(groupField, selectField, out Type groupAnonType, out Type selectorAnonType);
+        }
+
     }
 }
 #endif
