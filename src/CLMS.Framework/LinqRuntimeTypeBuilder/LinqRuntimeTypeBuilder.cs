@@ -3,18 +3,24 @@ using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading;
+
 #if NETFRAMEWORK
+using Microsoft.CSharp;
 #else
 using CLMS.Framework.Services;
 using CLMS.Framework.Utilities;
+using System.Runtime.Loader;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
 #endif
-using Microsoft.CSharp;
 
 namespace CLMS.Framework.LinqRuntimeTypeBuilder
 {
@@ -301,18 +307,59 @@ namespace CLMS.Framework.LinqRuntimeTypeBuilder
             return null;
         }
 
-        private static Assembly BuildAssembly(string code)
+        private static Assembly BuildAssembly(string codeToCompile)
         {
+#if NETSTANDARD           
+            var syntaxTree = CSharpSyntaxTree.ParseText(codeToCompile);
+
+            var assemblyName = Path.GetRandomFileName();
+
+            var references = new MetadataReference[]
+            {
+                MetadataReference.CreateFromFile(typeof(object).GetTypeInfo().Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(Enumerable).GetTypeInfo().Assembly.Location),
+                MetadataReference.CreateFromFile(typeof(BinaryExpression).GetTypeInfo().Assembly.Location), 
+            };
+
+            var compilation = CSharpCompilation.Create(
+                assemblyName,
+                syntaxTrees: new[] { syntaxTree },
+                references: references,
+                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+            using (var ms = new MemoryStream())
+            {
+                var result = compilation.Emit(ms);
+
+                if (!result.Success)
+                {
+                    var errors = new StringBuilder("Compiler Errors :\r\n");
+                    var failures = result.Diagnostics.Where(diagnostic =>
+                        diagnostic.IsWarningAsError ||
+                        diagnostic.Severity == DiagnosticSeverity.Error);
+
+                    foreach (var error in failures)
+                    {
+                        errors.AppendFormat("Error {0}: {1}\n",
+                            error.Id, error.GetMessage());
+                    }
+
+                    throw new ApplicationException(errors.ToString());
+                }
+
+                ms.Seek(0, SeekOrigin.Begin);
+                return AssemblyLoadContext.Default.LoadFromStream(ms);
+            }
+#else
             var provider = new CSharpCodeProvider();
-            var compilerparams = new CompilerParameters
+            var compilerParameters = new CompilerParameters
             {
                 GenerateExecutable = false,
                 GenerateInMemory = true
             };
+            compilerParameters.ReferencedAssemblies.Add("System.Core.Dll");
 
-            compilerparams.ReferencedAssemblies.Add("System.Core.Dll");
-
-            var results = provider.CompileAssemblyFromSource(compilerparams, code);
+            var results = provider.CompileAssemblyFromSource(compilerParameters, codeToCompile);
             if (!results.Errors.HasErrors) return results.CompiledAssembly;
 
             var errors = new StringBuilder("Compiler Errors :\r\n");
@@ -323,6 +370,7 @@ namespace CLMS.Framework.LinqRuntimeTypeBuilder
             }
 
             throw new ApplicationException(errors.ToString());
+#endif
         }
 
         private static Type GetNullableType(Type type)

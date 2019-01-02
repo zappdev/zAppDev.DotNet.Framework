@@ -1,5 +1,6 @@
 ﻿#if NETFRAMEWORK
 #else
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -28,7 +29,7 @@ namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
             ServiceLocator.SetLocatorProvider(services.BuildServiceProvider());
         }
         
-        [TestMethod()]
+        [TestMethod]
         public void SanitizeCSharpIdentifierTest()
         {
             var id = Builder.LinqRuntimeTypeBuilder.SanitizeCSharpIdentifier("true");
@@ -101,7 +102,19 @@ namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
         [TestMethod]
         public void GetDynamicTypesTest()
         {
-#if NETFRAMEWORK
+            var mock = new Mock<ICacheWrapperService>();
+
+            mock.Setup(foo => foo.Contains("BuiltTypes")).Returns(true);
+
+            var types = new Dictionary<string, Type>();
+
+            mock.Setup(foo => foo.Get<Dictionary<string, Type>>("BuiltTypes")).Returns(types);
+
+            var services = new ServiceCollection();
+            services.AddSingleton<ICacheWrapperService>((ins) => mock.Object);
+
+            ServiceLocator.SetLocatorProvider(services.BuildServiceProvider());
+
             var groupField = new Dictionary<string, Type>() {
                 { "intVar", typeof(int)},
                 { "stringVar", typeof(string)}
@@ -113,7 +126,6 @@ namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
             };
 
             var p1 = Builder.LinqRuntimeTypeBuilder.GetDynamicTypes(groupField, selectField, typeof(bool));
-#endif
         }
 
         [TestMethod]

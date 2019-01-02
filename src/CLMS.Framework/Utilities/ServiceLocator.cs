@@ -12,6 +12,8 @@ namespace CLMS.Framework.Utilities
     {
 #if NETSTANDARD
         private readonly ServiceProvider _currentServiceProvider;
+
+        [ThreadStatic]
         private static ServiceProvider _serviceProvider;
 
         public ServiceLocator(ServiceProvider currentServiceProvider)
