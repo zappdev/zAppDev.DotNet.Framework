@@ -271,7 +271,10 @@ namespace CLMS.Framework.Tests.Utilities
             Common.AppendAllTo("name.txt", "Example", 1252);
             Common.AppendAllTo("name.txt", "Example", true);
             Common.AppendAllTo("name.txt", new List<byte> { 81 });
-            Common.AppendAllTo("name.txt", new byte[] { 81 });            
+            Common.AppendAllTo("name.txt", new byte[] { 81 });         
+            
+            Common.MoveFile("./name.txt", "Assets/name.txt", true);
+            Common.ReadLinesFrom("./Assets/name.txt", 2, 5, 1252);
         }
 
         [TestMethod]
@@ -378,28 +381,31 @@ namespace CLMS.Framework.Tests.Utilities
         [TestMethod]
         public void ReadLinesFromTest() 
         {
-            var lines = Common.ReadLinesFrom("./Line.csv", 2, 5, 1252);
+            var lines = Common.ReadLinesFrom("./Assets/Line.csv", 2, 5, 1252);
 
             Assert.AreEqual(2, lines.Count);
             Assert.AreEqual("Apple", lines[0]);
 
-            Common.ReadLinesFrom("./Line.csv", 2, 1, 1252);
-        }
+            Common.ReadLinesFrom("./Assets/Line.csv", 2, 1, 1252);
 
-        [TestMethod]
-        public void ExtractLinesFromTest() 
-        {
-            var lines = Common.ExtractLinesFrom("./Line.csv", 2, 1252);
+            Common.CopyFile("./Assets/Line.csv", "./Assets/LineTemp.csv");;
+
+            lines = Common.ExtractLinesFrom("./Assets/LineTemp.csv", 2, 1252);
 
             Assert.AreEqual(2, lines.Count);
             Assert.AreEqual("Test", lines[0]);
-            Common.ExtractLinesFrom("./Line.csv", 2, 1252);
+            Common.ExtractLinesFrom("./Assets/LineTemp.csv", 2, 1252);
         }
 
         [TestMethod]
         public void RunExecutableTest() 
         {          
             Assert.ThrowsException<Win32Exception>(() => Common.RunExecutable("./hello.exe"));
+
+#if Windows
+            var result = Common.RunExecutable("./Assets/hh2.golden.exe");
+            Assert.AreEqual("Hello, World!\r\n", result);
+#endif
         }
 
         [TestMethod]
@@ -414,8 +420,8 @@ namespace CLMS.Framework.Tests.Utilities
         [TestMethod]
         public void SmoothTest()
         {
-            Assert.AreEqual("8c4996074e843911edcef4c7981c3a94", Common.GetMD5Hash(Common.SmoothRead("./JSON.ps1")));
-            Assert.AreEqual(31984, Common.SmoothReadBinary("./Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll").Length);
+            Assert.AreEqual("4a502cbee9b51224da964f9ffb363c77", Common.GetMD5Hash(Common.SmoothRead("./Assets/JSON.ps1")));
+            Assert.AreEqual(402, Common.SmoothReadBinary("./Assets/hh2.golden.exe").Length);
         }
     }
 

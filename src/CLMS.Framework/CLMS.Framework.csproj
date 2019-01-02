@@ -4,6 +4,9 @@
     <TargetFrameworks>net472;netstandard2.0;net462</TargetFrameworks>
     <AssemblyName>CLMS.Framework</AssemblyName>
     <RootNamespace>CLMS.Framework</RootNamespace>
+    <IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</IsWindows>
+    <IsOSX Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">true</IsOSX>
+    <IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">true</IsLinux>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
@@ -12,6 +15,28 @@
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'net472' OR '$(TargetFramework)' == 'net462'">
     <DefineConstants>$(DefineConstants);NETFRAMEWORK</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IsWindows)'=='true'">
+    <DefineConstants>Windows</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IsOSX)'=='true'">
+    <DefineConstants>OSX</DefineConstants>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(IsLinux)'=='true'">
+    <DefineConstants>Linux</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IsWindows)'=='true'">
+    <DefineConstants>Windows</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(IsOSX)'=='true'">
+    <DefineConstants>OSX</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(IsLinux)'=='true'">
+    <DefineConstants>Linux</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,21 +52,21 @@
     <PackageReference Include="Ionic.Zip" Version="1.9.1.8" />
 
     <PackageReference Include="Autofac" Version="3.5.2" />
-    <PackageReference Include="CacheManager.Core" Version="1.1.2" />
-    <PackageReference Include="CacheManager.Serialization.Json" Version="1.1.2" />
-    <PackageReference Include="CacheManager.StackExchange.Redis" Version="1.1.2" />
-    <PackageReference Include="CacheManager.SystemRuntimeCaching" Version="1.1.2" />
+    <PackageReference Include="CacheManager.Core" Version="1.0.1" />
+    <PackageReference Include="CacheManager.Serialization.Json" Version="1.0.1" />
+    <PackageReference Include="CacheManager.StackExchange.Redis" Version="1.0.1" />
+    <PackageReference Include="CacheManager.SystemRuntimeCaching" Version="1.0.1" />
     <PackageReference Include="CSharpVerbalExpressions" Version="0.1.0" />
     <PackageReference Include="Glimpse" Version="1.8.6" />
 
     <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
-    <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.4.0" />
+    <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.6" />
     <PackageReference Include="Microsoft.AspNet.WebApi.WebHost" Version="5.2.6" />
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
-    <PackageReference Include="Microsoft.Owin" Version="4.0.0" />
-    <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.0.0" />
-    <PackageReference Include="Microsoft.Owin.Security" Version="4.0.0" />
+    <PackageReference Include="Microsoft.Owin" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Owin.Security" Version="3.1.0" />
     <PackageReference Include="NCrontab" Version="3.3.0" />
 
     <PackageReference Include="Autofac.WebApi2" Version="4.0.0" />
@@ -72,7 +97,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="2.1.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
     <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.1.1" />
     <PackageReference Include="ncrontab" Version="3.3.0" />
     <PackageReference Include="RSG.Promise.Core" Version="3.0.0" />

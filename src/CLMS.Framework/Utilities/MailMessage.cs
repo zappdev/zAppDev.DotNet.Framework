@@ -34,6 +34,9 @@ namespace CLMS.Framework.Utilities
                 if (Attachment == null)
                 {
                     Attachment = new Attachment(value);
+#if NETFRAMEWORK
+                    Attachment.Name = Path.GetFileName(value);
+#endif
                 }
                 else
                 {

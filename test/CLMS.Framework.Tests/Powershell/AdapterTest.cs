@@ -19,16 +19,16 @@ namespace CLMS.Framework.Tests.Powershell
         {
             var adapter = new Adapter<Result>();
 
-            var result = adapter.GetPowershellResults("JSON.ps1", new Dictionary<string, object> { {"in", "more" }});
+            var result = adapter.GetPowershellResults("./Assets/JSON.ps1", new Dictionary<string, object> { {"in", "more" }});
             
             Assert.AreEqual(3, result.Result.Count);
             Assert.AreEqual(true, result.Successful);
             
-            adapter.GetPowershellResult("JSON.ps1");
+            adapter.GetPowershellResult("./Assets/JSON.ps1");
             
             var adapterIssue = new Adapter<string>();
 
-            Assert.ThrowsException<JsonReaderException>(() => { adapterIssue.GetPowershellResult("JSON.ps1", new Dictionary<string, object> { {"in", "ok" }}); });
+            Assert.ThrowsException<JsonReaderException>(() => { adapterIssue.GetPowershellResult("./Assets/JSON.ps1", new Dictionary<string, object> { {"in", "ok" }}); });
         }
 
         [TestMethod]
@@ -36,16 +36,16 @@ namespace CLMS.Framework.Tests.Powershell
         {
             var adapter = new Adapter<Result>();
 
-            var result = adapter.GetPowershellResult("JSON.ps1", new Dictionary<string, object> { {"in", "ok" }});
+            var result = adapter.GetPowershellResult("./Assets/JSON.ps1", new Dictionary<string, object> { {"in", "ok" }});
             
             Assert.AreEqual(0, result.Result.Test);
             Assert.AreEqual(true, result.Successful);
             
-            adapter.GetPowershellResult("JSON.ps1");
+            adapter.GetPowershellResult("./Assets/JSON.ps1");
             
             var adapterIssue = new Adapter<string>();
 
-            Assert.ThrowsException<JsonReaderException>(() => { adapterIssue.GetPowershellResult("JSON.ps1", new Dictionary<string, object> { {"in", "ok" }}); });
+            Assert.ThrowsException<JsonReaderException>(() => { adapterIssue.GetPowershellResult("./Assets/JSON.ps1", new Dictionary<string, object> { {"in", "ok" }}); });
         } 
     }
 }

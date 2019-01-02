@@ -28,7 +28,7 @@ namespace CLMS.Framework.Tests.Utilities
 
             var attachment = new EmailAttachment
             {
-                Name = "EmptyScript.ps1"
+                Name = "./Assets/EmptyScript.ps1"
             };
             Assert.AreEqual("EmptyScript.ps1", attachment.Name);
 
@@ -39,7 +39,7 @@ namespace CLMS.Framework.Tests.Utilities
             attachment = EmailAttachment.CreateFromString("test", "test", "text/plain");
             Assert.AreEqual("test", attachment.Name);
 
-            attachment = EmailAttachment.CreateFromFile("test", "TestScript.ps1", "text/plain");
+            attachment = EmailAttachment.CreateFromFile("test", "./Assets/TestScript.ps1", "text/plain");
             Assert.AreEqual("test", attachment.Name);
 
             attachment.Name = "newName";

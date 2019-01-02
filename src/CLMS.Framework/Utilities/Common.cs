@@ -102,7 +102,7 @@ namespace CLMS.Framework.Utilities
             var clonedCultureInfo = System.Globalization.CultureInfo.InvariantCulture.Clone() as System.Globalization.CultureInfo;
             if (!string.IsNullOrEmpty(decimalSeparator)) clonedCultureInfo.NumberFormat.NumberDecimalSeparator = decimalSeparator;
 
-            var numericRegex = new System.Text.RegularExpressions.Regex("^-?\\d+(\\.|,)?\\d*$", System.Text.RegularExpressions.RegexOptions.Compiled);
+            var numericRegex = new Regex("^-?\\d+(\\.|,)?\\d*$", RegexOptions.Compiled);
 
             var headerContent = columnNames.Aggregate("", (current, column) =>
             {
@@ -253,8 +253,8 @@ namespace CLMS.Framework.Utilities
 
             public string GetFriendlyMessage()
             {
-                var friendlyMessageHandler = new CLMS.Framework.Utilities.ExceptionHandler();
-                return friendlyMessageHandler.GetFriendlyMessageEntriesHTML(this.Exception);
+                var friendlyMessageHandler = new ExceptionHandler();
+                return friendlyMessageHandler.GetFriendlyMessageEntriesHTML(Exception);
             }
 
             public string Message;
@@ -549,18 +549,18 @@ namespace CLMS.Framework.Utilities
         {
 #if NETFRAMEWORK
 
-            path = path ?? System.Web.HttpContext.Current.Server.MapPath(Path.Combine("~/App_Data/temp", Guid.NewGuid().ToString()));
-            if (((System.IO.Directory.Exists(path)) == false))
+            path = path ?? HttpContext.Current.Server.MapPath(Path.Combine("~/App_Data/temp", Guid.NewGuid().ToString()));
+            if (((Directory.Exists(path)) == false))
             {
-                System.IO.Directory.CreateDirectory(path);
+                Directory.CreateDirectory(path);
             }
-            var zipPath = System.IO.Path.Combine(path, "downloaded.zip");
+            var zipPath = Path.Combine(path, "downloaded.zip");
             //(new System.Net.WebClient()).DownloadFile(url, zipPath);
             using (var wc = new System.Net.WebClient())
             {
                 wc.DownloadFile(url, zipPath);
             }
-            var extractPath = System.IO.Path.Combine(path, "extracted_data");
+            var extractPath = Path.Combine(path, "extracted_data");
 
             System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, extractPath);
 
@@ -581,9 +581,20 @@ throw new NotImplementedException();
             File.Move(src, dest);
         }
 
+        public static void CopyFile(string src, string dest, bool overwrite = false)
+        {
+            var exists = File.Exists(dest);
+
+            if (exists & !overwrite) throw new Exception("Destination file already exists.");
+
+            if (exists & overwrite) File.Delete(dest);
+
+            File.Copy(src, dest);
+        }
+
         public static void WriteAllTo(string path, string text)
         {
-            System.IO.File.WriteAllText(path, text);
+            File.WriteAllText(path, text);
         }
 
         public static void WriteAllTo(string path, string text, int codepage)
@@ -613,11 +624,11 @@ throw new NotImplementedException();
 
         public static void AppendAllTo(string path, string text)
         {
-            System.IO.File.AppendAllText(path, text);
+            File.AppendAllText(path, text);
         }
         public static void AppendAllTo(string path, string text, int codepage)
         {
-            System.IO.File.AppendAllText(path, text, Encoding.GetEncoding(codepage));
+            File.AppendAllText(path, text, Encoding.GetEncoding(codepage));
         }
         public static void AppendAllTo(string path, string text, bool withBOM)
         {
@@ -995,33 +1006,33 @@ throw new NotImplementedException();
 
         public static string Base64Encode(string plainText)
         {
-            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
-            return System.Convert.ToBase64String(plainTextBytes);
+            var plainTextBytes = Encoding.UTF8.GetBytes(plainText);
+            return Convert.ToBase64String(plainTextBytes);
         }
 
         public static string Base64Encode(byte[] inputBytes)
         {
-            return System.Convert.ToBase64String(inputBytes);
+            return Convert.ToBase64String(inputBytes);
         }
 
         public static string Base64Decode(string base64EncodedData)
         {
-            var base64EncodedBytes = System.Convert.FromBase64String(base64EncodedData);
-            return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
+            var base64EncodedBytes = Convert.FromBase64String(base64EncodedData);
+            return Encoding.UTF8.GetString(base64EncodedBytes);
         }
 
-        public static System.Collections.Generic.List<byte> Base64DecodeAsByteArray(string base64EncodedData)
+        public static List<byte> Base64DecodeAsByteArray(string base64EncodedData)
         {
-            return System.Convert.FromBase64String(base64EncodedData).ToList();
+            return Convert.FromBase64String(base64EncodedData).ToList();
         }
 
         public static string GetMD5Hash(string str)
         {
             using (var md5Hash = System.Security.Cryptography.MD5.Create())
             {
-                var sBuilder = new System.Text.StringBuilder();
+                var sBuilder = new StringBuilder();
 
-                var encodedData = System.Text.Encoding.UTF8.GetBytes(str);
+                var encodedData = Encoding.UTF8.GetBytes(str);
                 var hashedData = md5Hash.ComputeHash(encodedData);
                 foreach (var b in hashedData)
                 {
@@ -1180,20 +1191,20 @@ throw new NotImplementedException();
         public static string SmoothRead(string path)
         {
             var contents = "";
-            using (FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
-                using (StreamReader streamReader = new StreamReader(fileStream))
+                using (var streamReader = new StreamReader(fileStream))
                 {
                     contents = streamReader.ReadToEnd();
                 }
             }
-            return contents;
+            return NormalizeLineEncoding(contents);
         }
 
         public static byte[] SmoothReadBinary(string path)
         {
             byte[] result = null;
-            using (FileStream fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var fileStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 //Read carefully the file (and not the whole thing at once, 'cause it might be bigger than 2GB and the int.MaxValue might blow us up
                 result = new byte[fileStream.Length];
