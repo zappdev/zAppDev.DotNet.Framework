@@ -1,15 +1,17 @@
-﻿#if NETFRAMEWORK
-#else
-using Moq;
+﻿using Moq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
-using CLMS.Framework.Services;
-using CLMS.Framework.Utilities;
-using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Builder = CLMS.Framework.LinqRuntimeTypeBuilder;
+
+#if NETFRAMEWORK
+#else
+using CLMS.Framework.Services;
+using CLMS.Framework.Utilities;
+using Microsoft.Extensions.DependencyInjection;
+#endif
 
 namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
 {
@@ -19,6 +21,8 @@ namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
         [TestInitialize]
         public void Initialize() 
         {
+#if NETFRAMEWORK
+#else
             var mock = new Mock<ICacheWrapperService>();
 
             mock.Setup(foo => foo.Contains("BuiltTypes")).Returns(true);
@@ -31,12 +35,16 @@ namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
             services.AddSingleton<ICacheWrapperService>((ins) => mock.Object);
 
             ServiceLocator.SetLocatorProvider(services.BuildServiceProvider());
+#endif
         }
 
         [TestCleanup]
         public void Cleanup() 
         {
+#if NETFRAMEWORK
+#else
             ServiceLocator.SetLocatorProvider(null);
+#endif
         }
 
         [TestMethod]
@@ -225,27 +233,51 @@ namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
         {
             Expression<System.Func<int, object>> p = (a) => null;
 
-            var groupField = new List<FieldDefinition>() {
+            var groupField = new List<Builder.FieldDefinition<int>>() {
                 new Builder.FieldDefinition<int>
                 {
-                    Name = "Name",
+                    Name = "Key",
                     Type = typeof(string),
                     Selector = p
                 }
             };
 
-            var selectField = new List<FieldDefinition>() {
-                new Builder.FieldDefinition<int>
+            var selectField = new List<Builder.FieldDefinition<IGrouping<object, int>>>() {
+                new Builder.FieldDefinition<IGrouping<object, int>>
+                {
+                    Name = "Key",
+                    Type = typeof(string),
+                    Selector = groups => groups
+                },
+                new Builder.FieldDefinition<IGrouping<object, int>>
                 {
                     Name = "Name",
+                    Type = typeof(string),
+                    Selector = groups => groups
+                }
+            };
+            
+            var exp = Builder.LinqRuntimeTypeBuilder
+                .CreateGroupByAndSelectExpressions(groupField, selectField, out var groupAnonType, out var selectorAnonType);
+        }
+
+        [TestMethod]
+        public void CombineSelectorsToNewObjectTest()
+        {
+            Expression<System.Func<int, object>> p = (a) => null;
+            
+            var groupField = new List<Builder.FieldDefinition<int>>() {
+                new Builder.FieldDefinition<int>
+                {
+                    Name = "Key",
                     Type = typeof(string),
                     Selector = p
                 }
             };
             
-            var exp = Builder.LinqRuntimeTypeBuilder.CreateGroupByAndSelectExpressions(groupField, selectField, out Type groupAnonType, out Type selectorAnonType);
+            var exp = Builder.LinqRuntimeTypeBuilder
+                .CombineSelectorsToNewObject(groupField, out var type);
         }
 
     }
 }
-#endif
