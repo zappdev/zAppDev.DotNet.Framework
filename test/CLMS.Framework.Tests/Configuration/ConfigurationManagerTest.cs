@@ -3,11 +3,7 @@ using System;
 using System.Configuration;
 
 using CLMS.Framework.Configuration;
-#if NETFRAMEWORK
-#else
 using Microsoft.Extensions.Configuration;
-#endif
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CLMS.Framework.Tests.Configuration

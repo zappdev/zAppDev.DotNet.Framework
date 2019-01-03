@@ -1,5 +1,4 @@
-﻿#if NETFRAMEWORK
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Mail;
 using System.Threading;
@@ -15,22 +14,26 @@ namespace CLMS.Framework.Utilities
     public class Email
 	{
         #region IMAP Settings structure
-        public class IMAPSettings
+        public class ImapSettings
         {
             public string Server { get; internal set; }
+
             public int Port { get; internal set; }
+
             public string Username { get; internal set; }
+
             public string Password { get; internal set; }
+
             public bool UseSSL { get; internal set; }
 
-            public IMAPSettings()
+            public ImapSettings()
             {
 
             }
 
-            public IMAPSettings(System.Net.Configuration.MailSettingsSectionGroup smtpSettings)
+            public ImapSettings(MailSettings smtpSettings)
             {
-                var log = LogManager.GetLogger("Email");
+                var log = LogManager.GetLogger(typeof(ImapSettings));
 
                 var prefix = "IMAP:";
 
@@ -40,8 +43,8 @@ namespace CLMS.Framework.Utilities
                 var password = ConfigurationManager.AppSettings[$"{prefix}password"];
                 var useSSL = ConfigurationManager.AppSettings[$"{prefix}enableSSL"];
 
-                if (string.IsNullOrWhiteSpace(server)) throw new ArgumentNullException("MailSettings", $"Missing setting: [{prefix}host]");
-                if (string.IsNullOrWhiteSpace(port)) throw new ArgumentNullException("MailSettings", $"Missing setting: [{prefix}port]");
+                if (string.IsNullOrWhiteSpace(server)) throw new ArgumentNullException(nameof(ImapSettings), $"Missing setting: [{prefix}host]");
+                if (string.IsNullOrWhiteSpace(port)) throw new ArgumentNullException(nameof(ImapSettings), $"Missing setting: [{prefix}port]");
 
                 Server = server;
 
@@ -52,7 +55,7 @@ namespace CLMS.Framework.Utilities
                 }
                 else
                 {
-                    throw new ArgumentException("MailSettings", $"Invalid setting: [{prefix}port]");
+                    throw new ArgumentException(nameof(ImapSettings), $"Invalid setting: [{prefix}port]");
                 }
 
                 Username = username;
@@ -60,7 +63,7 @@ namespace CLMS.Framework.Utilities
                 {
                     Username = smtpSettings?.Smtp?.Network?.UserName;
                     if(string.IsNullOrWhiteSpace(Username))
-                        throw new ArgumentNullException("MailSettings", $"Missing setting: [{prefix}username]");
+                        throw new ArgumentNullException(nameof(ImapSettings), $"Missing setting: [{prefix}username]");
 
                     log.Warn($"Missing or incorrect setting: [{prefix}username]. Will try to use the username you set in your SMTP Settings.");
                 }
@@ -70,7 +73,7 @@ namespace CLMS.Framework.Utilities
                 {
                     Password = smtpSettings?.Smtp?.Network?.Password;
                     if(string.IsNullOrWhiteSpace(Password))
-                        throw new ArgumentNullException("MailSettings", $"Missing setting: [{prefix}password]");
+                        throw new ArgumentNullException(nameof(ImapSettings), $"Missing setting: [{prefix}password]");
 
                     log.Warn($"Missing or incorrect setting: [{prefix}password]. Will try to use the password you set in your SMTP Settings.");
                 }
@@ -88,23 +91,47 @@ namespace CLMS.Framework.Utilities
         }
         #endregion
 
-        public static System.Net.Configuration.MailSettingsSectionGroup FetchSMTPSettings()
+        public static MailSettings FetchSmtpSettings()
         {
-            var config = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration(HttpContext.Current.Request.ApplicationPath);
-            var settings = (System.Net.Configuration.MailSettingsSectionGroup)config.GetSectionGroup("system.net/mailSettings");
-            return settings;
+#if NETFRAMEWORK
+            System.Net.Configuration.MailSettingsSectionGroup settings = null;
+
+            if (HttpContext.Current == null)
+            {
+                settings = (System.Net.Configuration.MailSettingsSectionGroup) ConfigurationManager.GetSection("system.net/mailSettings");
+            }
+            else
+            {
+                var config = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration(HttpContext.Current.Request.ApplicationPath);
+                settings = (System.Net.Configuration.MailSettingsSectionGroup) config.GetSectionGroup("system.net/mailSettings");
+            }
+
+            return new MailSettings
+            {
+                Smtp = new SmtpSettings
+                {
+                    From = settings?.Smtp?.From,
+                    Network = new SmtpNetworkSettings
+                    {
+                        Password = settings?.Smtp?.Network?.Password,
+                        UserName = settings?.Smtp?.Network?.UserName
+                    }
+                }
+            };
+#else
+            return null;
+#endif
         }
 
-        #region SMTP: Sending E-Mails
+#region SMTP: Sending E-Mails
         public static void SendMail(EMailMessage message, bool sendAsync = false)
         {            
             if (string.IsNullOrEmpty(message.From))
             {
-                var config = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration(HttpContext.Current.Request.ApplicationPath);
-                var settings = FetchSMTPSettings();
+                var settings = FetchSmtpSettings();
 
                 if (settings == null)
-                    throw new ArgumentNullException("MailSettings", "No valid mail settings were found in the configuration.");
+                    throw new ArgumentNullException(nameof(message), "No valid mail settings were found in the configuration.");
 
                 message.From = settings.Smtp.From;
             }
@@ -149,7 +176,7 @@ namespace CLMS.Framework.Utilities
 	    /// <param name="sendAsync">Send the mail asynchronously</param>
 	    public static void SendMail(string subject, string body, string to, string cc = "", string bcc = "", string fromAddress = "", List<Attachment> attachments = null, bool sendAsync = false)
         {
-            var log = LogManager.GetLogger("Email");
+            var log = LogManager.GetLogger(typeof(Email));
 
             log.Debug("Start");
 
@@ -161,7 +188,7 @@ namespace CLMS.Framework.Utilities
             log.Debug("To address Ok");
 
 
-            var settings = FetchSMTPSettings();
+            var settings = FetchSmtpSettings();
 
             log.Debug("settings Ok");
 
@@ -243,7 +270,7 @@ namespace CLMS.Framework.Utilities
 
 		private static void SendMail(MailMessage message, bool sendAsync = false)
 		{
-			var log = LogManager.GetLogger("Email");
+			var log = LogManager.GetLogger(typeof(Email));
             SmtpClient client = null;
 			try
 			{
@@ -393,21 +420,21 @@ namespace CLMS.Framework.Utilities
             cdoMessage.Send();
 	    }*/
 
-        #endregion
+#endregion
 
 
-        #region IMAP: Reading E-Mails
+#region IMAP: Reading E-Mails
 
         private readonly bool _suppressExceptions;
 
-        private IMAPSettings _imapSettings { get; set; }
+        private ImapSettings _imapSettings { get; set; }
 
         public Email(bool suppressExceptions = false)
         {
             try
             {
                 _suppressExceptions = suppressExceptions;
-                _imapSettings = new IMAPSettings(FetchSMTPSettings());
+                _imapSettings = new ImapSettings(FetchSmtpSettings());
             }
             catch (Exception)
             {
@@ -420,7 +447,7 @@ namespace CLMS.Framework.Utilities
             try
             {
                 _suppressExceptions = suppressExceptions;
-                _imapSettings = new IMAPSettings();
+                _imapSettings = new ImapSettings();
                 _imapSettings.Server = server;
                 _imapSettings.Port = port;
                 _imapSettings.Username = username;
@@ -603,10 +630,23 @@ namespace CLMS.Framework.Utilities
             }
         }
 
-        #endregion
+#endregion
     }
 
+    public class MailSettings
+    {
+        public SmtpSettings Smtp { get; set; }
+    }
 
+    public class SmtpSettings
+    {
+        public string From { get; set; }
+        public SmtpNetworkSettings Network { get; set; }
+    }
 
+    public class SmtpNetworkSettings
+    {
+        public string Password { get; set; }
+        public string UserName { get; set; }
+    }
 }
-#endif

@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
-#if NETFRAMEWORK
-#else
 using Microsoft.Extensions.Configuration;
-#endif
 
 namespace CLMS.Framework.Configuration
 {
