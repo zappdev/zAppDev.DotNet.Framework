@@ -1,7 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Configuration;
-using System.IO;
 using Microsoft.Extensions.Configuration;
 
 namespace CLMS.Framework.Configuration
@@ -24,6 +24,15 @@ namespace CLMS.Framework.Configuration
 
     public class ConfigurationHandler
     {
+        public static IConfigurationRoot GetConfiguration()
+        {
+            return new Microsoft.Extensions.Configuration.ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddXmlFile("App.config", true, false)
+                .AddXmlFile("Web.config", true, false)
+                .Build();
+        }
+
 #if NETFRAMEWORK
 #else
         public static ConfigurationBuilder SetUpConfigurationBuilder(ConfigurationBuilder config)

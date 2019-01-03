@@ -1,13 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
+using System.Web;
+using System.Linq;
 using System.Net.Mail;
 using System.Threading;
 using System.Configuration;
-using System.Linq;
-using System.Web;
+using System.Collections.Generic;
+using CLMS.Framework.Configuration;
 using log4net;
 using S22.Imap;
-using System.IO;
+using Microsoft.Extensions.Configuration;
 
 namespace CLMS.Framework.Utilities
 {
@@ -98,26 +100,29 @@ namespace CLMS.Framework.Utilities
 
             if (HttpContext.Current == null)
             {
-                settings = (System.Net.Configuration.MailSettingsSectionGroup) ConfigurationManager.GetSection("system.net/mailSettings");
+                var config = ConfigurationHandler.GetConfiguration();
+
+                return config.GetSection("system.net/mailSettings").Get<MailSettings>();
             }
             else
             {
                 var config = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration(HttpContext.Current.Request.ApplicationPath);
                 settings = (System.Net.Configuration.MailSettingsSectionGroup) config.GetSectionGroup("system.net/mailSettings");
+
+                return new MailSettings
+                {
+                    Smtp = new SmtpSettings
+                    {
+                        From = settings?.Smtp?.From,
+                        Network = new SmtpNetworkSettings
+                        {
+                            Password = settings?.Smtp?.Network?.Password,
+                            UserName = settings?.Smtp?.Network?.UserName
+                        }
+                    }
+                };
             }
 
-            return new MailSettings
-            {
-                Smtp = new SmtpSettings
-                {
-                    From = settings?.Smtp?.From,
-                    Network = new SmtpNetworkSettings
-                    {
-                        Password = settings?.Smtp?.Network?.Password,
-                        UserName = settings?.Smtp?.Network?.UserName
-                    }
-                }
-            };
 #else
             return null;
 #endif
