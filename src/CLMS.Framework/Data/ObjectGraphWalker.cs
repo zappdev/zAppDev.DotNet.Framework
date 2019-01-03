@@ -387,7 +387,7 @@ namespace CLMS.Framework.Data
         /// <summary>
         /// Initializes the <see cref="ObjectGraphWalker"/> class.
         /// </summary>
-        public static void Initialize(Configuration cfg)
+        public static void Initialize(NHibernate.Cfg.Configuration cfg)
         {
             // get all types having
             // many/one-to-one properties

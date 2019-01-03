@@ -32,7 +32,7 @@ namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
             mock.Setup(foo => foo.Get<Dictionary<string, Type>>("BuiltTypes")).Returns(types);
 
             var services = new ServiceCollection();
-            services.AddSingleton<ICacheWrapperService>((ins) => mock.Object);
+            services.AddSingleton(ins => mock.Object);
 
             ServiceLocator.SetLocatorProvider(services.BuildServiceProvider());
 #endif
@@ -88,7 +88,7 @@ namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
         [TestMethod]
         public void FieldDefinitionTest()
         {
-            Expression<System.Func<int, object>> p = (a) => null;
+            Expression<Func<int, object>> p = (a) => null;
 
             var test = new Builder.FieldDefinition<int>
             {
@@ -109,7 +109,7 @@ namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
 
             var param = new Builder.ParameterReplaceVisitor(p1, p1);
 
-            Expression<System.Func<int, object>> p = (a) => null;
+            Expression<Func<int, object>> p = (a) => null;
 
             param.Visit(p);
             param.Visit(p1);
@@ -151,9 +151,7 @@ namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
                 { "stringVar", typeof(string)}
             };
 
-            var groupField = new Dictionary<string, Type>()
-            {
-            };
+            var groupField = new Dictionary<string, Type>();
 
             Builder.LinqRuntimeTypeBuilder.GetDynamicTypes(groupField, selectField, typeof(bool));
         }
@@ -167,9 +165,7 @@ namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
                 { "stringVar", typeof(string)}
             };
 
-            var selectField = new Dictionary<string, Type>()
-            {
-            };
+            var selectField = new Dictionary<string, Type>();
 
             Builder.LinqRuntimeTypeBuilder.GetDynamicTypes(groupField, selectField, typeof(bool));
         }
@@ -178,34 +174,30 @@ namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
         [ExpectedException(typeof(ArgumentNullException))]
         public void GetDynamicTypesThrow3Test()
         {
-            var selectField = new Dictionary<string, Type>() {
+            var selectField = new Dictionary<string, Type> {
                 { "intVar", typeof(int)},
                 { "stringVar", typeof(string)}
             };
 
-            Dictionary<string, Type> groupField = null;
-
-            Builder.LinqRuntimeTypeBuilder.GetDynamicTypes(groupField, selectField, typeof(bool));
+            Builder.LinqRuntimeTypeBuilder.GetDynamicTypes(null, selectField, typeof(bool));
         }
 
         [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void GetDynamicTypesThrow4Test()
         {
-            var groupField = new Dictionary<string, Type>() {
+            var groupField = new Dictionary<string, Type> {
                 { "intVar", typeof(int)},
                 { "stringVar", typeof(string)}
             };
 
-            Dictionary<string, Type> selectField = null;
-
-            Builder.LinqRuntimeTypeBuilder.GetDynamicTypes(groupField, selectField, typeof(bool));
+            Builder.LinqRuntimeTypeBuilder.GetDynamicTypes(groupField, null, typeof(bool));
         }
 
         [TestMethod]
         public void GetDynamicTypeTest()
         {
-            var field = new Dictionary<string, Type>() {
+            var field = new Dictionary<string, Type> {
                 { "intVar", typeof(int)},
                 { "stringVar", typeof(string)}
             };
@@ -224,14 +216,14 @@ namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
         [ExpectedException(typeof(ArgumentOutOfRangeException))]
         public void GetDynamicTypeThrow2Test()
         {
-            var field = new Dictionary<string, Type>() { };
+            var field = new Dictionary<string, Type>();
             var p1 = Builder.LinqRuntimeTypeBuilder.GetDynamicType(field, typeof(bool));            
         }
 
         [TestMethod]
         public void CreateGroupByAndSelectExpressionsTest() 
         {
-            Expression<System.Func<int, object>> p = (a) => null;
+            Expression<Func<int, object>> p = (a) => null;
 
             var groupField = new List<Builder.FieldDefinition<int>>() {
                 new Builder.FieldDefinition<int>
@@ -264,7 +256,7 @@ namespace CLMS.Framework.Tests.LinqRuntimeTypeBuilder
         [TestMethod]
         public void CombineSelectorsToNewObjectTest()
         {
-            Expression<System.Func<int, object>> p = (a) => null;
+            Expression<Func<int, object>> p = (a) => null;
             
             var groupField = new List<Builder.FieldDefinition<int>>() {
                 new Builder.FieldDefinition<int>

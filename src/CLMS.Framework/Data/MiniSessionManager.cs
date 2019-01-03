@@ -21,7 +21,7 @@ namespace CLMS.Framework.Data
         [ThreadStatic]
         private static MiniSessionManager _manager;
         private static ISessionFactory _sessionFactory;
-        private static Configuration _config;
+        private static NHibernate.Cfg.Configuration _config;
 
         public static string UpdateDbScript
         {
@@ -54,7 +54,7 @@ namespace CLMS.Framework.Data
 
         private static ISessionFactory BuildSessionFactory()
         {
-            _config = new Configuration();
+            _config = new NHibernate.Cfg.Configuration();
             var hibernateConfig = "hibernate.cfg.xml";
             //if not rooted, assume path from base directory
             if (System.IO.Path.IsPathRooted(hibernateConfig) == false)
@@ -80,7 +80,7 @@ namespace CLMS.Framework.Data
             return factory;
         }
 
-        private static void UpdateDatabaseSchema(Configuration cfg)
+        private static void UpdateDatabaseSchema(NHibernate.Cfg.Configuration cfg)
         {
             ExecuteScript(@"IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'wf') EXEC('CREATE SCHEMA wf AUTHORIZATION [dbo]');
                     IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'security') EXEC('CREATE SCHEMA security AUTHORIZATION [dbo]');

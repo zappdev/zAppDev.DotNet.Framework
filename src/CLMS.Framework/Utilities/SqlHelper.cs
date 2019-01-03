@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace CLMS.Framework.Utilities
 {
@@ -16,15 +17,8 @@ namespace CLMS.Framework.Utilities
             {
                 return timeOut.Value;
             }
-
-            int commandTimeout;
-            if (int.TryParse(System.Configuration.ConfigurationManager.AppSettings["SQLQueryTimeoutInSeconds"], out commandTimeout))
-            {
-                return commandTimeout;
-            }
-
-            //Return the default value, in seconds
-            return 30;
+            var timeoutParam = System.Configuration.ConfigurationManager.AppSettings["SQLQueryTimeoutInSeconds"];
+            return int.TryParse(timeoutParam, out var commandTimeout) ? commandTimeout : 30;
         }
 
         public static List<Dictionary<string, object>> RunSqlQuery(string query, Dictionary<string, object> parameters, string connectionString)
@@ -59,13 +53,13 @@ namespace CLMS.Framework.Utilities
                         }
                     }
 
-                    using (System.Data.SqlClient.SqlDataReader rdr = command.ExecuteReader())
+                    using (var rdr = command.ExecuteReader())
                     {
                         while (rdr.Read())
                         {
                             var result = new Dictionary<string, object>();
 
-                            for (int i = 0; i < rdr.FieldCount; i++)
+                            for (var i = 0; i < rdr.FieldCount; i++)
                             {
                                 var columnName = rdr.GetName(i);
                                 result.Add(columnName, rdr[columnName]);
@@ -108,13 +102,13 @@ namespace CLMS.Framework.Utilities
                         }
                     }
 
-                    using (System.Data.SqlClient.SqlDataReader rdr = command.ExecuteReader())
+                    using (var rdr = command.ExecuteReader())
                     {
                         while (rdr.Read())
                         {
                             var result = new Dictionary<string, object>();
 
-                            for (int i = 0; i < rdr.FieldCount; i++)
+                            for (var i = 0; i < rdr.FieldCount; i++)
                             {
                                 var columnName = rdr.GetName(i);
                                 result.Add(columnName, rdr[columnName]);
