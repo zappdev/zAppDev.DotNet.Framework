@@ -1,6 +1,7 @@
 using System.Collections.Generic;
-using System.Configuration;
+using CLMS.Framework.Configuration;
 using CLMS.Framework.Utilities;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CLMS.Framework.Tests.Utilities
@@ -11,25 +12,17 @@ namespace CLMS.Framework.Tests.Utilities
         [TestInitialize]
         public void Initialize()
         {
-#if NETFRAMEWORK
-#else
-            var currentConfig =
-                ConfigurationManager.OpenExeConfiguration(
-                    ConfigurationUserLevel.None);
-
-            var configFileMap = new ExeConfigurationFileMap
-            {
-                ExeConfigFilename = "App.config"
-            };
-
-            var validConfig =
-                ConfigurationManager.OpenMappedExeConfiguration(
-                    configFileMap, ConfigurationUserLevel.None);
-
-            validConfig.SaveAs(currentConfig.FilePath, ConfigurationSaveMode.Full);
-#endif
+            var services = new ServiceCollection();
+            services.AddSingleton(ins => ConfigurationHandler.GetConfiguration());
+            ServiceLocator.SetLocatorProvider(services.BuildServiceProvider());
         }
-        
+
+        [TestCleanup]
+        public void Cleanup()
+        {
+            ServiceLocator.SetLocatorProvider(null);
+        }
+
         [TestMethod]
         public void GetConnectionStringTest()
         {
@@ -50,6 +43,11 @@ namespace CLMS.Framework.Tests.Utilities
             };
 
             users = SqlHelper.RunSqlQuery("SELECT * FROM [dbo].[Customer] WHERE [FirstName] = @Name", parameters, SqlHelper.GetConnectionString());
+
+            Assert.IsNotNull(users);
+            Assert.AreEqual(1, users.Count);
+
+            users = SqlHelper.RunSqlQuery("SELECT * FROM [dbo].[Customer] WHERE [FirstName] = @Name", parameters, 100, SqlHelper.GetConnectionString());
 
             Assert.IsNotNull(users);
             Assert.AreEqual(1, users.Count);

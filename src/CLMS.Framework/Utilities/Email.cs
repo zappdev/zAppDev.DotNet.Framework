@@ -96,18 +96,15 @@ namespace CLMS.Framework.Utilities
         public static MailSettings FetchSmtpSettings()
         {
 #if NETFRAMEWORK
-            System.Net.Configuration.MailSettingsSectionGroup settings = null;
 
             if (HttpContext.Current == null)
             {
-                var config = ConfigurationHandler.GetConfiguration();
-
-                return config.GetSection("system.net/mailSettings").Get<MailSettings>();
+                return ConfigurationHandler.GetSmtpSettings();
             }
             else
             {
                 var config = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration(HttpContext.Current.Request.ApplicationPath);
-                settings = (System.Net.Configuration.MailSettingsSectionGroup) config.GetSectionGroup("system.net/mailSettings");
+                var settings = (System.Net.Configuration.MailSettingsSectionGroup) config.GetSectionGroup("system.net/mailSettings");
 
                 return new MailSettings
                 {
@@ -124,11 +121,11 @@ namespace CLMS.Framework.Utilities
             }
 
 #else
-            return null;
+            return ConfigurationHandler.GetSmtpSettings();
 #endif
         }
 
-#region SMTP: Sending E-Mails
+        #region SMTP: Sending E-Mails
         public static void SendMail(EMailMessage message, bool sendAsync = false)
         {            
             if (string.IsNullOrEmpty(message.From))
@@ -636,22 +633,5 @@ namespace CLMS.Framework.Utilities
         }
 
 #endregion
-    }
-
-    public class MailSettings
-    {
-        public SmtpSettings Smtp { get; set; }
-    }
-
-    public class SmtpSettings
-    {
-        public string From { get; set; }
-        public SmtpNetworkSettings Network { get; set; }
-    }
-
-    public class SmtpNetworkSettings
-    {
-        public string Password { get; set; }
-        public string UserName { get; set; }
-    }
+    }    
 }

@@ -1,7 +1,5 @@
-﻿#if NETSTANDARD
+﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-#endif
-using System;
 
 namespace CLMS.Framework.Utilities
 {
@@ -10,7 +8,6 @@ namespace CLMS.Framework.Utilities
     /// </summary>
     public class ServiceLocator
     {
-#if NETSTANDARD
         private readonly ServiceProvider _currentServiceProvider;
 
         [ThreadStatic]
@@ -35,8 +32,14 @@ namespace CLMS.Framework.Utilities
 
         public TService GetInstance<TService>()
         {
-            return _currentServiceProvider.GetService<TService>();
+            try
+            {
+                return _currentServiceProvider.GetService<TService>();            
+            }
+            catch (ArgumentException)
+            {
+                return default(TService);
+            }
         }
-#endif
     }
 }

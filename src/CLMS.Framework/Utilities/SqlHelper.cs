@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using CLMS.Framework.Configuration;
 
 namespace CLMS.Framework.Utilities
 {
     public class SqlHelper
     {
-
         public static string GetConnectionString()
         {
-            return System.Configuration.ConfigurationManager.ConnectionStrings["Database"].ConnectionString;
+            var config = ConfigurationHandler.GetAppConfiguration();
+            return config.ConnectionStrings["Database"].ConnectionString;
         }
 
         private static int GetCommandTimeout(int? timeOut = null)
@@ -17,7 +17,8 @@ namespace CLMS.Framework.Utilities
             {
                 return timeOut.Value;
             }
-            var timeoutParam = System.Configuration.ConfigurationManager.AppSettings["SQLQueryTimeoutInSeconds"];
+            var config = ConfigurationHandler.GetAppConfiguration();
+            var timeoutParam = config.AppSettings["SQLQueryTimeoutInSeconds"];
             return int.TryParse(timeoutParam, out var commandTimeout) ? commandTimeout : 30;
         }
 

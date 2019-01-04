@@ -1,9 +1,6 @@
-
-using System;
 using System.Configuration;
 
 using CLMS.Framework.Configuration;
-using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CLMS.Framework.Tests.Configuration
@@ -36,16 +33,10 @@ namespace CLMS.Framework.Tests.Configuration
         [TestMethod]
         public void SetUpConfigurationBuilderTest()
         {
-#if NETFRAMEWORK
-            Assert.IsNotNull(System.Configuration.ConfigurationManager.ConnectionStrings["Database"].ConnectionString);
-#else
-            var config = ConfigurationHandler
-                .SetUpConfigurationBuilder(new ConfigurationBuilder())
-                .Build();
+            var config = ConfigurationHandler.GetAppConfiguration();
 
-            var appConfig = config.Get<AppConfig>();
-            Assert.IsNotNull(appConfig.ConnectionStrings["Database"].ConnectionString);
-#endif
+            Assert.IsNotNull(config.ConnectionStrings["Database"].ConnectionString);
+            Assert.AreEqual("false", config.AppSettings["ZipWebRequests"]);
         }
     }
 }

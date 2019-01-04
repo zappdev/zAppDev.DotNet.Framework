@@ -2,35 +2,34 @@
 using System.IO;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
+using System.Xml;
+using CLMS.Framework.Utilities;
 using Microsoft.Extensions.Configuration;
 
 namespace CLMS.Framework.Configuration
-{
-    public class AppConfig
-    {
-        public Dictionary<string, ConnectionSettings> ConnectionStrings { get; set; }
-
-        public Dictionary<string, string> AppSettings { get; set; }
-
-        public class ConnectionSettings
-        {
-            public string Name { get; set; }
-
-            public string ConnectionString { get; set; }
-
-            public string ProviderName { get; set; }
-        }
-    }
-
+{   
     public class ConfigurationHandler
     {
-        public static IConfigurationRoot GetConfiguration()
+        public static IConfiguration GetConfiguration()
         {
             return new Microsoft.Extensions.Configuration.ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddXmlFile("App.config", true, false)
-                .AddXmlFile("Web.config", true, false)
+                .Add(new LegacyConfigurationProvider())
                 .Build();
+        }
+
+        public static MailSettings GetSmtpSettings()
+        {
+            return GetConfiguration()
+                .GetSection("system.net/mailSettings")
+                .Get<MailSettings>();
+        }
+
+        public static AppConfiguration GetAppConfiguration()
+        {
+            var config = ServiceLocator.Current.GetInstance<IConfiguration>();
+            return (config ?? GetConfiguration()).Get<AppConfiguration>();
         }
 
 #if NETFRAMEWORK
@@ -44,22 +43,38 @@ namespace CLMS.Framework.Configuration
 #endif
     }
 
-#if NETFRAMEWORK
-#else
     public class LegacyConfigurationProvider : ConfigurationProvider, IConfigurationSource
     {
         public override void Load()
         {
-            foreach (ConnectionStringSettings connectionString in ConfigurationManager.ConnectionStrings)
+            var doc = new XmlDocument();
+
+            doc.Load(@".\App.config");
+
+            var selectNodes = doc.SelectNodes("//configuration/connectionStrings/add");
+            if (selectNodes != null)
             {
-                Data.Add($"ConnectionStrings:{connectionString.Name}:connectionString", connectionString.ConnectionString);
-                Data.Add($"ConnectionStrings:{connectionString.Name}:name", connectionString.Name);
-                Data.Add($"ConnectionStrings:{connectionString.Name}:providerName", connectionString.ProviderName);
+                foreach (XmlNode connection in selectNodes)
+                {
+                    if (connection.Attributes == null) continue;
+
+                    Data.Add($"ConnectionStrings:{connection.Attributes["name"].Value}:connectionString",
+                        connection.Attributes["connectionString"].Value);
+                    Data.Add($"ConnectionStrings:{connection.Attributes["name"].Value}:name",
+                        connection.Attributes["name"].Value);
+                    Data.Add($"ConnectionStrings:{connection.Attributes["name"].Value}:providerName",
+                        connection.Attributes["providerName"].Value);
+                }
             }
 
-            foreach (var settingKey in ConfigurationManager.AppSettings.AllKeys)
+            var appSettNodeList = doc.SelectNodes("//configuration/appSettings/add");
+            if (appSettNodeList == null) return;
+
+            foreach (XmlNode appSett in appSettNodeList)
             {
-                Data.Add($"AppSettings:{settingKey}", ConfigurationManager.AppSettings[settingKey]);
+                if (appSett.Attributes == null) continue;
+
+                    Data.Add($"AppSettings:{appSett.Attributes["key"].Value}", appSett.Attributes["value"].Value);
             }
         }
 
@@ -68,5 +83,5 @@ namespace CLMS.Framework.Configuration
             return this;
         }
     }
-#endif
+
 }
