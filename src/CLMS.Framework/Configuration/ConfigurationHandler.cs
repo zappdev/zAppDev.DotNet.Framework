@@ -72,7 +72,10 @@ namespace CLMS.Framework.Configuration
             {
                 if (appSett.Attributes == null) continue;
 
-                    Data.Add($"AppSettings:{appSett.Attributes["key"].Value}", appSett.Attributes["value"].Value);
+                var key = appSett.Attributes["key"].Value;
+
+                var prefix = key.Contains(":") ? "" : "AppSettings:";
+                Data.Add($"{prefix}{appSett.Attributes["key"].Value}", appSett.Attributes["value"].Value);
             }
         }
 

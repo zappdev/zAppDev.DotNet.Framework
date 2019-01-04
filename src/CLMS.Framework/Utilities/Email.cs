@@ -1,15 +1,14 @@
 ﻿using System;
 using System.IO;
-using System.Web;
 using System.Linq;
 using System.Net.Mail;
 using System.Threading;
 using System.Configuration;
 using System.Collections.Generic;
+using System.Net;
 using CLMS.Framework.Configuration;
 using log4net;
 using S22.Imap;
-using Microsoft.Extensions.Configuration;
 
 namespace CLMS.Framework.Utilities
 {
@@ -18,15 +17,7 @@ namespace CLMS.Framework.Utilities
         #region IMAP Settings structure
         public class ImapSettings
         {
-            public string Server { get; internal set; }
-
-            public int Port { get; internal set; }
-
-            public string Username { get; internal set; }
-
-            public string Password { get; internal set; }
-
-            public bool UseSSL { get; internal set; }
+            public ImapConfiguration ImapConfiguration { get; internal set; }
 
             public ImapSettings()
             {
@@ -37,55 +28,32 @@ namespace CLMS.Framework.Utilities
             {
                 var log = LogManager.GetLogger(typeof(ImapSettings));
 
-                var prefix = "IMAP:";
+                const string prefix = "IMAP:";
 
-                var server = ConfigurationManager.AppSettings[$"{prefix}host"];
-                var port = ConfigurationManager.AppSettings[$"{prefix}port"];
-                var username = ConfigurationManager.AppSettings[$"{prefix}username"];
-                var password = ConfigurationManager.AppSettings[$"{prefix}password"];
-                var useSSL = ConfigurationManager.AppSettings[$"{prefix}enableSSL"];
+                ImapConfiguration = ConfigurationHandler.GetAppConfiguration().ImapConfiguration;
 
-                if (string.IsNullOrWhiteSpace(server)) throw new ArgumentNullException(nameof(ImapSettings), $"Missing setting: [{prefix}host]");
-                if (string.IsNullOrWhiteSpace(port)) throw new ArgumentNullException(nameof(ImapSettings), $"Missing setting: [{prefix}port]");
-
-                Server = server;
-
-				int p;
-                if (int.TryParse(port, out p))
+                if (string.IsNullOrWhiteSpace(ImapConfiguration.Host)) throw new ArgumentNullException(nameof(ImapSettings), $"Missing setting: [{prefix}host]");
+                if (ImapConfiguration.Port != null) throw new ArgumentNullException(nameof(ImapSettings), $"Missing setting: [{prefix}port]");
+               
+                if (string.IsNullOrWhiteSpace(ImapConfiguration.Username))
                 {
-                    Port = p;
-                }
-                else
-                {
-                    throw new ArgumentException(nameof(ImapSettings), $"Invalid setting: [{prefix}port]");
-                }
-
-                Username = username;
-                if (string.IsNullOrWhiteSpace(Username))
-                {
-                    Username = smtpSettings?.Smtp?.Network?.UserName;
-                    if(string.IsNullOrWhiteSpace(Username))
+                    ImapConfiguration.Username = smtpSettings?.Smtp?.Network?.UserName;
+                    if(string.IsNullOrWhiteSpace(ImapConfiguration.Username))
                         throw new ArgumentNullException(nameof(ImapSettings), $"Missing setting: [{prefix}username]");
 
                     log.Warn($"Missing or incorrect setting: [{prefix}username]. Will try to use the username you set in your SMTP Settings.");
                 }
 
-                Password = password;
-                if (string.IsNullOrWhiteSpace(Password))
+                if (string.IsNullOrWhiteSpace(ImapConfiguration.Password))
                 {
-                    Password = smtpSettings?.Smtp?.Network?.Password;
-                    if(string.IsNullOrWhiteSpace(Password))
+                    ImapConfiguration.Password = smtpSettings?.Smtp?.Network?.Password;
+                    if(string.IsNullOrWhiteSpace(ImapConfiguration.Password))
                         throw new ArgumentNullException(nameof(ImapSettings), $"Missing setting: [{prefix}password]");
 
                     log.Warn($"Missing or incorrect setting: [{prefix}password]. Will try to use the password you set in your SMTP Settings.");
                 }
 
-				bool s;
-                if(bool.TryParse(useSSL, out s))
-                {
-                    UseSSL = s;
-                }
-                else
+                if(ImapConfiguration.UseSSL == null)
                 {
                     log.Warn($"Missing or incorrect setting: [{prefix}enableSSL]. Will go with 'false'.");
                 }
@@ -100,7 +68,9 @@ namespace CLMS.Framework.Utilities
 
         #region SMTP: Sending E-Mails
         public static void SendMail(EMailMessage message, bool sendAsync = false)
-        {            
+        {
+            var appConfiguration = ConfigurationHandler.GetAppConfiguration();
+
             if (string.IsNullOrEmpty(message.From))
             {
                 var settings = FetchSmtpSettings();
@@ -111,21 +81,20 @@ namespace CLMS.Framework.Utilities
                 message.From = settings.Smtp.From;
             }
 
-            bool testMode = false;
-            bool.TryParse(ConfigurationManager.AppSettings["TestMode"], out testMode);
+            bool.TryParse(appConfiguration.AppSettings["TestMode"], out var testMode);
 
             if (testMode) {
-                string originalRecipients = "";
+                var originalRecipients = "";
                 foreach (var i in message.To) {
-                    originalRecipients += string.Format("<br/>{0}", i);
+                    originalRecipients += $"<br/>{i}";
                 }
 
                 message.To.Clear();
-                message.To.Add(ConfigurationManager.AppSettings["TestModeEmail"]);
+                message.To.Add(appConfiguration.AppSettings["TestModeEmail"]);
                 message.Body = "<b>TEST MODE</b> Original Recipients:" + originalRecipients + "<br/><br/>" + message.Body;
             }
 
-            var mailSeparatorCharacter = ConfigurationManager.AppSettings["EmailSeparatorCharacter"];
+            var mailSeparatorCharacter = appConfiguration.AppSettings["EmailSeparatorCharacter"];
             mailSeparatorCharacter = !string.IsNullOrWhiteSpace(mailSeparatorCharacter) ? mailSeparatorCharacter : ",";
 
             SendMail(message.Subject,
@@ -168,16 +137,16 @@ namespace CLMS.Framework.Utilities
             log.Debug("settings Ok");
 
             if (settings == null)
-                throw new ArgumentNullException("MailSettings", "No valid mail settings were found in the configuration.");
+                throw new ArgumentNullException(nameof(settings), "No valid mail settings were found in the configuration.");
 
-            string fromMailAddress = string.IsNullOrWhiteSpace(fromAddress) ? settings.Smtp.From : fromAddress;
+            var fromMailAddress = string.IsNullOrWhiteSpace(fromAddress) ? settings.Smtp.From : fromAddress;
 
-            log.Debug("from address ook");
+            log.Debug("from address Ok");
 
             if (string.IsNullOrWhiteSpace(fromMailAddress))
                 throw new ArgumentNullException(nameof(fromAddress), "No valid sender mail address was found in the configuration or in the arguments.");
             
-            log.Debug("Creating MailMeessage");
+            log.Debug("Creating Mail Message");
 
             var message = new MailMessage
             {
@@ -246,6 +215,7 @@ namespace CLMS.Framework.Utilities
 		private static void SendMail(MailMessage message, bool sendAsync = false)
 		{
 			var log = LogManager.GetLogger(typeof(Email));
+		    var settings = FetchSmtpSettings();
             SmtpClient client = null;
 			try
 			{
@@ -255,19 +225,23 @@ namespace CLMS.Framework.Utilities
 					return;
 				}
 
-				client = new SmtpClient();
-				log.Debug("host: " + client.Host);
+			    client = new SmtpClient(settings.Smtp.Network.Host, settings.Smtp.Network.Port)
+			    {
+			        Credentials = new NetworkCredential(settings.Smtp.Network.UserName,
+			            settings.Smtp.Network.Password)
+			    };
+
+			    log.Debug("host: " + client.Host);
                 log.Debug("port: " + client.Port);
 
-				bool ssl;
-				if (bool.TryParse(ConfigurationManager.AppSettings["EnableSSL"], out ssl))
+				if (bool.TryParse(ConfigurationManager.AppSettings["EnableSSL"], out var ssl))
 				{
 					client.EnableSsl = ssl;
 				}
 
                 log.Debug("SSL: " + client.EnableSsl);
 
-                string emailSecureConnectionType = ConfigurationManager.AppSettings["EmailSecureConnectionType"];
+                var emailSecureConnectionType = ConfigurationManager.AppSettings["EmailSecureConnectionType"];
 			    if (string.IsNullOrWhiteSpace(emailSecureConnectionType)) {
 			        emailSecureConnectionType = "TLS";
 			    }
@@ -422,12 +396,17 @@ namespace CLMS.Framework.Utilities
             try
             {
                 _suppressExceptions = suppressExceptions;
-                _imapSettings = new ImapSettings();
-                _imapSettings.Server = server;
-                _imapSettings.Port = port;
-                _imapSettings.Username = username;
-                _imapSettings.Password = password;
-                _imapSettings.UseSSL = useSSL;
+                _imapSettings = new ImapSettings
+                {
+                    ImapConfiguration = new ImapConfiguration
+                    {
+                        Host = server,
+                        Port = port,
+                        Username = username,
+                        Password = password,
+                        UseSSL = useSSL
+                    }
+                };
             }
             catch (Exception)
             {
@@ -439,9 +418,9 @@ namespace CLMS.Framework.Utilities
         {
             try
             {
-                using (ImapClient Client = new ImapClient(_imapSettings.Server, _imapSettings.Port, _imapSettings.Username, _imapSettings.Password, AuthMethod.Login, _imapSettings.UseSSL))
+                using (var client = GetClient())
                 {
-                    return Client.Authed;
+                    return client.Authed;
                 }
             }
             catch (Exception)
@@ -454,9 +433,9 @@ namespace CLMS.Framework.Utilities
         {
             try
             {
-                using (ImapClient Client = new ImapClient(_imapSettings.Server, _imapSettings.Port, _imapSettings.Username, _imapSettings.Password, AuthMethod.Login, _imapSettings.UseSSL))
+                using (var client = GetClient())
                 {
-                    return Client.Search(SearchCondition.Unseen()).Count();
+                    return client.Search(SearchCondition.Unseen()).Count();
                 }
             }
             catch (Exception)
@@ -465,7 +444,7 @@ namespace CLMS.Framework.Utilities
                 return -1;
             }
         }
-
+        
         public bool HasUnreadMessages()
         {
             return GetMailCount() > 0;
@@ -473,35 +452,36 @@ namespace CLMS.Framework.Utilities
 
         private EMailMessage Convert(MailMessage message, uint id, bool readAll)
         {
-            var emailMessage = new EMailMessage();
-
-            emailMessage.From = message.From.Address;
-            emailMessage.Subject = message.Subject;
-
-            if (readAll)
+            var emailMessage = new EMailMessage
             {
-                emailMessage.Body = message.Body;
-                emailMessage.IsBodyHtml = message.IsBodyHtml;
-                emailMessage.To = message.To.Select(x => x.Address).ToList();
-                emailMessage.CC = message.CC.Select(x => x.Address).ToList();
-                emailMessage.Bcc = message.Bcc.Select(x => x.Address).ToList();
+                From = message.From.Address,
+                Subject = message.Subject
+            };
 
-                foreach (var attachment in message.Attachments)
+
+            if (!readAll) return emailMessage;
+
+            emailMessage.Body = message.Body;
+            emailMessage.IsBodyHtml = message.IsBodyHtml;
+            emailMessage.To = message.To.Select(x => x.Address).ToList();
+            emailMessage.CC = message.CC.Select(x => x.Address).ToList();
+            emailMessage.Bcc = message.Bcc.Select(x => x.Address).ToList();
+
+            foreach (var attachment in message.Attachments)
+            {
+                if (attachment.ContentStream?.CanRead == true)
                 {
-                    if (attachment.ContentStream?.CanRead == true)
-                    {
 
-                        using (var stream = new MemoryStream())
+                    using (var stream = new MemoryStream())
+                    {
+                        var attachmentBytes = new List<byte>();
+                        while (true)
                         {
-                            var attachmentBytes = new List<byte>();
-                            while (true)
-                            {
-                                var nextByte = stream.ReadByte();
-                                if (nextByte == -1) break;
-                                attachmentBytes.Add((byte)nextByte);
-                            }
-                            emailMessage.Attachments.Add(EmailAttachment.CreateFromBytes(attachment.Name, attachmentBytes.ToArray(), attachment.ContentType.MediaType));
+                            var nextByte = stream.ReadByte();
+                            if (nextByte == -1) break;
+                            attachmentBytes.Add((byte)nextByte);
                         }
+                        emailMessage.Attachments.Add(EmailAttachment.CreateFromBytes(attachment.Name, attachmentBytes.ToArray(), attachment.ContentType.MediaType));
                     }
                 }
             }
@@ -512,12 +492,12 @@ namespace CLMS.Framework.Utilities
         {
             try
             {
-                using (ImapClient Client = new ImapClient(_imapSettings.Server, _imapSettings.Port, _imapSettings.Username, _imapSettings.Password, AuthMethod.Login, _imapSettings.UseSSL))
+                using (var client = GetClient())
                 {
-                    var message = Client.GetMessage((uint)id, readAll ? FetchOptions.Normal : FetchOptions.NoAttachments);
+                    var message = client.GetMessage((uint)id, readAll ? FetchOptions.Normal : FetchOptions.NoAttachments);
                     if (message != null)
                     {
-                        MarkAsRead(Client, (uint)id, markAsRead);
+                        MarkAsRead(client, (uint)id, markAsRead);
                         return Convert(message, (uint)id, readAll);
                     }
                 }
@@ -535,9 +515,9 @@ namespace CLMS.Framework.Utilities
 
             try
             {
-                using (ImapClient Client = new ImapClient(_imapSettings.Server, _imapSettings.Port, _imapSettings.Username, _imapSettings.Password, AuthMethod.Login, _imapSettings.UseSSL))
+                using (var client = GetClient())
                 {
-                    ids = Client.Search(SearchCondition.Unseen()).Select(x => (int)x).ToList();
+                    ids = client.Search(SearchCondition.Unseen()).Select(x => (int)x).ToList();
                 }
             }
             catch (Exception)
@@ -554,17 +534,17 @@ namespace CLMS.Framework.Utilities
 
             try
             {
-                using (ImapClient Client = new ImapClient(_imapSettings.Server, _imapSettings.Port, _imapSettings.Username, _imapSettings.Password, AuthMethod.Login, _imapSettings.UseSSL))
+                using (var client = GetClient())
                 {
-                    IEnumerable<uint> uids = ids == null ? Client.Search(SearchCondition.Unseen()) : ids.Select(x => (uint)x);
-                    IEnumerable<MailMessage> messages = Client.GetMessages(uids, readAll ? FetchOptions.Normal : FetchOptions.NoAttachments);
+                    var uids = ids == null ? client.Search(SearchCondition.Unseen()) : ids.Select(x => (uint)x);
+                    var messages = client.GetMessages(uids, readAll ? FetchOptions.Normal : FetchOptions.NoAttachments);
 
                     var index = 0;
                     foreach (var message in messages)
                     {
-                        uint uid = uids.ElementAt(index);
+                        var uid = uids.ElementAt(index);
                         emailMessages.Add(Convert(message, uid, readAll));
-                        MarkAsRead(Client, uid, markAsRead);
+                        MarkAsRead(client, uid, markAsRead);
 
                         index++;
                     }
@@ -590,12 +570,12 @@ namespace CLMS.Framework.Utilities
         {
             try
             {
-                using (ImapClient Client = new ImapClient(_imapSettings.Server, _imapSettings.Port, _imapSettings.Username, _imapSettings.Password, AuthMethod.Login, _imapSettings.UseSSL))
+                using (var client = GetClient())
                 {
-                    var message = Client.GetMessage((uint)id);
+                    var message = client.GetMessage((uint)id);
                     if (message != null)
                     {
-                        MarkAsRead(Client, (uint)id, isRead);
+                        MarkAsRead(client, (uint)id, isRead);
                     }
                 }
             }
@@ -605,6 +585,17 @@ namespace CLMS.Framework.Utilities
             }
         }
 
-#endregion
+	    private ImapClient GetClient()
+	    {
+	        return new ImapClient(
+	            _imapSettings.ImapConfiguration.Host,
+	            _imapSettings.ImapConfiguration.Port.Value,
+	            _imapSettings.ImapConfiguration.Username,
+	            _imapSettings.ImapConfiguration.Password,
+	            AuthMethod.Login,
+	            _imapSettings.ImapConfiguration.UseSSL.Value);
+	    }
+
+        #endregion
     }    
 }

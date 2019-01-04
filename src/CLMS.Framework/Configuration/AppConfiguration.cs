@@ -7,14 +7,16 @@ namespace CLMS.Framework.Configuration
         public Dictionary<string, ConnectionSettings> ConnectionStrings { get; set; }
 
         public Dictionary<string, string> AppSettings { get; set; }
+        
+        public ImapConfiguration ImapConfiguration { get; set; }
+    }
 
-        public class ConnectionSettings
-        {
-            public string Name { get; set; }
+    public class ConnectionSettings
+    {
+        public string Name { get; set; }
 
-            public string ConnectionString { get; set; }
+        public string ConnectionString { get; set; }
 
-            public string ProviderName { get; set; }
-        }
+        public string ProviderName { get; set; }
     }
 }
