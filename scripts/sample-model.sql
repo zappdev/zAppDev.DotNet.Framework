@@ -150,6 +150,20 @@ if exists (select 1
    drop table Supplier
 go
 
+if exists ( select  *
+            from   sys.objects
+            where   object_id = OBJECT_ID(N'Test')
+                    AND type IN ( N'P', N'PC' ) ) 
+   drop procedure Test
+go
+
+if exists ( select  *
+            from   sys.objects
+            where   object_id = OBJECT_ID(N'TestParam')
+                    AND type IN ( N'P', N'PC' ) ) 
+   drop procedure TestParam
+go
+
 /*==============================================================*/
 /* Table: Customer                                              */
 /*==============================================================*/
@@ -311,4 +325,14 @@ go
 alter table Product
    add constraint FK_PRODUCT_REFERENCE_SUPPLIER foreign key (SupplierId)
       references Supplier (Id)
+go
+
+create proc Test 
+as 
+   select * from [dbo].[Customer]; 
+go
+
+create proc TestParam @NAME varchar   
+as
+   select * from [dbo].[Customer] where [FirstName] = '@NAME';
 go
