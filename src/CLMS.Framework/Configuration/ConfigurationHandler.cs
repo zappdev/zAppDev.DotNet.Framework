@@ -1,8 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
+﻿using System.IO;
 using System.Xml;
 using CLMS.Framework.Utilities;
 using Microsoft.Extensions.Configuration;
@@ -13,34 +9,36 @@ namespace CLMS.Framework.Configuration
     {
         public static IConfiguration GetConfiguration()
         {
-            return new Microsoft.Extensions.Configuration.ConfigurationBuilder()
+            return new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
+                .AddXmlFile("Web.config", true, true)
                 .Add(new LegacyConfigurationProvider())
                 .Build();
         }
 
         public static MailSettings GetSmtpSettings()
         {
-            return GetConfiguration()
-                .GetSection("system.net/mailSettings")
+            return GetInjectedConfig().GetSection("system.net:mailSettings")
                 .Get<MailSettings>();
         }
 
         public static AppConfiguration GetAppConfiguration()
         {
-            var config = ServiceLocator.Current.GetInstance<IConfiguration>();
-            return (config ?? GetConfiguration()).Get<AppConfiguration>();
+            return GetInjectedConfig().Get<AppConfiguration>();
         }
-
-#if NETFRAMEWORK
-#else
+        
         public static ConfigurationBuilder SetUpConfigurationBuilder(ConfigurationBuilder config)
         {
             config.SetBasePath(Directory.GetCurrentDirectory());
             config.Add(new LegacyConfigurationProvider());
             return config;
-        }        
-#endif
+        }
+        
+        private static IConfiguration GetInjectedConfig()
+        {
+            var config = ServiceLocator.Current.GetInstance<IConfiguration>();
+            return (config ?? GetConfiguration());
+        }
     }
 
     public class LegacyConfigurationProvider : ConfigurationProvider, IConfigurationSource

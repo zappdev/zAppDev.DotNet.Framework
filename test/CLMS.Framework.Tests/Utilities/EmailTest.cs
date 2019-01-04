@@ -1,11 +1,10 @@
-﻿using System.ServiceModel.Channels;
-
+﻿using System.IO;
+using Http.TestLibrary;
 using CLMS.Framework.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 
 #if NETFRAMEWORK
-using System.Web;
+
 #endif
 
 namespace CLMS.Framework.Tests.Utilities
@@ -21,12 +20,12 @@ namespace CLMS.Framework.Tests.Utilities
             Assert.AreEqual("", settings.Smtp.From);
 
 #if NETFRAMEWORK
-            var context = new Mock<HttpContext>();
-            HttpContext.Current = context.Object;
+            using (new HttpSimulator("/", Directory.GetCurrentDirectory()).SimulateRequest())
+            {               
+                settings = Email.FetchSmtpSettings();
 
-            settings = Email.FetchSmtpSettings();
-
-            Assert.AreEqual("", settings.Smtp.From);
+                Assert.AreEqual("", settings.Smtp.From);
+            }
 #endif
 
         }

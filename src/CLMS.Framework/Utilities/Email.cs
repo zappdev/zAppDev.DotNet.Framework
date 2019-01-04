@@ -95,34 +95,7 @@ namespace CLMS.Framework.Utilities
 
         public static MailSettings FetchSmtpSettings()
         {
-#if NETFRAMEWORK
-
-            if (HttpContext.Current == null)
-            {
-                return ConfigurationHandler.GetSmtpSettings();
-            }
-            else
-            {
-                var config = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration(HttpContext.Current.Request.ApplicationPath);
-                var settings = (System.Net.Configuration.MailSettingsSectionGroup) config.GetSectionGroup("system.net/mailSettings");
-
-                return new MailSettings
-                {
-                    Smtp = new SmtpSettings
-                    {
-                        From = settings?.Smtp?.From,
-                        Network = new SmtpNetworkSettings
-                        {
-                            Password = settings?.Smtp?.Network?.Password,
-                            UserName = settings?.Smtp?.Network?.UserName
-                        }
-                    }
-                };
-            }
-
-#else
             return ConfigurationHandler.GetSmtpSettings();
-#endif
         }
 
         #region SMTP: Sending E-Mails
