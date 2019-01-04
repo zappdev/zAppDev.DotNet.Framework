@@ -332,7 +332,7 @@ as
    select * from [dbo].[Customer]; 
 go
 
-create proc TestParam @NAME varchar   
+create proc TestParam @NAME varchar(255)
 as
-   select * from [dbo].[Customer] where [FirstName] = '@NAME';
+   select * from [dbo].[Customer] where [FirstName] = @NAME;
 go

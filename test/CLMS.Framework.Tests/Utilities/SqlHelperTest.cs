@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Configuration;
 using CLMS.Framework.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -33,32 +33,44 @@ namespace CLMS.Framework.Tests.Utilities
         [TestMethod]
         public void GetConnectionStringTest()
         {
-            const string expected = "Data Source=192.168.2.201;Initial Catalog=cfTests_4_gtheofilis;Integrated Security=False;User ID=g.theofilis@clmsuk.com;Password=f8743baeb8bc41939c3f6989d256f640c9953e790de84c839b0eb872e1a817ce1@";
-            Assert.AreEqual(expected, SqlHelper.GetConnectionString());
+            Assert.IsNotNull(SqlHelper.GetConnectionString());
         }
 
         [TestMethod]
         public void GetCommandTimeoutTest()
         {
-            var users = SqlHelper.RunSqlQuery("SELECT * FROM [security].[ApplicationUsers]");
+            var users = SqlHelper.RunSqlQuery("SELECT * FROM [dbo].[Customer]");
 
             Assert.IsNotNull(users);
+            Assert.AreEqual(91, users.Count);
 
             var parameters = new Dictionary<string, object>
             {
-                {"Name", ""}
+                {"Name", "Art"}
             };
 
-            users = SqlHelper.RunSqlQuery("SELECT * FROM [security].[ApplicationUsers] WHERE [UserName] = @Name", parameters, SqlHelper.GetConnectionString());
+            users = SqlHelper.RunSqlQuery("SELECT * FROM [dbo].[Customer] WHERE [FirstName] = @Name", parameters, SqlHelper.GetConnectionString());
 
             Assert.IsNotNull(users);
+            Assert.AreEqual(1, users.Count);
         }
 
         [TestMethod]
         public void RunStoredProcedureTest()
         {
             var result = SqlHelper.RunStoredProcedure("Test");
-            Assert.IsNotNull(result);
+            Assert.AreEqual(91, result?.Count);
+
+            var parameters = new Dictionary<string, object>
+            {
+                {"Name", "Art"}
+            };
+
+            result = SqlHelper.RunStoredProcedureWithConnectionString("Test", SqlHelper.GetConnectionString());
+            Assert.AreEqual(91, result?.Count);
+
+            result = SqlHelper.RunStoredProcedure("TestParam", parameters, SqlHelper.GetConnectionString());
+            Assert.AreEqual(1, result?.Count);
         }
     }
 }

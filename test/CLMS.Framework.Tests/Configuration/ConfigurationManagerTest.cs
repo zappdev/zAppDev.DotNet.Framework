@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using System.Configuration;
 
@@ -36,16 +36,15 @@ namespace CLMS.Framework.Tests.Configuration
         [TestMethod]
         public void SetUpConfigurationBuilderTest()
         {
-            const string expected = "Data Source=192.168.2.201;Initial Catalog=cfTests_4_gtheofilis;Integrated Security=False;User ID=g.theofilis@clmsuk.com;Password=f8743baeb8bc41939c3f6989d256f640c9953e790de84c839b0eb872e1a817ce1@";
 #if NETFRAMEWORK
-            Assert.AreEqual(expected, System.Configuration.ConfigurationManager.ConnectionStrings["Database"].ConnectionString);
+            Assert.IsNotNull(System.Configuration.ConfigurationManager.ConnectionStrings["Database"].ConnectionString);
 #else
             var config = ConfigurationHandler
                 .SetUpConfigurationBuilder(new ConfigurationBuilder())
                 .Build();
 
             var appConfig = config.Get<AppConfig>();
-            Assert.AreEqual(expected, appConfig.ConnectionStrings["Database"].ConnectionString);
+            Assert.IsNotNull(appConfig.ConnectionStrings["Database"].ConnectionString);
 #endif
         }
     }

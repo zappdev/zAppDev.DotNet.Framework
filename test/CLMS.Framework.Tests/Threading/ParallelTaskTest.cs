@@ -15,7 +15,7 @@ namespace CLMS.Framework.Tests.Threading
     [TestClass]
     public class ParallelTaskTest
     {
-        [TestMethod()]
+        [TestMethod]
         public void ForEachTest()
         {
             var items = new List<Item> { new Item { Name = "" } };
