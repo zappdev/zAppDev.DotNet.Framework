@@ -48,7 +48,7 @@ namespace CLMS.Framework.Configuration
         {
             var doc = new XmlDocument();
 
-            doc.Load(@".\App.config");
+            doc.Load("App.config");
 
             var selectNodes = doc.SelectNodes("//configuration/connectionStrings/add");
             if (selectNodes != null)

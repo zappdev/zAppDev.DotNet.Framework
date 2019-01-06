@@ -1,6 +1,6 @@
 #!/bin/bash
 
-host="192.168.2.201"
+host="localhost"
 username="AppDev"
 password="AppDev"
 
