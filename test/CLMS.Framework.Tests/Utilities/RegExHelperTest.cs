@@ -1,6 +1,4 @@
-﻿#if NETFRAMEWORK
-#else
-using CLMS.Framework.Utilities;
+﻿using CLMS.Framework.Utilities;
 using CSharpVerbalExpressions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -12,14 +10,15 @@ namespace CLMS.Framework.Tests.Utilities
         [TestMethod]
         public void GetMatchTest()
         {
-            var verbEx = new VerbalExpressions()
-                        .StartOfLine()
-                        .Then("http")
-                        .Maybe("s")
-                        .Then("://")
-                        .Maybe("www.")
-                        .AnythingBut(" ")
-                        .EndOfLine();
+            var verbEx = VerbalExpressions
+                .DefaultExpression
+                .StartOfLine()
+                .Then("http")
+                .Maybe("s")
+                .Then("://")
+                .Maybe("www.")
+                .AnythingBut(" ")
+                .EndOfLine();
 
             var testMe = "https://www.google.com";
 
@@ -31,20 +30,21 @@ namespace CLMS.Framework.Tests.Utilities
 
             Assert.AreEqual(null, matches);
         }
-        
+
         [TestMethod]
         public void GetMatchesTest()
         {
-            var verbEx = new VerbalExpressions()
-                        .StartOfLine()
-                        .Then("http")
-                        .Maybe("s")
-                        .Then("://")
-                        .Maybe("www.")
-                        .AnythingBut(" ")
-                        .EndOfLine();
+            var verbEx = VerbalExpressions
+                .DefaultExpression
+                .StartOfLine()
+                .Then("http")
+                .Maybe("s")
+                .Then("://")
+                .Maybe("www.")
+                .AnythingBut(" ")
+                .EndOfLine();
 
-            var testMe = "https://www.google.com";
+            const string testMe = "https://www.google.com";
 
             var matches = RegExHelper.GetMatches(verbEx, testMe);
 
@@ -56,4 +56,3 @@ namespace CLMS.Framework.Tests.Utilities
         }
     }
 }
-#endif
