@@ -5,6 +5,7 @@ using System.Net.Mail;
 using System.Threading;
 using System.Configuration;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using CLMS.Framework.Configuration;
 using log4net;
@@ -33,7 +34,8 @@ namespace CLMS.Framework.Utilities
                 ImapConfiguration = ConfigurationHandler.GetAppConfiguration().ImapConfiguration;
 
                 if (string.IsNullOrWhiteSpace(ImapConfiguration.Host)) throw new ArgumentNullException(nameof(ImapSettings), $"Missing setting: [{prefix}host]");
-                if (ImapConfiguration.Port != null) throw new ArgumentNullException(nameof(ImapSettings), $"Missing setting: [{prefix}port]");
+                
+                if (ImapConfiguration.Port == null) throw new ArgumentNullException(nameof(ImapSettings), $"Missing setting: [{prefix}port]");
                
                 if (string.IsNullOrWhiteSpace(ImapConfiguration.Username))
                 {
@@ -53,7 +55,7 @@ namespace CLMS.Framework.Utilities
                     log.Warn($"Missing or incorrect setting: [{prefix}password]. Will try to use the password you set in your SMTP Settings.");
                 }
 
-                if(ImapConfiguration.UseSSL == null)
+                if(ImapConfiguration.EnableSsl == null)
                 {
                     log.Warn($"Missing or incorrect setting: [{prefix}enableSSL]. Will go with 'false'.");
                 }
@@ -404,7 +406,7 @@ namespace CLMS.Framework.Utilities
                         Port = port,
                         Username = username,
                         Password = password,
-                        UseSSL = useSSL
+                        EnableSsl = useSSL
                     }
                 };
             }
@@ -528,6 +530,25 @@ namespace CLMS.Framework.Utilities
             return ids.Select(x => (int?)x).ToList();
         }
 
+        public List<int?> GetAllIDs()
+        {
+            var ids = new List<int>();
+
+            try
+            {
+                using (var client = GetClient())
+                {
+                    ids = client.Search(SearchCondition.All()).Select(x => (int)x).ToList();
+                }
+            }
+            catch (Exception)
+            {
+                if (!_suppressExceptions) throw;
+            }
+
+            return ids.Select(x => (int?)x).ToList();
+        }
+        
         public List<EMailMessage> GetMails(bool readAll, bool markAsRead = false, List<int?> ids = null)
         {
             var emailMessages = new List<EMailMessage>();
@@ -586,15 +607,20 @@ namespace CLMS.Framework.Utilities
         }
 
 	    private ImapClient GetClient()
-	    {
-	        return new ImapClient(
+        {
+            Debug.Assert(_imapSettings.ImapConfiguration.Port != null, 
+                "_imapSettings.ImapConfiguration.Port != null");
+            Debug.Assert(_imapSettings.ImapConfiguration.EnableSsl != null, 
+                "_imapSettings.ImapConfiguration.EnableSsl != null");
+
+            return new ImapClient(
 	            _imapSettings.ImapConfiguration.Host,
 	            _imapSettings.ImapConfiguration.Port.Value,
 	            _imapSettings.ImapConfiguration.Username,
 	            _imapSettings.ImapConfiguration.Password,
 	            AuthMethod.Login,
-	            _imapSettings.ImapConfiguration.UseSSL.Value);
-	    }
+	            _imapSettings.ImapConfiguration.EnableSsl.Value);
+        }
 
         #endregion
     }    

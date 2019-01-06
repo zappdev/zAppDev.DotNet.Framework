@@ -24,6 +24,13 @@ namespace CLMS.Framework.Tests.Utilities
         public List<string> Items { get; set; }
 
         [TestMethod]
+        public void CapitalizeTest()
+        {
+            Assert.AreEqual("Test", Common.Capitalize("test"));
+            Assert.AreEqual("TestTest", Common.Capitalize("testTest"));
+        }
+
+        [TestMethod]
         public void SafeCastTest()
         {
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US", false);
@@ -94,8 +101,8 @@ namespace CLMS.Framework.Tests.Utilities
         [TestMethod]
         public void GetExcelFormatTest()
         {
-            List<string> columnNames = new List<string> { "Col" };
-            List<List<object>> values = new List<List<object>> { new List<object> { "1" } };
+            var columnNames = new List<string> { "Col" };
+            var values = new List<List<object>> { new List<object> { "1" } };
 
             var result = Common.GetExcelFormat(columnNames, values);
             Assert.AreEqual(899, result.Length);        
@@ -110,7 +117,7 @@ namespace CLMS.Framework.Tests.Utilities
             Assert.AreEqual(1015, result.Length);
             Assert.AreEqual("476bfd5f05408af5ea0fbe261186baa7", Common.GetMD5Hash(result));
 
-            object[][] valuesObj = new[] {new[] { (object) 0 }};
+            var valuesObj = new[] {new[] { (object) 0 }};
 
             result = Common.GetExcelFormat(
                 columnNames.ToArray(), valuesObj, null, null, "Sheet1", true, 

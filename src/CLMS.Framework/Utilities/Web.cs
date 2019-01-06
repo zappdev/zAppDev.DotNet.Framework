@@ -69,13 +69,13 @@ namespace CLMS.Framework.Utilities
                         Usually, the first keys are 'controller' and 'action'. However, I don't wanna ignore them COMPLETELY. Just the first ones.
                         'Cause maybe a controller action has an 'action' parameter. Don't wanna lose that.
                     */
-                    if ((!foundControllerKey) && (string.Compare(key, "controller", true) == 0))
+                    if ((!foundControllerKey) && (string.Compare(key, "controller", StringComparison.OrdinalIgnoreCase) == 0))
                     {
                         foundControllerKey = true;
                         continue;
                     }
 
-                    if ((!foundActionKey) && (string.Compare(key, "action", true) == 0))
+                    if ((!foundActionKey) && (string.Compare(key, "action", StringComparison.OrdinalIgnoreCase) == 0))
                     {
                         foundActionKey = true;
                         continue;

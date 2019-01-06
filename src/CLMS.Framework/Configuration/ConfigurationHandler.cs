@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Linq;
 using System.Xml;
 using CLMS.Framework.Utilities;
 using Microsoft.Extensions.Configuration;
@@ -75,13 +76,20 @@ namespace CLMS.Framework.Configuration
                 var key = appSett.Attributes["key"].Value;
 
                 var prefix = key.Contains(":") ? "" : "AppSettings:";
-                Data.Add($"{prefix}{appSett.Attributes["key"].Value}", appSett.Attributes["value"].Value);
+                key = string.Join(":", key.Split(':').Select(Handle));
+                Data.Add($"{prefix}{key}", appSett.Attributes["value"].Value);
             }
         }
 
         public IConfigurationProvider Build(IConfigurationBuilder builder)
         {
             return this;
+        }
+
+        private static string Handle(string c)
+        {
+            if (c.Equals("IMAP")) return "ImapConfiguration";
+            return c;
         }
     }
 

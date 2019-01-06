@@ -89,6 +89,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="CLMS.AppDev.Cache">
+      <HintPath>..\..\Lib\CLMS.AppDev.Cache.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  
+  <ItemGroup>
     <Folder Include="Data\Mappings\" />
   </ItemGroup>
 
