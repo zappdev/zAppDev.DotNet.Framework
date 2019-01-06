@@ -1,13 +1,18 @@
-﻿#if NETFRAMEWORK
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel.Channels;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web;
+
 using CLMS.Framework.Utilities;
 using Newtonsoft.Json.Linq;
+
+#if NETFRAMEWORK
+using System.Web;
+#else
+using Microsoft.AspNetCore.Http;
+#endif
 
 namespace Services
 {
@@ -38,10 +43,10 @@ namespace Services
             {
                 this.Refresh_token = (string) obj["Refresh_token"];
             }
+
             this.ServiceUrl = (string) obj["instance_url"];
             this.Token_type = (string) obj["token_type"];
         }
-
     }
 
     public class OAuth2ReturnUrl
@@ -72,8 +77,9 @@ namespace Services
         {
             if (serviceName != null)
             {
-                return typeof (T).Name + "_" + serviceName;
+                return typeof(T).Name + "_" + serviceName;
             }
+
             return null;
         }
 
@@ -84,8 +90,9 @@ namespace Services
             {
                 if (serviceName != null)
                 {
-                    return (T)Web.Session.Get(SessionKey(serviceName));
+                    return (T) Web.Session.Get(SessionKey(serviceName));
                 }
+
                 return default(T);
             }
             catch (Exception)
@@ -101,8 +108,13 @@ namespace Services
             {
                 if (serviceName != null)
                 {
-                    return (T)httpContext.Session[SessionKey(serviceName)];
+                    #if NETFRAMEWORK
+                    return (T) httpContext.Session[SessionKey(serviceName)];
+                    #else
+                    throw new NotImplementedException();
+#endif
                 }
+
                 return default(T);
             }
             catch (Exception)
@@ -123,7 +135,6 @@ namespace Services
             }
             catch (Exception)
             {
-
             }
         }
 
@@ -134,7 +145,11 @@ namespace Services
             {
                 if (serviceName != null)
                 {
+#if NETFRAMEWORK
                     httpContext.Session[SessionKey(serviceName)] = tobj;
+#else
+                    throw new NotImplementedException();
+#endif
                 }
             }
             catch (Exception)
@@ -149,14 +164,7 @@ namespace Services
 
         public static void Initialize(HttpContext httpContext, string serviceName)
         {
-            Set(httpContext,serviceName, default(T));
+            Set(httpContext, serviceName, default(T));
         }
-
-
-
-
     }
-
-
 }
-#endif

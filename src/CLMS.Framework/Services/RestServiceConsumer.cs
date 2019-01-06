@@ -1,5 +1,4 @@
-﻿#if NETFRAMEWORK
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
@@ -8,22 +7,23 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Web;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Services;
+#if NETFRAMEWORK
+using System.Web;
+#else
+using Microsoft.AspNetCore.Http;
+
+#endif
 
 
 namespace CLMS.Framework.Services
 {
-
-
     public class OAuth2InvalidToken
     {
-
     }
-
 
 
     public enum RestResultType
@@ -59,29 +59,27 @@ namespace CLMS.Framework.Services
     }
 
 
-    
     public enum OAuth2GrantType
     {
         Password,
         WebServer
     }
-    
 
-    public class RestServiceConsumptionOptions: ServiceConsumptionOptions, IRestServiceConsumptionOptions
-    {        
-        public RestResultType Type { get; set; }        
+
+    public class RestServiceConsumptionOptions : ServiceConsumptionOptions, IRestServiceConsumptionOptions
+    {
+        public RestResultType Type { get; set; }
         public PostType PostType { get; set; }
         public RestSecurityType SecurityType { get; set; }
-        public OAuth2GrantType oAuth2GrantType { get; set; }        
-        public string Password { get; set; }        
-        public string ClientSecret { get; set; }        
+        public OAuth2GrantType oAuth2GrantType { get; set; }
+        public string Password { get; set; }
+        public string ClientSecret { get; set; }
         public string AuthorizationURL { get; set; }
-        public string Scope { get; set; }        
+        public string Scope { get; set; }
     }
 
     public class RestServiceConsumer
     {
-
         private static IEnumerable<KeyValuePair<string, string>> ConvertNameValueCollectionToKeyValuePair(
             NameValueCollection input)
         {
@@ -98,6 +96,7 @@ namespace CLMS.Framework.Services
                 {
                     return fullnameParts[fullnameParts.Length - 2];
                 }
+
                 return null;
             }
             catch (Exception)
@@ -108,25 +107,25 @@ namespace CLMS.Framework.Services
 
         public static object Consume<T>(RestServiceConsumptionOptions options, ServiceConsumptionContainer resultBag)
         {
-           
             string serviceName = GetServiceName<T>();
 
-            int retries =0;
-            Object obj = InnerConsume<T>(options, serviceName, retries++,  resultBag);
+            int retries = 0;
+            Object obj = InnerConsume<T>(options, serviceName, retries++, resultBag);
 
-            if (obj != null && obj.GetType() == typeof (OAuth2InvalidToken))
+            if (obj != null && obj.GetType() == typeof(OAuth2InvalidToken))
             {
                 GetOAuth2Token.InitializeTokens(options, serviceName);
-                return (InnerConsume<T>(options, serviceName, retries,  resultBag));
+                return (InnerConsume<T>(options, serviceName, retries, resultBag));
             }
 
             return obj;
         }
 
 
-        public static object InnerConsume<T>(RestServiceConsumptionOptions options, string serviceName, int retries, ServiceConsumptionContainer resultBag)
+        public static object InnerConsume<T>(RestServiceConsumptionOptions options, string serviceName, int retries,
+            ServiceConsumptionContainer resultBag)
         {
-
+#if NETFRAMEWORK
             OAuth2TokenData currentOAuth2TokenData = null;
             if (options.SecurityType == RestSecurityType.OAuth2)
             {
@@ -145,7 +144,8 @@ namespace CLMS.Framework.Services
                         switch (options.PostType)
                         {
                             case PostType.JSON:
-								var jsonSerialized = new Utilities.Serializer<object>().ToJson(options.Data, false, options.IgnoreNullValues);
+								var jsonSerialized =
+ new Utilities.Serializer<object>().ToJson(options.Data, false, options.IgnoreNullValues);
                                 resultBag.HttpResponseMessage = client
                                         .PostAsync("", new StringContent(jsonSerialized, Encoding.UTF8, "application/json"))
                                         .Result;
@@ -229,7 +229,8 @@ namespace CLMS.Framework.Services
                 if (resultBag.HttpResponseMessage.IsSuccessStatusCode)
                 {
 
-                    var setCookieHeader = resultBag.HttpResponseMessage.Headers.FirstOrDefault(a => a.Key?.ToLower() == "set-cookie");
+                    var setCookieHeader =
+ resultBag.HttpResponseMessage.Headers.FirstOrDefault(a => a.Key?.ToLower() == "set-cookie");
                     if (HttpContext.Current != null && setCookieHeader.Value != null && setCookieHeader.Value.Any())
                     {
                         HttpContext.Current.Items["ServiceAuthCookie"] = setCookieHeader;
@@ -322,7 +323,9 @@ namespace CLMS.Framework.Services
                 throw new ApplicationException($"{(int)resultBag.HttpResponseMessage.StatusCode} ({resultBag.HttpResponseMessage.ReasonPhrase})");
 
             }
-
+#else
+            throw new NotImplementedException();
+#endif
         }
 
 
@@ -338,97 +341,104 @@ namespace CLMS.Framework.Services
             return new FormUrlEncodedContent(ConvertNameValueCollectionToKeyValuePair(formData));
         }
 
-        private static HttpClient GetHttpClient(RestServiceConsumptionOptions options, OAuth2TokenData currentOAuth2TokenData)
+        private static HttpClient GetHttpClient(RestServiceConsumptionOptions options,
+            OAuth2TokenData currentOAuth2TokenData)
         {
+#if NETFRAMEWORK
             var handler = new HttpClientHandler();
 
 
-				if (options.SecurityType == RestSecurityType.BasicAuth)
-				{
-					if (!string.IsNullOrEmpty(options.UserName))
-					{
-						handler.Credentials = new NetworkCredential(options.UserName, options.Password);
-					}
-				}
-				else if (options.SecurityType == RestSecurityType.OAuth2 
-                     && currentOAuth2TokenData != null && currentOAuth2TokenData.ServiceUrl !=null)
-				{
-					if (!options.Url.StartsWith(currentOAuth2TokenData.ServiceUrl))
-					{
-						if (currentOAuth2TokenData.ServiceUrl.EndsWith("/"))
-						{
-							currentOAuth2TokenData.ServiceUrl = currentOAuth2TokenData.ServiceUrl.Substring(0,
+            if (options.SecurityType == RestSecurityType.BasicAuth)
+            {
+                if (!string.IsNullOrEmpty(options.UserName))
+                {
+                    handler.Credentials = new NetworkCredential(options.UserName, options.Password);
+                }
+            }
+            else if (options.SecurityType == RestSecurityType.OAuth2
+                     && currentOAuth2TokenData != null && currentOAuth2TokenData.ServiceUrl != null)
+            {
+                if (!options.Url.StartsWith(currentOAuth2TokenData.ServiceUrl))
+                {
+                    if (currentOAuth2TokenData.ServiceUrl.EndsWith("/"))
+                    {
+                        currentOAuth2TokenData.ServiceUrl = currentOAuth2TokenData.ServiceUrl.Substring(0,
                             currentOAuth2TokenData.ServiceUrl.Length - 1);
-						}
-						if (options.Url.StartsWith("/"))
-						{
-							options.Url = options.Url.Substring(1);
-						}
+                    }
 
-						options.Url = currentOAuth2TokenData.ServiceUrl + "/" + options.Url;
-					}
+                    if (options.Url.StartsWith("/"))
+                    {
+                        options.Url = options.Url.Substring(1);
+                    }
 
-				}
+                    options.Url = currentOAuth2TokenData.ServiceUrl + "/" + options.Url;
+                }
+            }
 
-				if (HttpContext.Current?.Items["ServiceAuthCookie"] != null)
-				{
-					try
-					{
-						var setCookieHeader = (KeyValuePair<string, IEnumerable<string>>)HttpContext.Current.Items["ServiceAuthCookie"];
-						var cookieContainer = new CookieContainer();
-						cookieContainer.SetCookies(new Uri(options.Url), string.Join(",", setCookieHeader.Value));
-						handler.CookieContainer = cookieContainer;
-					}
-					catch (Exception e)
-					{
-						log4net.LogManager.GetLogger(typeof(RestServiceConsumer))
-							.Error($"Could not SetCookie [ServiceAuthCookie]!", e);
-					}
-				}
+            if (HttpContext.Current?.Items["ServiceAuthCookie"] != null)
+            {
+                try
+                {
+                    var setCookieHeader =
+                        (KeyValuePair<string, IEnumerable<string>>) HttpContext.Current.Items["ServiceAuthCookie"];
+                    var cookieContainer = new CookieContainer();
+                    cookieContainer.SetCookies(new Uri(options.Url), string.Join(",", setCookieHeader.Value));
+                    handler.CookieContainer = cookieContainer;
+                }
+                catch (Exception e)
+                {
+                    log4net.LogManager.GetLogger(typeof(RestServiceConsumer))
+                        .Error($"Could not SetCookie [ServiceAuthCookie]!", e);
+                }
+            }
 
-				var client = new HttpClient(handler)
-				{
-					BaseAddress = new Uri(options.Url)
-				};
+            var client = new HttpClient(handler)
+            {
+                BaseAddress = new Uri(options.Url)
+            };
 
-				if (options.ExtraHeaderData?.ContainsKey("accept") != true)
-				{
-					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
-					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/xml"));
-					client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));					
-				}
+            if (options.ExtraHeaderData?.ContainsKey("accept") != true)
+            {
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/xml"));
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/xml"));
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));
+            }
 
-				if (options.ExtraHeaderData != null)
-				{
-					foreach (var eh in options.ExtraHeaderData)
-					{
-						client.DefaultRequestHeaders.TryAddWithoutValidation(eh.Key, eh.Value);
-					}
-				}
+            if (options.ExtraHeaderData != null)
+            {
+                foreach (var eh in options.ExtraHeaderData)
+                {
+                    client.DefaultRequestHeaders.TryAddWithoutValidation(eh.Key, eh.Value);
+                }
+            }
 
-				if (options.ExtraHeaderData?.ContainsKey("authorization") != true)
-				{	
-					if (options.SecurityType == RestSecurityType.BasicAuth)
-					{
-						var usernameAndPassword = $"{options.UserName}:{options.Password}";
-						var bytes = Encoding.UTF8.GetBytes(usernameAndPassword);
-						usernameAndPassword = Convert.ToBase64String(bytes);
-						client.DefaultRequestHeaders.Add("Authorization", $"Basic {usernameAndPassword}");
-					}
-					else if (options.SecurityType == RestSecurityType.OAuth2 && currentOAuth2TokenData != null)
-					{
-						//Bearer
-						client.DefaultRequestHeaders.Add("Authorization", currentOAuth2TokenData.Token_type + " " + currentOAuth2TokenData.Token);
-						//client.DefaultRequestHeaders.Add("Authorization", sessionAuth2TokenResults.token_type + " " + "lalala");
-					}					
-				}
+            if (options.ExtraHeaderData?.ContainsKey("authorization") != true)
+            {
+                if (options.SecurityType == RestSecurityType.BasicAuth)
+                {
+                    var usernameAndPassword = $"{options.UserName}:{options.Password}";
+                    var bytes = Encoding.UTF8.GetBytes(usernameAndPassword);
+                    usernameAndPassword = Convert.ToBase64String(bytes);
+                    client.DefaultRequestHeaders.Add("Authorization", $"Basic {usernameAndPassword}");
+                }
+                else if (options.SecurityType == RestSecurityType.OAuth2 && currentOAuth2TokenData != null)
+                {
+                    //Bearer
+                    client.DefaultRequestHeaders.Add("Authorization",
+                        currentOAuth2TokenData.Token_type + " " + currentOAuth2TokenData.Token);
+                    //client.DefaultRequestHeaders.Add("Authorization", sessionAuth2TokenResults.token_type + " " + "lalala");
+                }
+            }
 
             return client;
-
+#else
+            throw new NotImplementedException();
+#endif
         }
 
-        public static JObject Consume(RestServiceConsumptionOptions options, ServiceConsumptionContainer resultBag = null)
+        public static JObject Consume(RestServiceConsumptionOptions options,
+            ServiceConsumptionContainer resultBag = null)
         {
             return Consume<object>(options, resultBag) as JObject;
         }
@@ -442,7 +452,9 @@ namespace CLMS.Framework.Services
 
     public class RestServiceHelper
     {
-        public static RestServerBasicAuthorizationData GetBasicAuthorizationCredentials(HttpRequestBase request, string service, string methodName)
+        #if NETFRAMEWORK
+        public static RestServerBasicAuthorizationData GetBasicAuthorizationCredentials(HttpRequestBase request,
+            string service, string methodName)
         {
             var authData = request.Headers["Authorization"] ?? "";
 
@@ -462,7 +474,6 @@ namespace CLMS.Framework.Services
 
             return null;
         }
+        #endif
     }
-
 }
-#endif

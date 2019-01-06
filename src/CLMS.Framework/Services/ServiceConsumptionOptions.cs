@@ -1,14 +1,18 @@
-﻿#if NETFRAMEWORK
-using CacheManager.Core;
+﻿using CacheManager.Core;
 using System.Collections.Generic;
+
+#if NETFRAMEWORK
 using System.Web.Http.Controllers;
+#endif
 
 namespace CLMS.Framework.Services
 {
     public class ServiceConsumptionOptions : IServiceConsumptionOptions, ICachedServiceConsumptionOptions
     {
         public string Url { get; set; }
-        public RestHTTPVerb Verb { get; set; }
+#if NETFRAMEWORK
+        public RestHTTPVerb Verb { get; set; }        
+#endif
         public string UserName { get; set; }
         public string ClientId { get; set; }
         public string AccessTokenUrl { get; set; }
@@ -31,10 +35,12 @@ namespace CLMS.Framework.Services
         /// </summary>
         public bool CachePerUser { get; set; }
 
+#if NETFRAMEWORK
         /// <summary>
         /// The running Http Context. Can be null, when running outside of a web application
         /// </summary>
         public HttpActionContext ActionExecutedContext { get; set; }
+#endif
 
         /// <summary>
         /// If true, will not use the URI Query as part of the Cache Key <![CDATA[(e.g. ?pageIndex=0&&fetchRows=25)]]>
@@ -55,7 +61,4 @@ namespace CLMS.Framework.Services
 
         public string Arguments { get; set; }
     }
-
-
 }
-#endif

@@ -1,33 +1,33 @@
-﻿#if NETFRAMEWORK
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web;
 using CLMS.Framework.Services;
+#if NETFRAMEWORK
+using System.Web;
+#else
+using Microsoft.AspNetCore.Http;
+#endif
 
 namespace Services
 {
     public class GetOAuth2Token
     {
-
-
-
-        public static OAuth2TokenData GetSessionToken(string serviceName, RestServiceConsumptionOptions options, HttpContext httpContext)
+        public static OAuth2TokenData GetSessionToken(string serviceName, RestServiceConsumptionOptions options,
+            HttpContext httpContext)
         {
-
+#if NETFRAMEWORK
             try
             {
-
                 //if (serviceName == null)
                 //{
                 //    return null;
                 //}
 
-                OAuth2TokenData sessionOAuth2TokenData = OAuth2SessionData<OAuth2TokenData>.Get(serviceName);
+                var sessionOAuth2TokenData = OAuth2SessionData<OAuth2TokenData>.Get(serviceName);
 
                 if (sessionOAuth2TokenData != null)
                 {
@@ -36,40 +36,36 @@ namespace Services
                         return sessionOAuth2TokenData;
                     }
                 }
-                int res = 0;
+
+                var res = 0;
                 Dictionary<string, string> dictParams = null;
-                bool refreshTokenWasUsed = false;
+                var refreshTokenWasUsed = false;
                 if (sessionOAuth2TokenData == null)
                 {
                     sessionOAuth2TokenData = new OAuth2TokenData();
                     if (options.oAuth2GrantType == OAuth2GrantType.WebServer)
                     {
-
-                        string sessionAuth2Code = OAuth2SessionData<OAuth2Code>.Get(serviceName)?.Code;
+                        var sessionAuth2Code = OAuth2SessionData<OAuth2Code>.Get(serviceName)?.Code;
 
                         if (sessionAuth2Code == null)
                         {
                             OAuth2SessionData<OAuth2ReturnUrl>.Set(serviceName,
                                 new OAuth2ReturnUrl(HttpContext.Current.Request.Url.ToString()));
-                            var simpleTask = Task.Run(() =>
-                            {
-                                res = GetWebServerAuthorization(options, httpContext);
-                            });
+                            var simpleTask = Task.Run(() => { res = GetWebServerAuthorization(options, httpContext); });
                             simpleTask.Wait();
 
                             return null;
                         }
 
                         dictParams = new Dictionary<string, string>
-                            {
-                                {"grant_type", "authorization_code"},
-                                {"code", sessionAuth2Code},
-                                {"client_id", options.ClientId},
-                                {"client_secret", options.ClientSecret},
-                                //{"scope", ""},
-                                {"redirect_uri", options.CallBackUrl}
-                            };
-
+                        {
+                            {"grant_type", "authorization_code"},
+                            {"code", sessionAuth2Code},
+                            {"client_id", options.ClientId},
+                            {"client_secret", options.ClientSecret},
+                            //{"scope", ""},
+                            {"redirect_uri", options.CallBackUrl}
+                        };
                     }
                     else if (options.oAuth2GrantType == OAuth2GrantType.Password)
                     {
@@ -81,7 +77,6 @@ namespace Services
                             {"username", options.UserName},
                             {"password", options.Password}
                         };
-
                     }
                 }
                 else
@@ -98,7 +93,6 @@ namespace Services
                         {"client_id", options.ClientId},
                         {"client_secret", options.ClientSecret}
                     };
-
                 }
 
                 var task = Task.Run(async () =>
@@ -118,29 +112,26 @@ namespace Services
                         OAuth2SessionData<OAuth2TokenData>.Initialize(serviceName);
                         OAuth2SessionData<OAuth2Code>.Initialize(serviceName);
                     }
+
                     return null;
                 }
 
                 OAuth2SessionData<OAuth2TokenData>.Set(serviceName, sessionOAuth2TokenData);
                 return sessionOAuth2TokenData;
-
-
             }
             catch (Exception)
             {
                 return null;
             }
-
+#else
+            throw new NotImplementedException();
+#endif
         }
 
 
-
-
-        public static void InitializeTokens(RestServiceConsumptionOptions options,string serviceName)
+        public static void InitializeTokens(RestServiceConsumptionOptions options, string serviceName)
         {
-
-            OAuth2TokenData sessionOAuth2TokenData = OAuth2SessionData<OAuth2TokenData>.Get(serviceName);
-
+            var sessionOAuth2TokenData = OAuth2SessionData<OAuth2TokenData>.Get(serviceName);
 
             switch (options.oAuth2GrantType)
             {
@@ -153,8 +144,8 @@ namespace Services
                     {
                         sessionOAuth2TokenData.ForceRefreshToken = true;
                         OAuth2SessionData<OAuth2TokenData>.Set(serviceName, sessionOAuth2TokenData);
-
                     }
+
                     break;
                 case OAuth2GrantType.WebServer:
                     if (sessionOAuth2TokenData.Refresh_token == null)
@@ -167,10 +158,9 @@ namespace Services
                         sessionOAuth2TokenData.ForceRefreshToken = true;
                         OAuth2SessionData<OAuth2TokenData>.Set(serviceName, sessionOAuth2TokenData);
                     }
+
                     break;
             }
-
-
         }
 
         public static OAuth2TokenData GetAuthToken(
@@ -178,6 +168,7 @@ namespace Services
             string serviceName,
             HttpContext httpContext)
         {
+#if NETFRAMEWORK
             OAuth2TokenData sessionOAuth2TokenData = null;
             switch (options.oAuth2GrantType)
             {
@@ -189,42 +180,42 @@ namespace Services
                     {
                         throw new ApplicationException("sessionAuth2TokenData == null, " + options.oAuth2GrantType);
                     }
+
                     return sessionOAuth2TokenData;
                 default:
-                    throw new ApplicationException("Uknown OAuth2GrantType: " + options.oAuth2GrantType);
+                    throw new ApplicationException("Unknown OAuth2GrantType: " + options.oAuth2GrantType);
             }
+#else
+            throw new NotImplementedException();
+#endif
         }
 
 
-
-
         public static async Task<int> GetAuthToken(
-                                       string accessTokenUrl,
-                                       Dictionary<string, string> dict,
-                                       OAuth2TokenData oAuth2TokenData
+            string accessTokenUrl,
+            Dictionary<string, string> dict,
+            OAuth2TokenData oAuth2TokenData
         )
         {
             HttpClient authClient = null;
             HttpResponseMessage message = null;
             try
             {
-
                 authClient = new HttpClient();
 
                 using (HttpContent content = new FormUrlEncodedContent(dict))
-				{
+                {
+                    message = await authClient.PostAsync(accessTokenUrl, content);
 
-					message = await authClient.PostAsync(accessTokenUrl, content);
+                    if (message.StatusCode == HttpStatusCode.OK)
+                    {
+                        var responseString = await message.Content.ReadAsStringAsync();
+                        oAuth2TokenData.Parse(responseString);
+                        return 0;
+                    }
 
-					if (message.StatusCode == HttpStatusCode.OK)
-					{
-						string responseString = await message.Content.ReadAsStringAsync();
-						oAuth2TokenData.Parse(responseString);
-						return 0;
-					}
-
-					return 1;
-				}
+                    return 1;
+                }
             }
             catch (Exception)
             {
@@ -235,23 +226,22 @@ namespace Services
                 message?.Dispose();
                 authClient?.Dispose();
             }
-
         }
 
 
         private static int GetWebServerAuthorization(RestServiceConsumptionOptions options, HttpContext httpContext)
         {
-
             var authURI = new StringBuilder();
             authURI.Append(options.AuthorizationURL + "?");
             authURI.Append("response_type=code");
             authURI.Append("&client_id=" + options.ClientId);
             authURI.Append("&redirect_uri=" + options.CallBackUrl);
 
-            if (!String.IsNullOrEmpty(options.Scope))
+            if (!string.IsNullOrEmpty(options.Scope))
             {
                 authURI.Append("&scope=" + options.Scope);
             }
+
             //Check it with Salesforce
             authURI.Append("&access_type=" + "offline");
 
@@ -267,11 +257,6 @@ namespace Services
 
 
             return 1;
-
-
         }
-
-
     }
 }
-#endif

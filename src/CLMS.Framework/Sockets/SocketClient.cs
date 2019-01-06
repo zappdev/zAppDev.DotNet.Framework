@@ -14,25 +14,13 @@ namespace CLMS.Framework.Sockets
         private readonly System.Net.Sockets.Socket _socket;
         private readonly UTF8Encoding _encoder = new UTF8Encoding();
         private static readonly Dictionary<string, SocketClient> _sockets = new Dictionary<string, SocketClient>();
-        private BufferManager _bufferManager;
+        private readonly BufferManager _bufferManager;
         //private ILog LogManager.GetLogger(this.GetType());
-        private MessageHandler _messageHandler;
+        private readonly MessageHandler _messageHandler;
 
-        public Socket TheSocket
-        {
-            get
-            {
-                return _socket;
-            }
-        }
+        public Socket TheSocket => _socket;
 
-        public bool IsConnected
-        {
-            get
-            {
-                return _socket.Connected;
-            }
-        }
+        public bool IsConnected => _socket.Connected;
 
         public static SocketClient CreateConnection(string name, string ip, int port)
         {
@@ -69,7 +57,7 @@ namespace CLMS.Framework.Sockets
             _sockets.Remove(name);
         }
 
-        internal SocketClient(string ipAdd, int port)
+        private SocketClient(string ipAdd, int port)
         {
             //_logger = LogManager.GetLogger(this.GetType());
             _bufferManager = new BufferManager(ChunkSize, ChunkSize);
@@ -85,7 +73,7 @@ namespace CLMS.Framework.Sockets
             _addr = new IPEndPoint(IPAddress.Parse(ipAdd), port);
         }
 
-        internal void Connect()
+        private void Connect()
         {
             _socket.Connect(_addr);
         }
@@ -124,27 +112,27 @@ namespace CLMS.Framework.Sockets
                             break;
 
                         case SocketAsyncOperation.Receive:
-                            DataHoldingUserToken recToken = (DataHoldingUserToken)e.UserToken;
+                            var recToken = (DataHoldingUserToken)e.UserToken;
                             LogManager.GetLogger(this.GetType()).Debug("IO_Completed method In Receive, id = " + recToken.TokenId);
                             ProcessReceive(args);
 
                             break;
 
                         case SocketAsyncOperation.Send:
-                            DataHoldingUserToken sendToken = (DataHoldingUserToken)e.UserToken;
+                            var sendToken = (DataHoldingUserToken)e.UserToken;
                             LogManager.GetLogger(this.GetType()).Debug("IO_Completed method In Send, id = " + sendToken.TokenId + ". NOT IMPLEMENTED!");
                             //ProcessSend(e);
                             break;
 
                         case SocketAsyncOperation.Disconnect:
-                            DataHoldingUserToken disconnectToken = (DataHoldingUserToken)e.UserToken;
+                            var disconnectToken = (DataHoldingUserToken)e.UserToken;
                             LogManager.GetLogger(this.GetType()).Debug("IO_Completed method In Disconnect, id = " + disconnectToken.TokenId + ". NOT IMPLEMENTED!");
                             //ProcessDisconnectAndCloseSocket(e);
                             break;
 
                         default:
                             {
-                                DataHoldingUserToken errorToken = (DataHoldingUserToken)e.UserToken;
+                                var errorToken = (DataHoldingUserToken)e.UserToken;
                                 LogManager.GetLogger(this.GetType()).Debug("Error in I/O Completed, id = " + errorToken.TokenId + ". NOT IMPLEMENTED!");
                                 throw new ArgumentException("\r\nError in I/O Completed, id = " + errorToken.TokenId);
                             }
@@ -152,7 +140,7 @@ namespace CLMS.Framework.Sockets
                 }
                 catch(Exception err)
                 {
-                    DataHoldingUserToken errorToken = (DataHoldingUserToken)e.UserToken;
+                    var errorToken = (DataHoldingUserToken)e.UserToken;
                     LogManager.GetLogger(this.GetType()).Error("EXCEPTION in I/O Completed, id = " + errorToken.TokenId + ".", err);
                 }
             };
@@ -162,7 +150,7 @@ namespace CLMS.Framework.Sockets
 
         private void ProcessReceive(SocketAsyncEventArgs args)
         {
-            DataHoldingUserToken receiveSendToken = (DataHoldingUserToken)args.UserToken;
+            var receiveSendToken = (DataHoldingUserToken)args.UserToken;
 
             if (args.SocketError != SocketError.Success)
             {
@@ -185,10 +173,10 @@ namespace CLMS.Framework.Sockets
 
             // For debug purposes only
             //This only gives us a readable string if it is operating on string data.
-            string tempString = Encoding.ASCII.GetString(args.Buffer, receiveSendToken.receiveMessageOffset, args.BytesTransferred);
+            var tempString = Encoding.ASCII.GetString(args.Buffer, receiveSendToken.receiveMessageOffset, args.BytesTransferred);
             LogManager.GetLogger(this.GetType()).Debug(receiveSendToken.TokenId + " data received = " + tempString);
 
-            bool incomingTcpMessageIsReady = _messageHandler.HandleMessage(args, receiveSendToken);
+            var incomingTcpMessageIsReady = _messageHandler.HandleMessage(args, receiveSendToken);
 
             if (incomingTcpMessageIsReady == true)
             {
@@ -211,14 +199,14 @@ namespace CLMS.Framework.Sockets
         // Set the receive buffer and post a receive op.
         private void StartReceive(SocketAsyncEventArgs receiveSendEventArgs)
         {
-            DataHoldingUserToken receiveSendToken = (DataHoldingUserToken)receiveSendEventArgs.UserToken;
+            var receiveSendToken = (DataHoldingUserToken)receiveSendEventArgs.UserToken;
             //Set buffer for receive.          
             //receiveSendEventArgs.SetBuffer(receiveSendToken.receiveMessageOffset, ChunkSize);
             receiveSendEventArgs.SetBuffer(0, ChunkSize);
 
             LogManager.GetLogger(this.GetType()).Debug("\r\nStartReceive, id = " + receiveSendToken.TokenId);
 
-            bool willRaiseEvent = _socket.ReceiveAsync(receiveSendEventArgs);
+            var willRaiseEvent = _socket.ReceiveAsync(receiveSendEventArgs);
             if (!willRaiseEvent)
             {
                 LogManager.GetLogger(this.GetType()).Debug("StartReceive in if (!willRaiseEvent), id = " + receiveSendToken.TokenId);
@@ -267,11 +255,11 @@ namespace CLMS.Framework.Sockets
         // Disconnect from the host.        
         private void StartDisconnect(SocketAsyncEventArgs receiveSendEventArgs)
         {
-            DataHoldingUserToken receiveSendToken = (DataHoldingUserToken)receiveSendEventArgs.UserToken;
+            var receiveSendToken = (DataHoldingUserToken)receiveSendEventArgs.UserToken;
             LogManager.GetLogger(this.GetType()).Debug("Disconnecting id: " + receiveSendToken.TokenId);
 
             _socket.Shutdown(SocketShutdown.Both);
-            bool willRaiseEvent = this._socket.DisconnectAsync(receiveSendEventArgs);
+            var willRaiseEvent = this._socket.DisconnectAsync(receiveSendEventArgs);
             if (!willRaiseEvent)
             {
                 ProcessDisconnectAndCloseSocket(receiveSendEventArgs);
@@ -281,7 +269,7 @@ namespace CLMS.Framework.Sockets
         //____________________________________________________________________________
         private void ProcessDisconnectAndCloseSocket(SocketAsyncEventArgs receiveSendEventArgs)
         {
-            DataHoldingUserToken receiveSendToken = (DataHoldingUserToken)receiveSendEventArgs.UserToken;
+            var receiveSendToken = (DataHoldingUserToken)receiveSendEventArgs.UserToken;
             LogManager.GetLogger(this.GetType()).Debug("ProcessDisconnect id: " + receiveSendToken.TokenId);
 
 
