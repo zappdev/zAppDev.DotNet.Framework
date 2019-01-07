@@ -1,42 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Reflection.Emit;
-using System.Web;
 using AppDevCache = CLMS.AppDev.Cache;
-using System.Web.Http;
 using System.Configuration;
+using System.Web;
+#if NETFRAMEWORK
+using System.Net.Http;
+#else
+using Microsoft.AspNetCore.Http;
+#endif
 
 namespace CLMS.Framework.Utilities
 {
     public class Web
     {
+        private static HttpContext GetContext()
+        {
+#if NETFRAMEWORK
+            return HttpContext.Current;
+#else
+            var contextAccessor = ServiceLocator.Current.GetInstance<IHttpContextAccessor>();
+            return contextAccessor.HttpContext;
+#endif
+        }
+
         public static string GetClientIp()
         {
 #if NETFRAMEWORK
             var ip = HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
-            ip = string.IsNullOrEmpty(ip) == false ? ip.Split(',')[0].Trim() : HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"];
+            ip =
+ string.IsNullOrEmpty(ip) == false ? ip.Split(',')[0].Trim() : HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"];
             return ip;
 #else
-            throw new NotImplementedException();
+            var contextAccessor = ServiceLocator.Current.GetInstance<IHttpContextAccessor>();
+            return contextAccessor.HttpContext.Connection.RemoteIpAddress.ToString();
 #endif
         }
 
         public static bool IsUserInRole(string roleName)
         {
-#if NETFRAMEWORK
-            return HttpContext.Current.User.IsInRole(roleName);
-#else
-            throw new NotImplementedException();
-#endif
+            return GetContext().User.IsInRole(roleName);
         }
 
         public static bool IsInControllerAction(string action)
         {
             return GetFormArgument("_currentControllerAction") == action;
         }
-
 
         public static string GetQuery()
         {
@@ -89,7 +98,53 @@ namespace CLMS.Framework.Utilities
 
             return routeData + query;
 #else
-            throw new NotImplementedException();
+            var query = "";
+            var routeData = "";
+
+            //Good for links such as: ~/GoTo?aNumber=5&astring=xaxa
+            if (GetContext().Request.QueryString.HasValue)
+            {
+                var result = new List<string>();
+                foreach (var key in GetContext().Request.Query.Keys)
+                {
+                    result.Add($@"{key}={GetContext().Request.Query[key]}");
+                }
+                query = string.Join("&", result);
+                if (!string.IsNullOrWhiteSpace(query)) query = $"?{query}";
+            }
+
+            //Good for links such as:  ~/GoTo/5/xaxa
+            if (GetContext().Request.Get.RouteData?.Values?.Count > 0)
+            {
+                var foundControllerKey = false;
+                var foundActionKey = false;
+                var result = new List<string>();
+
+                foreach (var key in GetContext().Request.RequestContext.RouteData.Values.Keys)
+                {
+                    /*
+                        Usually, the first keys are 'controller' and 'action'. However, I don't wanna ignore them COMPLETELY. Just the first ones.
+                        'Cause maybe a controller action has an 'action' parameter. Don't wanna lose that.
+                    */
+                    if ((!foundControllerKey) && (string.Compare(key, "controller", StringComparison.OrdinalIgnoreCase) == 0))
+                    {
+                        foundControllerKey = true;
+                        continue;
+                    }
+
+                    if ((!foundActionKey) && (string.Compare(key, "action", StringComparison.OrdinalIgnoreCase) == 0))
+                    {
+                        foundActionKey = true;
+                        continue;
+                    }
+
+                    result.Add($@"{GetContext().Request.RequestContext.RouteData.Values[key]}");
+                }
+                routeData = string.Join("/", result);
+                if (!string.IsNullOrWhiteSpace(routeData)) routeData = $"/{routeData}";
+            }
+
+            return routeData + query;
 #endif
         }
 
@@ -132,11 +187,7 @@ namespace CLMS.Framework.Utilities
 
         public static string GetRequestHeader(string header)
         {
-#if NETFRAMEWORK
-            return HttpContext.Current?.Request?.Headers?.Get(header);
-#else
-            throw new NotImplementedException();
-#endif
+            return GetContext()?.Request?.Headers[header];
         }
 
         public static string GetReturnUrl()
@@ -155,17 +206,23 @@ namespace CLMS.Framework.Utilities
             }
             return string.Empty;
 #else
-        throw new NotImplementedException();
+            if (!string.IsNullOrEmpty(GetContext().Request.Query["returnUrl"]))
+            {
+                return GetContext().Request.Query["returnUrl"];
+            }
+
+            if (string.IsNullOrEmpty(GetContext().Request.Headers["Referer"].ToString())) 
+                return string.Empty;
+            
+            var query = GetContext().Request.Headers["Referer"].ToString();;
+            return HttpUtility.ParseQueryString(query)["returnUrl"];
 #endif
         }
 
         public static bool IsUser(string username)
         {
-#if NETFRAMEWORK
-            return HttpContext.Current.User.Identity.Name == username;
-#else
-throw new NotImplementedException();
-#endif
+            return GetContext().User.Identity.Name == username;
+
         }
 
         // Serialization Sanitization entries
@@ -173,11 +230,13 @@ throw new NotImplementedException();
         // that cause asp.net mvc to crash when NormalizeJQueryToMvc internal method is invoked
         public static Dictionary<string, string> SerializationSanitizationEntries = new Dictionary<string, string>()
         {
-            {  "=", ">>MVC_1<<" }
+            {"=", ">>MVC_1<<"}
         };
 
         private static ServerRole _serverRole;
-        public static ServerRole CurrentServerRole => _serverRole == ServerRole.None ? GetCurrentServerRole() : _serverRole;
+
+        public static ServerRole CurrentServerRole =>
+            _serverRole == ServerRole.None ? GetCurrentServerRole() : _serverRole;
 
         private static ServerRole GetCurrentServerRole()
         {
@@ -187,8 +246,7 @@ throw new NotImplementedException();
 
                 _serverRole = string.IsNullOrWhiteSpace(role)
                     ? ServerRole.Combined
-                    : (ServerRole)Enum.Parse(typeof(ServerRole), role);
-
+                    : (ServerRole) Enum.Parse(typeof(ServerRole), role);
             }
             catch
             {

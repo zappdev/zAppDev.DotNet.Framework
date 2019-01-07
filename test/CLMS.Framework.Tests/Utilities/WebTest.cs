@@ -1,12 +1,19 @@
 using System;
-using System.Collections.Specialized;
-using System.Diagnostics;
 using System.IO;
+using System.Net;
+using System.Collections.Specialized;
+using System.Configuration;
+using System.Diagnostics;
 using CLMS.Framework.Utilities;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 #if NETFRAMEWORK
 using Http.TestLibrary;
+#else
+using Moq;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Internal;
 #endif
 
 namespace CLMS.Framework.Tests.Utilities
@@ -22,9 +29,19 @@ namespace CLMS.Framework.Tests.Utilities
             {
                 Assert.AreEqual("127.0.0.1", Web.GetClientIp());
             }
+#else
+            HttpCoreSimulate(() =>
+            {
+                var context = new DefaultHttpContext();
+
+                context.Connection.RemoteIpAddress = IPAddress.Parse("127.0.0.1");
+                return context;
+            });
+
+            Assert.AreEqual("127.0.0.1", Web.GetClientIp());
 #endif
         }
-        
+
         [TestMethod]
         public void IsUserInRoleTest()
         {
@@ -33,9 +50,11 @@ namespace CLMS.Framework.Tests.Utilities
             {
 //                Assert.AreEqual(false, Web.IsUserInRole("Admin"));
             }
+#else
+
 #endif
         }
-        
+
         [TestMethod]
         public void IsInControllerActionTest()
         {
@@ -53,7 +72,7 @@ namespace CLMS.Framework.Tests.Utilities
             }
 #endif
         }
-        
+
         [TestMethod]
         public void GetQueryTest()
         {
@@ -62,10 +81,12 @@ namespace CLMS.Framework.Tests.Utilities
                 .SimulateRequest(new Uri("http://clms.test.com?_currentControllerAction=Test")))
             {
                 Assert.AreEqual("?_currentControllerAction=Test", Web.GetQuery());
-            }            
+            }
+#else
+            Assert.AreEqual("?_currentControllerAction=Test", Web.GetQuery());
 #endif
         }
-        
+
         [TestMethod]
         public void GetFormArgument()
         {
@@ -83,7 +104,7 @@ namespace CLMS.Framework.Tests.Utilities
             }            
 #endif
         }
-        
+
         [TestMethod]
         public void GetRequestHeader()
         {
@@ -100,7 +121,7 @@ namespace CLMS.Framework.Tests.Utilities
             }
 #endif
         }
-        
+
         [TestMethod]
         public void GetReturnUrl()
         {
@@ -109,22 +130,33 @@ namespace CLMS.Framework.Tests.Utilities
                 .SimulateRequest(new Uri("http://clms.test.com?returnUrl=www.google.com")))
             {
                 Assert.AreEqual("www.google.com", Web.GetReturnUrl());
-            }            
+            }
+#else
+            HttpCoreSimulate(() =>
+            {
+                var context = new DefaultHttpContext();
+
+                context.Request.QueryString = new QueryString("?returnUrl=www.google.com");
+
+                return context;
+            });
+            
+            Assert.AreEqual("www.google.com", Web.GetReturnUrl());
 #endif
         }
-        
+
         [TestMethod]
         public void SerializationSanitizationEntriesTest()
         {
             Assert.AreEqual(">>MVC_1<<", Web.SerializationSanitizationEntries["="]);
         }
-        
+
         [TestMethod]
         public void CurrentServerRoleTest()
         {
             Assert.AreEqual(Web.ServerRole.Combined, Web.CurrentServerRole);
         }
-        
+
         [TestMethod]
         public void MapPathTest()
         {
@@ -160,7 +192,22 @@ namespace CLMS.Framework.Tests.Utilities
                 
                 Assert.ThrowsException<AppDev.Cache.CacheException>(() => Web.Session.Get("Phone"));
             } 
-#endif      
+#endif
         }
+
+#if NETFRAMEWORK
+#else
+        private static void HttpCoreSimulate(Func<DefaultHttpContext> getContext)
+        {
+            var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
+            var context = getContext();
+
+            mockHttpContextAccessor.Setup(_ => _.HttpContext).Returns(context);
+
+            var services = new ServiceCollection();
+            services.AddSingleton(ins => mockHttpContextAccessor.Object);
+            ServiceLocator.SetLocatorProvider(services.BuildServiceProvider());
+        }
+#endif
     }
 }

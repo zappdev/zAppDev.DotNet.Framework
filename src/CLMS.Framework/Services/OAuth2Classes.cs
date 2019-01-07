@@ -4,12 +4,11 @@ using System.Linq;
 using System.ServiceModel.Channels;
 using System.Text;
 using System.Threading.Tasks;
-
 using CLMS.Framework.Utilities;
 using Newtonsoft.Json.Linq;
-
 #if NETFRAMEWORK
 using System.Web;
+
 #else
 using Microsoft.AspNetCore.Http;
 #endif
@@ -37,7 +36,7 @@ namespace Services
 
         public void Parse(string postRresponseString)
         {
-            JObject obj = JObject.Parse(postRresponseString);
+            var obj = JObject.Parse(postRresponseString);
             this.Token = (string) obj["access_token"];
             if (this.Refresh_token == null)
             {
@@ -108,9 +107,9 @@ namespace Services
             {
                 if (serviceName != null)
                 {
-                    #if NETFRAMEWORK
+#if NETFRAMEWORK
                     return (T) httpContext.Session[SessionKey(serviceName)];
-                    #else
+#else
                     throw new NotImplementedException();
 #endif
                 }

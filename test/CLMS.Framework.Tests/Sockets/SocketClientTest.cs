@@ -32,8 +32,8 @@ namespace CLMS.Framework.Tests.Sockets
                 return true;
             });
             
-            // SocketClient.CloseConnection(serviceName);
-            // Assert.ThrowsException<Exception>(() => SocketClient.CloseConnection("NotExist"));
+            SocketClient.CloseConnection(serviceName);
+            Assert.ThrowsException<Exception>(() => SocketClient.CloseConnection("NotExist"));
             
             client.Dispose();
         }
@@ -41,7 +41,9 @@ namespace CLMS.Framework.Tests.Sockets
         [TestMethod]
         public void BadConnectionTest()
         {
-#if Linux
+#if NETFRAMEWORK
+            Assert.ThrowsException<SocketException>(() => SocketClient.CreateConnection("GoogleDNS Bad", "8.8.8.8", 80));
+#else
             try
             {
                 SocketClient.CreateConnection("GoogleDNS Bad", "8.8.8.8", 80);
@@ -50,8 +52,6 @@ namespace CLMS.Framework.Tests.Sockets
             {
                 
             }
-#else
-            Assert.ThrowsException<SocketException>(() => SocketClient.CreateConnection("GoogleDNS Bad", "8.8.8.8", 80));
 #endif
         }
     }
