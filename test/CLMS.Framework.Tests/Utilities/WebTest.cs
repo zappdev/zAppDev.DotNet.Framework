@@ -245,6 +245,7 @@ namespace CLMS.Framework.Tests.Utilities
                 .SimulateRequest(new Uri("http://clms.test.com?returnUrl=www.google.com")))
             {                
                 Assert.IsTrue(regex.IsMatch(Web.MapPath("App_Data")));
+                Assert.IsTrue(regex.IsMatch(Web.MapPath("~/App_Data/CodeMap.js")));
             }
 #else
             Helper.HttpCoreSimulate(() =>

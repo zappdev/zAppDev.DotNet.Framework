@@ -259,7 +259,7 @@ namespace CLMS.Framework.Utilities
             }
 #else
             var hosting = ServiceLocator.Current.GetInstance<IHostingEnvironment>();
-            return Path.Combine(hosting.ContentRootPath, path);
+            return Path.Combine(hosting.ContentRootPath, path.Replace("~/", ""));
 #endif
         }
 
