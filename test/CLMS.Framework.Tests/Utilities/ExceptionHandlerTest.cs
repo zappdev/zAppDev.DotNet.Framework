@@ -1,6 +1,15 @@
 ﻿using CLMS.Framework.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.IO;
+using System.Net;
+
+#if NETFRAMEWORK
+using Http.TestLibrary;
+#else
+using Moq;
+using Microsoft.AspNetCore.Http;
+#endif
 
 namespace CLMS.Framework.Tests.Utilities
 {
@@ -19,9 +28,7 @@ namespace CLMS.Framework.Tests.Utilities
         [TestMethod]
         public void MapTest()
         {
-            var obj = new Map();
-
-            obj = new Map("app", "CondionalFormating", "id", 1);
+            var obj = new Map("app", "CondionalFormating", "id", 1);
 
             Assert.AreEqual("id", obj.AppDevIdentifier);
             Assert.AreEqual(AppDevSemantic.CondionalFormating, obj.AppDevSemantic);
@@ -54,6 +61,28 @@ namespace CLMS.Framework.Tests.Utilities
 
             Assert.AreEqual("id", obj.AppdevIdentifier);
             Assert.AreEqual("test", obj.AppdevSemantic);
+        }
+
+        [TestMethod]
+        public void ExceptionHandlerInitTest()
+        {
+#if NETFRAMEWORK
+            using (new HttpSimulator("/", Directory.GetCurrentDirectory()).SimulateRequest())
+            {
+                var obj = new ExceptionHandler();
+
+            }
+#else
+            Helper.HttpCoreSimulate(() =>
+            {
+                var context = new DefaultHttpContext();
+
+                context.Connection.RemoteIpAddress = IPAddress.Parse("127.0.0.1");
+                return context;
+            });
+
+            var obj = new ExceptionHandler();
+#endif
         }
     }
 }
