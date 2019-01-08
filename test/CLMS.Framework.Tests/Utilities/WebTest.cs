@@ -4,6 +4,7 @@ using System.Net;
 using System.Collections.Specialized;
 using System.Configuration;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 using CLMS.Framework.Utilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -216,7 +217,8 @@ namespace CLMS.Framework.Tests.Utilities
             using (new HttpSimulator("/", Directory.GetCurrentDirectory())
                 .SimulateRequest(new Uri("http://clms.test.com?returnUrl=www.google.com")))
             {
-                Assert.AreEqual(@"C:\Users\George Theofilis\Documents\Projects\Core\CLMS.Framework\test\CLMS.Framework.Tests\bin\Debug\net472\App_Data", Web.MapPath("App_Data"));
+                var regex = new Regex(@"^(.+)(\\|\/)([^(\\|\/)]+)$");
+                Assert.IsTrue(regex.IsMatch(Web.MapPath("App_Data")));
             } 
 #endif
         }
