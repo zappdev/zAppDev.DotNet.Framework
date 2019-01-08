@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Web;
 
 namespace CLMS.Framework.Utilities
 {
@@ -19,11 +18,7 @@ namespace CLMS.Framework.Utilities
             if (MapsParsed) return;
 
             Maps = new List<Map>();
-#if NETFRAMEWORK
-            ParseMapFiles(HttpContext.Current.Server.MapPath("~/App_Data/CodeMap.js"));
-#else
-throw new NotImplementedException();
-#endif
+            ParseMapFiles(Web.MapPath("~/App_Data/CodeMap.js"));
         }
 
         public string GetFriendlyMessageEntriesHTML(Exception e)
