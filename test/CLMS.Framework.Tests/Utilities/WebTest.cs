@@ -5,7 +5,6 @@ using System.Collections.Specialized;
 using System.Configuration;
 using System.Diagnostics;
 using CLMS.Framework.Utilities;
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 #if NETFRAMEWORK
@@ -14,6 +13,7 @@ using Http.TestLibrary;
 using Moq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Internal;
+
 #endif
 
 namespace CLMS.Framework.Tests.Utilities
@@ -70,6 +70,17 @@ namespace CLMS.Framework.Tests.Utilities
             {
                 Assert.AreEqual(true, Web.IsInControllerAction("Test"));
             }
+#else
+            HttpCoreSimulate(() =>
+            {
+                var context = new DefaultHttpContext();
+
+                context.Request.QueryString = new QueryString("?_currentControllerAction=Test");
+
+                return context;
+            });
+            
+            Assert.AreEqual(true, Web.IsInControllerAction("Test"));
 #endif
         }
 
@@ -83,6 +94,15 @@ namespace CLMS.Framework.Tests.Utilities
                 Assert.AreEqual("?_currentControllerAction=Test", Web.GetQuery());
             }
 #else
+            HttpCoreSimulate(() =>
+            {
+                var context = new DefaultHttpContext();
+
+                context.Request.QueryString = new QueryString("?_currentControllerAction=Test");
+
+                return context;
+            });
+
             Assert.AreEqual("?_currentControllerAction=Test", Web.GetQuery());
 #endif
         }
@@ -102,6 +122,17 @@ namespace CLMS.Framework.Tests.Utilities
             {
                 Assert.AreEqual("", Web.GetFormArgument("returnUrl"));
             }            
+#else
+            HttpCoreSimulate(() =>
+            {
+                var context = new DefaultHttpContext();
+
+                context.Request.QueryString = new QueryString("?_currentControllerAction=Test");
+
+                return context;
+            });
+            Assert.AreEqual("Test", Web.GetFormArgument("_currentControllerAction"));
+            Assert.AreEqual("", Web.GetFormArgument("returnUrl"));
 #endif
         }
 
@@ -119,6 +150,16 @@ namespace CLMS.Framework.Tests.Utilities
             {
                 Assert.AreEqual("text/plain", Web.GetRequestHeader("Accept"));
             }
+#else
+            HttpCoreSimulate(() =>
+            {
+                var context = new DefaultHttpContext();
+
+                context.Request.Headers.Add("Accept", "text/plain");
+
+                return context;
+            });
+            Assert.AreEqual("text/plain", Web.GetRequestHeader("Accept"));
 #endif
         }
 
@@ -137,6 +178,17 @@ namespace CLMS.Framework.Tests.Utilities
                 var context = new DefaultHttpContext();
 
                 context.Request.QueryString = new QueryString("?returnUrl=www.google.com");
+
+                return context;
+            });
+
+            Assert.AreEqual("www.google.com", Web.GetReturnUrl());
+            
+            HttpCoreSimulate(() =>
+            {
+                var context = new DefaultHttpContext();
+
+                context.Request.Headers.Add("Referer", "returnUrl=www.google.com");
 
                 return context;
             });

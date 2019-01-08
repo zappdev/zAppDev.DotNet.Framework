@@ -100,50 +100,17 @@ namespace CLMS.Framework.Utilities
 #else
             var query = "";
             var routeData = "";
-
+            var context = GetContext();
+            
             //Good for links such as: ~/GoTo?aNumber=5&astring=xaxa
-            if (GetContext().Request.QueryString.HasValue)
+            if (context.Request.QueryString.HasValue)
             {
-                var result = new List<string>();
-                foreach (var key in GetContext().Request.Query.Keys)
-                {
-                    result.Add($@"{key}={GetContext().Request.Query[key]}");
-                }
+                var result = context.Request.Query
+                    .Keys.Select(key => $@"{key}={context.Request.Query[key]}").ToList();
                 query = string.Join("&", result);
                 if (!string.IsNullOrWhiteSpace(query)) query = $"?{query}";
             }
-
-            //Good for links such as:  ~/GoTo/5/xaxa
-            if (GetContext().Request.Get.RouteData?.Values?.Count > 0)
-            {
-                var foundControllerKey = false;
-                var foundActionKey = false;
-                var result = new List<string>();
-
-                foreach (var key in GetContext().Request.RequestContext.RouteData.Values.Keys)
-                {
-                    /*
-                        Usually, the first keys are 'controller' and 'action'. However, I don't wanna ignore them COMPLETELY. Just the first ones.
-                        'Cause maybe a controller action has an 'action' parameter. Don't wanna lose that.
-                    */
-                    if ((!foundControllerKey) && (string.Compare(key, "controller", StringComparison.OrdinalIgnoreCase) == 0))
-                    {
-                        foundControllerKey = true;
-                        continue;
-                    }
-
-                    if ((!foundActionKey) && (string.Compare(key, "action", StringComparison.OrdinalIgnoreCase) == 0))
-                    {
-                        foundActionKey = true;
-                        continue;
-                    }
-
-                    result.Add($@"{GetContext().Request.RequestContext.RouteData.Values[key]}");
-                }
-                routeData = string.Join("/", result);
-                if (!string.IsNullOrWhiteSpace(routeData)) routeData = $"/{routeData}";
-            }
-
+            
             return routeData + query;
 #endif
         }
@@ -181,7 +148,26 @@ namespace CLMS.Framework.Utilities
 
             return string.Empty;
 #else
-            throw new NotImplementedException();
+            var context = GetContext();
+            // Good for links such as: ~/GoTo?aNumber=5&astring=xaxa
+            if (!string.IsNullOrEmpty(context.Request.Query[argname]))
+            {
+                return context.Request.Query[argname];
+            }
+
+            // Good for links such as:  ~/GoTo/5/xaxa
+            // Not supported by .NET Core
+
+            if (context.Items[argname] != null)
+            {
+                return context.Items[argname].ToString();
+            }
+
+            if (argname != "returnUrl") return string.Empty;
+            
+            var returnUrl = GetReturnUrl();
+            return returnUrl != null ? returnUrl.TrimStart('~') : string.Empty;
+
 #endif
         }
 
