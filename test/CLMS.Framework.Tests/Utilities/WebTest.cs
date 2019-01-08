@@ -2,19 +2,18 @@ using System;
 using System.IO;
 using System.Net;
 using System.Collections.Specialized;
-using System.Configuration;
 using System.Diagnostics;
+using System.Security.Claims;
 using System.Text.RegularExpressions;
 using CLMS.Framework.Utilities;
-using Microsoft.Extensions.DependencyInjection;
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 #if NETFRAMEWORK
 using Http.TestLibrary;
 #else
 using Moq;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
-
 #endif
 
 namespace CLMS.Framework.Tests.Utilities
@@ -31,7 +30,7 @@ namespace CLMS.Framework.Tests.Utilities
                 Assert.AreEqual("127.0.0.1", Web.GetClientIp());
             }
 #else
-            HttpCoreSimulate(() =>
+            Helper.HttpCoreSimulate(() =>
             {
                 var context = new DefaultHttpContext();
 
@@ -52,7 +51,34 @@ namespace CLMS.Framework.Tests.Utilities
 //                Assert.AreEqual(false, Web.IsUserInRole("Admin"));
             }
 #else
+            Helper.HttpCoreSimulate(() =>
+            {
+                var context = new DefaultHttpContext();
 
+                context.User.AddIdentity(new ClaimsIdentity());
+                return context;
+            });
+            Assert.AreEqual(false, Web.IsUserInRole("Admin"));
+#endif
+        }
+
+        [TestMethod]
+        public void IsUserTest()
+        {
+#if NETFRAMEWORK
+            using (new HttpSimulator("/", Directory.GetCurrentDirectory()).SimulateRequest())
+            {
+//                Assert.AreEqual(false, Web.IsUserInRole("Admin"));
+            }
+#else
+            Helper.HttpCoreSimulate(() =>
+            {
+                var context = new DefaultHttpContext();
+
+                context.User.AddIdentity(new ClaimsIdentity());
+                return context;
+            });
+            Assert.AreEqual(false, Web.IsUser("Admin"));
 #endif
         }
 
@@ -72,7 +98,7 @@ namespace CLMS.Framework.Tests.Utilities
                 Assert.AreEqual(true, Web.IsInControllerAction("Test"));
             }
 #else
-            HttpCoreSimulate(() =>
+            Helper.HttpCoreSimulate(() =>
             {
                 var context = new DefaultHttpContext();
 
@@ -80,7 +106,7 @@ namespace CLMS.Framework.Tests.Utilities
 
                 return context;
             });
-            
+
             Assert.AreEqual(true, Web.IsInControllerAction("Test"));
 #endif
         }
@@ -95,7 +121,7 @@ namespace CLMS.Framework.Tests.Utilities
                 Assert.AreEqual("?_currentControllerAction=Test", Web.GetQuery());
             }
 #else
-            HttpCoreSimulate(() =>
+            Helper.HttpCoreSimulate(() =>
             {
                 var context = new DefaultHttpContext();
 
@@ -124,7 +150,7 @@ namespace CLMS.Framework.Tests.Utilities
                 Assert.AreEqual("", Web.GetFormArgument("returnUrl"));
             }            
 #else
-            HttpCoreSimulate(() =>
+            Helper.HttpCoreSimulate(() =>
             {
                 var context = new DefaultHttpContext();
 
@@ -142,7 +168,7 @@ namespace CLMS.Framework.Tests.Utilities
         {
             var options = new NameValueCollection();
 
-            var headers = new NameValueCollection {{"Accept", "text/plain"}};
+            var headers = new NameValueCollection { { "Accept", "text/plain" } };
 
 
 #if NETFRAMEWORK
@@ -152,7 +178,7 @@ namespace CLMS.Framework.Tests.Utilities
                 Assert.AreEqual("text/plain", Web.GetRequestHeader("Accept"));
             }
 #else
-            HttpCoreSimulate(() =>
+            Helper.HttpCoreSimulate(() =>
             {
                 var context = new DefaultHttpContext();
 
@@ -174,7 +200,7 @@ namespace CLMS.Framework.Tests.Utilities
                 Assert.AreEqual("www.google.com", Web.GetReturnUrl());
             }
 #else
-            HttpCoreSimulate(() =>
+            Helper.HttpCoreSimulate(() =>
             {
                 var context = new DefaultHttpContext();
 
@@ -184,8 +210,8 @@ namespace CLMS.Framework.Tests.Utilities
             });
 
             Assert.AreEqual("www.google.com", Web.GetReturnUrl());
-            
-            HttpCoreSimulate(() =>
+
+            Helper.HttpCoreSimulate(() =>
             {
                 var context = new DefaultHttpContext();
 
@@ -193,7 +219,7 @@ namespace CLMS.Framework.Tests.Utilities
 
                 return context;
             });
-            
+
             Assert.AreEqual("www.google.com", Web.GetReturnUrl());
 #endif
         }
@@ -213,13 +239,23 @@ namespace CLMS.Framework.Tests.Utilities
         [TestMethod]
         public void MapPathTest()
         {
+            var regex = new Regex(@"^(.+)(\\|\/)([^(\\|\/)]+)$");
 #if NETFRAMEWORK
             using (new HttpSimulator("/", Directory.GetCurrentDirectory())
                 .SimulateRequest(new Uri("http://clms.test.com?returnUrl=www.google.com")))
-            {
-                var regex = new Regex(@"^(.+)(\\|\/)([^(\\|\/)]+)$");
+            {                
                 Assert.IsTrue(regex.IsMatch(Web.MapPath("App_Data")));
-            } 
+            }
+#else
+            Helper.HttpCoreSimulate(() =>
+            {
+                var context = new DefaultHttpContext();
+
+                context.Request.Headers.Add("Referer", "returnUrl=www.google.com");
+
+                return context;
+            });
+            Assert.IsTrue(regex.IsMatch(Web.MapPath("App_Data")));
 #endif
         }
 
@@ -246,22 +282,36 @@ namespace CLMS.Framework.Tests.Utilities
                 
                 Assert.ThrowsException<AppDev.Cache.CacheException>(() => Web.Session.Get("Phone"));
             } 
-#endif
-        }
-
-#if NETFRAMEWORK
 #else
-        private static void HttpCoreSimulate(Func<DefaultHttpContext> getContext)
-        {
-            var mockHttpContextAccessor = new Mock<IHttpContextAccessor>();
-            var context = getContext();
+            Helper.HttpCoreSimulate(() =>
+            {
+                var context = new DefaultHttpContext();
 
-            mockHttpContextAccessor.Setup(_ => _.HttpContext).Returns(context);
+                context.Request.Headers.Add("Referer", "returnUrl=www.google.com");
 
-            var services = new ServiceCollection();
-            services.AddSingleton(ins => mockHttpContextAccessor.Object);
-            ServiceLocator.SetLocatorProvider(services.BuildServiceProvider());
-        }
+                var mockSession = new Mock<ISession>();
+                mockSession.Setup(_ => _.Id).Returns("dqe3wrd");
+                context.Session = mockSession.Object;
+
+                return context;
+            });
+
+            //Debug.WriteLine(Web.Session.GetStorage());
+
+            //Assert.ThrowsException<AppDev.Cache.CacheException>(() => Web.Session.Get("Name"));
+
+            //Web.Session.Set("Name", "George");
+
+            //Assert.AreEqual("George", Web.Session.Get("Name"));
+
+            //Web.Session.Add("Phone", "808080");
+
+            //Assert.AreEqual("808080", Web.Session.Get("Phone"));
+
+            //Web.Session.Remove("Phone");
+
+            //Assert.ThrowsException<AppDev.Cache.CacheException>(() => Web.Session.Get("Phone"));
 #endif
+        }
     }
 }

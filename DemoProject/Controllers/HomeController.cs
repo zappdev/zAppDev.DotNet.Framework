@@ -36,7 +36,7 @@ namespace DemoProject.Controllers
 
             try
             {
-                var email = Email.FetchSMTPSettings();
+                var email = Email.FetchSmtpSettings();
                 throw new Exception();
             } catch (Exception ex)
             {
@@ -48,7 +48,7 @@ namespace DemoProject.Controllers
 
         public IActionResult Contact()
         {
-            ViewData["Message"] = $"{System.Web.HttpContext.ContentRootPath} Your contact page.";
+            ViewData["Message"] = $"Your contact page.";
 
             return View();
         }

@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using AppDevCache = CLMS.AppDev.Cache;
 using System.Configuration;
+using System.IO;
+using System.Net.Http;
 using System.Web;
+
 #if NETFRAMEWORK
 using System.Net.Http;
 #else
+using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Http;
 #endif
 
@@ -14,7 +18,7 @@ namespace CLMS.Framework.Utilities
 {
     public class Web
     {
-        private static HttpContext GetContext()
+        public static HttpContext GetContext()
         {
 #if NETFRAMEWORK
             return HttpContext.Current;
@@ -254,16 +258,26 @@ namespace CLMS.Framework.Utilities
                 return System.Web.Hosting.HostingEnvironment.MapPath(path);
             }
 #else
-            throw new NotImplementedException();
+            var hosting = ServiceLocator.Current.GetInstance<IHostingEnvironment>();
+            return Path.Combine(hosting.ContentRootPath, path);
 #endif
         }
 
         public class Session
         {
+            public static AppDevCache.ICache<string> GetCache()
+            {
+#if NETFRAMEWORK
+                return AppDevCache.CacheManager.Current;
+#else
+                return ServiceLocator.Current.GetInstance<AppDevCache.ICache<string>>();
+#endif
+            }
+
             public static Dictionary<string, object> GetStorage()
             {
                 var sessionId = GetSessionId();
-                var items = AppDevCache.CacheManager.Current.KeyValuePair(item => item.Key.StartsWith(sessionId));
+                var items = GetCache().KeyValuePair(item => item.Key.StartsWith(sessionId));
                 return items.ToDictionary(item => item.Key.Replace(sessionId, ""), item => item.Value);
             }
 
@@ -281,32 +295,35 @@ namespace CLMS.Framework.Utilities
 
                 return httpRequestMessage.GetCorrelationId().ToString();
 #else
-                throw new NotImplementedException();
+                var sessionId = GetContext().Session?.Id;
+                if (!string.IsNullOrWhiteSpace(sessionId)) return sessionId;
+
+                throw new ApplicationException("Session Id is empty");
 #endif
             }
 
             public static object Get(string key)
             {
                 key = $"{GetSessionId()}{key}";
-                return AppDevCache.CacheManager.Current.Get<object>(key);
+                return GetCache().Get<object>(key);
             }
 
             public static void Set(string key, object value)
             {
                 key = $"{GetSessionId()}{key}";
-                AppDevCache.CacheManager.Current.Set(key, value);
+                GetCache().Set(key, value);
             }
 
             public static void Add(string key, object value)
             {
                 key = $"{GetSessionId()}{key}";
-                AppDevCache.CacheManager.Current.Add(key, value);
+                GetCache().Add(key, value);
             }
 
             public static void Remove(string key)
             {
                 key = $"{GetSessionId()}{key}";
-                AppDevCache.CacheManager.Current.Remove<object>(key);
+                GetCache().Remove<object>(key);
             }
         }
 

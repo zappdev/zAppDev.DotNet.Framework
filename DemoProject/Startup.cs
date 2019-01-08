@@ -53,7 +53,6 @@ namespace DemoProject
 
             app.UseStaticFiles();
             app.UseCookiePolicy();
-            app.UseStaticHttpContext();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
