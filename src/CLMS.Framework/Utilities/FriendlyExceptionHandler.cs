@@ -39,12 +39,14 @@ namespace CLMS.Framework.Utilities
             var stackTrace = new StackTrace(e, true);
             var clientHelpers = new List<FriendlyMessageDTO>();
             var originalMaps = new List<Map>();
-            var friendlyMessageDTO = new FriendlyMessageDTO();
+            var friendlyMessageDTO = new FriendlyMessageDTO
+            {
+                Entries = new List<FriendlyMessageEntryDTO>(),
+                OriginalExceptionMessage = e.Message,
+                OriginalStackTrace = e.StackTrace,
+                ExceptionType = e.GetType().Name
+            };
 
-            friendlyMessageDTO.Entries = new List<FriendlyMessageEntryDTO>();
-            friendlyMessageDTO.OriginalExceptionMessage = e.Message;
-            friendlyMessageDTO.OriginalStackTrace = e.StackTrace;
-            friendlyMessageDTO.ExceptionType = e.GetType().Name;
 
             if (e is System.Data.ConstraintException)
             {
