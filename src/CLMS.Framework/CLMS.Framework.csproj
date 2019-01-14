@@ -73,7 +73,6 @@
     <PackageReference Include="Microsoft.Owin" Version="3.1.0" />
     <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="3.1.0" />
     <PackageReference Include="Microsoft.Owin.Security" Version="3.1.0" />
-    <PackageReference Include="NCrontab" Version="3.3.0" />
 
     <PackageReference Include="Autofac.WebApi2" Version="4.0.0" />
     <PackageReference Include="NLog" Version="4.5.11" />
@@ -115,6 +114,9 @@
   <ItemGroup>
     <Reference Include="CLMS.AppDev.Cache">
       <HintPath>..\..\Lib\CLMS.AppDev.Cache.dll</HintPath>
+    </Reference>
+    <Reference Include="NCrontab">
+      <HintPath>..\..\Lib\NCrontab.dll</HintPath>
     </Reference>
   </ItemGroup>
 
