@@ -32,45 +32,54 @@ namespace CLMS.Framework.Data
 
         public bool WillFlush { get; set; }
 
-        public ISession Session { get; }
+        public ISession Session
+        {
+            get;
+            set;
+        }
 
+        public ISessionFactory SessionFactory { get; }
+        
         public readonly ILogger<MiniSessionService> Logger;
 
         public MiniSessionService(
-            ISession session,
+            ISessionFactory factory,
             ILogger<MiniSessionService> logger)
         {
-            Session = session;
+            SessionFactory = factory;
             Logger = logger;
+        }
+
+        public ISession OpenSession()
+        {
+            // Reuse session if exists
+            if (Session != null && Session.IsOpen)
+            {
+                return Session;
+            }
+            var session = SessionFactory.OpenSession();
+            session.FlushMode = FlushMode.Manual;
+            Session = session;
+            return session;
+        }
+
+        public ISession OpenSessionWithTransaction()
+        {
+            var session = OpenSession();
+            session.BeginTransaction();
+            return session;
         }
 
         public ISession OpenTransaction()
         {
-            Session.BeginTransaction();
-            return Session;
+            return OpenSession();
         }
 
         public ITransaction BeginTransaction()
         {
             return Session.BeginTransaction(IsolationLevel.ReadCommitted);
         }
-
-        private void Commit()
-        {
-            if (Session == null)
-            {
-                throw new ApplicationException("No Session to Commit!!");
-            }
-            if (WillFlush)
-            {
-                Session.Flush();
-            }
-            if (Session.Transaction.IsActive)
-            {
-                Session.Transaction.Commit();
-            }
-        }
-
+        
         public void CommitChanges(Exception exception = null, Action postAction = null)
         {
             try
@@ -91,6 +100,39 @@ namespace CLMS.Framework.Data
                 CloseSession();
             }
         }
+        
+        public void CloseSession()
+        {
+            Session?.Dispose();
+            Session = null;
+        }
+
+        ~MiniSessionService()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Commit()
+        {
+            if (Session == null)
+            {
+                throw new ApplicationException("No Session to Commit!!");
+            }
+            if (WillFlush)
+            {
+                Session.Flush();
+            }
+            if (Session.Transaction.IsActive)
+            {
+                Session.Transaction.Commit();
+            }
+        }
 
         private void Rollback()
         {
@@ -103,22 +145,6 @@ namespace CLMS.Framework.Data
             {
                 Session.Transaction.Rollback();
             }
-        }
-
-        public void CloseSession()
-        {
-            Session?.Dispose();
-        }
-
-        ~MiniSessionService()
-        {
-            Dispose(false);
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
 
         private void Dispose(bool disposing)

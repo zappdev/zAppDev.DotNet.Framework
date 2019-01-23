@@ -8,8 +8,12 @@ namespace CLMS.Framework.Data
         RepositoryAction LastAction { get; set; }
         bool WillFlush { get; set; }
         ISession Session { get; }
+        ISessionFactory SessionFactory { get; }
 
         ITransaction BeginTransaction();
+        ISession OpenSession();
+        ISession OpenSessionWithTransaction();
+
         void CloseSession();
         void Dispose();
         ISession OpenTransaction();

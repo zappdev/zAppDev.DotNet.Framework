@@ -97,9 +97,14 @@ namespace CLMS.Framework.Data
             DatabaseUpdateExecutedInRequest = true;
         }
 
-        private static void ExecuteScript(string stmt)
+        public static void ExecuteScript(string stmt)
         {
-            using (var connection = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["Database"].ConnectionString))
+            ExecuteScript(System.Configuration.ConfigurationManager.ConnectionStrings["Database"].ConnectionString, stmt);
+        }
+
+        public static void ExecuteScript(string connectionString, string stmt)
+        {
+            using (var connection = new SqlConnection(connectionString))
             {
                 connection.Open();
                 if (string.IsNullOrEmpty(stmt)) return;
