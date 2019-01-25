@@ -41,6 +41,15 @@ namespace CLMS.Framework.Utilities
 #endif
         }
 
+        public static string GetBrowserType()
+        {
+#if NETFRAMEWORK
+            return HttpContext.Current.Request.Browser.Type;
+#else
+            return GetContext().Request.Headers["User-Agent"].ToString();
+#endif
+        }
+
         public static bool IsUserInRole(string roleName)
         {
             return GetContext().User.IsInRole(roleName);
