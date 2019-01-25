@@ -44,7 +44,7 @@ namespace CLMS.Framework.Data
 
         public MiniSessionService(
             ISessionFactory factory,
-            ILogger<MiniSessionService> logger)
+            ILogger<MiniSessionService> logger = null)
         {
             SessionFactory = factory;
             Logger = logger;
@@ -91,7 +91,7 @@ namespace CLMS.Framework.Data
             }
             catch (Exception x)
             {
-                Logger.LogError("Error in closing session.", x);
+                Logger?.LogError("Error in closing session.", x);
                 throw;
             }
             finally
@@ -138,7 +138,7 @@ namespace CLMS.Framework.Data
         {
             if (Session == null)
             {
-                Logger.LogWarning("No session to rollback!", new ApplicationException("No Session to Rollback!!"));
+                Logger?.LogWarning("No session to rollback!", new ApplicationException("No Session to Rollback!!"));
                 return;
             }
             if (Session.Transaction.IsActive)
