@@ -19,21 +19,18 @@ namespace CLMS.Framework.Data
         {
             get
             {
-#if NETFRAMEWORK
                 if (!RunningInWeb)
                 {
                     return _localData ?? (_localData = new Hashtable());
                 }
 
-                if (!(HttpContext.Current.Items[LocalDataHashtableKey] is Hashtable web_hashtable))
+                var context = Utilities.Web.GetContext();
+                if (!(context.Items[LocalDataHashtableKey] is Hashtable web_hashtable))
                 {
                     web_hashtable = new Hashtable();
-                    HttpContext.Current.Items[LocalDataHashtableKey] = web_hashtable;
+                    context.Items[LocalDataHashtableKey] = web_hashtable;
                 }
                 return web_hashtable;
-#else
-                throw new NotImplementedException();
-#endif
             }
         }
 
@@ -54,11 +51,7 @@ namespace CLMS.Framework.Data
         {
             get
             {
-#if NETFRAMEWORK
-                return HttpContext.Current != null;
-#else
-                throw new NotImplementedException();
-#endif
+                return Utilities.Web.GetContext() != null;
             }
         }
     }
