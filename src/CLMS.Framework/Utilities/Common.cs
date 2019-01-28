@@ -547,9 +547,7 @@ namespace CLMS.Framework.Utilities
 
         public static string DownloadAndExtractZip(string url, string path = null)
         {
-#if NETFRAMEWORK
-
-            path = path ?? HttpContext.Current.Server.MapPath(Path.Combine("~/App_Data/temp", Guid.NewGuid().ToString()));
+            path = path ?? Web.MapPath(Path.Combine("~/App_Data/temp", Guid.NewGuid().ToString()));
             if (((Directory.Exists(path)) == false))
             {
                 Directory.CreateDirectory(path);
@@ -565,9 +563,6 @@ namespace CLMS.Framework.Utilities
             System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, extractPath);
 
             return extractPath;
-#else
-throw new NotImplementedException();
-#endif
         }
 
         public static void MoveFile(string src, string dest, bool overwrite = false)

@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceModel.Channels;
-using System.Text;
-using System.Threading.Tasks;
 using CLMS.Framework.Utilities;
 using Newtonsoft.Json.Linq;
 #if NETFRAMEWORK
 using System.Web;
-
 #else
 using Microsoft.AspNetCore.Http;
 #endif
@@ -100,29 +94,6 @@ namespace Services
             }
         }
 
-
-        public static T Get(HttpContext httpContext, string serviceName)
-        {
-            try
-            {
-                if (serviceName != null)
-                {
-#if NETFRAMEWORK
-                    return (T) httpContext.Session[SessionKey(serviceName)];
-#else
-                    throw new NotImplementedException();
-#endif
-                }
-
-                return default(T);
-            }
-            catch (Exception)
-            {
-                return default(T);
-            }
-        }
-
-
         public static void Set(string serviceName, T tobj)
         {
             try
@@ -137,33 +108,9 @@ namespace Services
             }
         }
 
-
-        public static void Set(HttpContext httpContext, string serviceName, T tobj)
-        {
-            try
-            {
-                if (serviceName != null)
-                {
-#if NETFRAMEWORK
-                    httpContext.Session[SessionKey(serviceName)] = tobj;
-#else
-                    throw new NotImplementedException();
-#endif
-                }
-            }
-            catch (Exception)
-            {
-            }
-        }
-
         public static void Initialize(string serviceName)
         {
             Set(serviceName, default(T));
-        }
-
-        public static void Initialize(HttpContext httpContext, string serviceName)
-        {
-            Set(httpContext, serviceName, default(T));
         }
     }
 }

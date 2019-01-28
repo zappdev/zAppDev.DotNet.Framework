@@ -4,9 +4,7 @@ using System.Linq;
 using AppDevCache = CLMS.AppDev.Cache;
 using System.Configuration;
 using System.IO;
-using System.Net.Http;
 using System.Web;
-
 #if NETFRAMEWORK
 using System.Net.Http;
 #else
