@@ -640,8 +640,7 @@ namespace CLMS.Framework.Utilities
 
         public static MambaError GetLastError()
         {
-            var key = $"{Web.Session.GetSessionId()}LastError";
-            return Web.Session.Get(key) as MambaError ?? new MambaError();
+            return Web.Session.Get("LastError") as MambaError ?? new MambaError();
         }
 
         public static string GetConfigurationKey(string key)
