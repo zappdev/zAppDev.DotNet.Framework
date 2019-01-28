@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using System.Web;
 using System.Reflection;
 using System.Configuration;
 using System.Net.Http.Formatting;
@@ -11,8 +10,6 @@ using System.Xml.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NHibernate.Util;
-
-using AppDevCache = CLMS.AppDev.Cache;
 using System.Text.RegularExpressions;
 
 namespace CLMS.Framework.Utilities
@@ -359,23 +356,6 @@ namespace CLMS.Framework.Utilities
             return t.HasValue;
         }
 
-        public static string RegisterUser(string username, string password, string email = "", bool isApproved = true)
-        {
-#if NETFRAMEWORK
-            var status = System.Web.Security.MembershipCreateStatus.Success;
-            using (var sc = new System.Transactions.TransactionScope(System.Transactions.TransactionScopeOption.Suppress))
-            {
-                var user = System.Web.Security.Membership.CreateUser(username, password, email, null, null, isApproved, out status); sc.Complete();
-            };
-
-            if (status != System.Web.Security.MembershipCreateStatus.Success) return status.ToString();
-
-            return null;
-#else
-            throw new NotImplementedException();
-#endif
-        }
-
         public static Random Random = new Random();
 
         public static T SafeCast<T>(object obj)
@@ -645,37 +625,23 @@ namespace CLMS.Framework.Utilities
         }
         public static string GetApplicationTempFolderPath()
         {
-#if NETFRAMEWORK
-
-            var appTempPath = System.Web.Hosting.HostingEnvironment.MapPath("~/App_Data/Temp/");
+            var appTempPath = Web.MapPath("~/App_Data/Temp/");
             if (!Directory.Exists(appTempPath))
+            {
                 Directory.CreateDirectory(appTempPath);
+            }
             return appTempPath;
-#else
-throw new NotImplementedException();
-#endif
         }
 
         public static void SetLastError(Exception ex)
         {
-#if NETFRAMEWORK
-
-            var key = $"{HttpContext.Current.Session.SessionID}LastError";
-            AppDevCache.CacheManager.Current.Set(key, new MambaError(ex));
-#else
-            throw new NotImplementedException();
-#endif
+            Web.Session.Set("LastError", new MambaError(ex));
         }
 
         public static MambaError GetLastError()
         {
-#if NETFRAMEWORK
-
-            var key = $"{HttpContext.Current.Session.SessionID}LastError";
-            return AppDevCache.CacheManager.Current.Get(key, new MambaError());
-#else
-            throw new NotImplementedException();
-#endif
+            var key = $"{Web.Session.GetSessionId()}LastError";
+            return Web.Session.Get(key) as MambaError ?? new MambaError();
         }
 
         public static string GetConfigurationKey(string key)
