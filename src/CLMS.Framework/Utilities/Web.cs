@@ -18,6 +18,17 @@ namespace CLMS.Framework.Utilities
 {
     public class Web
     {
+        public static Uri GetRequestUri()
+        {
+#if NETFRAMEWORK
+            return HttpContext.Current.Request.Url;
+#else
+            var contextAccessor = ServiceLocator.Current.GetInstance<IHttpContextAccessor>();
+            var req = contextAccessor.HttpContext.Request;
+            return new Uri($"{req.Scheme}://{req.Host}{req.Path}{req.QueryString}"); ;
+#endif
+        }
+
         public static HttpContext GetContext()
         {
 #if NETFRAMEWORK

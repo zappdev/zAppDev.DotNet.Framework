@@ -10,9 +10,7 @@ namespace CLMS.Framework.Services
     public class ServiceConsumptionOptions : IServiceConsumptionOptions, ICachedServiceConsumptionOptions
     {
         public string Url { get; set; }
-#if NETFRAMEWORK
         public RestHTTPVerb Verb { get; set; }        
-#endif
         public string UserName { get; set; }
         public string ClientId { get; set; }
         public string AccessTokenUrl { get; set; }

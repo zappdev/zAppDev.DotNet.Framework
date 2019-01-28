@@ -125,11 +125,10 @@ namespace CLMS.Framework.Services
         public static object InnerConsume<T>(RestServiceConsumptionOptions options, string serviceName, int retries,
             ServiceConsumptionContainer resultBag)
         {
-#if NETFRAMEWORK
             OAuth2TokenData currentOAuth2TokenData = null;
             if (options.SecurityType == RestSecurityType.OAuth2)
             {
-                currentOAuth2TokenData = GetOAuth2Token.GetAuthToken(options, serviceName, HttpContext.Current);
+                currentOAuth2TokenData = GetOAuth2Token.GetAuthToken(options, serviceName, Utilities.Web.GetContext());
             }
 
             using (var client = GetHttpClient(options, currentOAuth2TokenData))
@@ -231,9 +230,9 @@ namespace CLMS.Framework.Services
 
                     var setCookieHeader =
  resultBag.HttpResponseMessage.Headers.FirstOrDefault(a => a.Key?.ToLower() == "set-cookie");
-                    if (HttpContext.Current != null && setCookieHeader.Value != null && setCookieHeader.Value.Any())
+                    if (Utilities.Web.GetContext() != null && setCookieHeader.Value != null && setCookieHeader.Value.Any())
                     {
-                        HttpContext.Current.Items["ServiceAuthCookie"] = setCookieHeader;
+                        Utilities.Web.GetContext().Items["ServiceAuthCookie"] = setCookieHeader;
                     }
 
                     options.Type = RestResultType.STRING;
@@ -323,9 +322,6 @@ namespace CLMS.Framework.Services
                 throw new ApplicationException($"{(int)resultBag.HttpResponseMessage.StatusCode} ({resultBag.HttpResponseMessage.ReasonPhrase})");
 
             }
-#else
-            throw new NotImplementedException();
-#endif
         }
 
 
@@ -344,7 +340,6 @@ namespace CLMS.Framework.Services
         private static HttpClient GetHttpClient(RestServiceConsumptionOptions options,
             OAuth2TokenData currentOAuth2TokenData)
         {
-#if NETFRAMEWORK
             var handler = new HttpClientHandler();
 
 
@@ -375,12 +370,12 @@ namespace CLMS.Framework.Services
                 }
             }
 
-            if (HttpContext.Current?.Items["ServiceAuthCookie"] != null)
+            if (Utilities.Web.GetContext()?.Items["ServiceAuthCookie"] != null)
             {
                 try
                 {
                     var setCookieHeader =
-                        (KeyValuePair<string, IEnumerable<string>>) HttpContext.Current.Items["ServiceAuthCookie"];
+                        (KeyValuePair<string, IEnumerable<string>>)Utilities.Web.GetContext().Items["ServiceAuthCookie"];
                     var cookieContainer = new CookieContainer();
                     cookieContainer.SetCookies(new Uri(options.Url), string.Join(",", setCookieHeader.Value));
                     handler.CookieContainer = cookieContainer;
@@ -432,9 +427,6 @@ namespace CLMS.Framework.Services
             }
 
             return client;
-#else
-            throw new NotImplementedException();
-#endif
         }
 
         public static JObject Consume(RestServiceConsumptionOptions options,
@@ -442,38 +434,5 @@ namespace CLMS.Framework.Services
         {
             return Consume<object>(options, resultBag) as JObject;
         }
-    }
-
-    public class RestServerBasicAuthorizationData
-    {
-        public string UserName { get; set; }
-        public string Password { get; set; }
-    }
-
-    public class RestServiceHelper
-    {
-        #if NETFRAMEWORK
-        public static RestServerBasicAuthorizationData GetBasicAuthorizationCredentials(HttpRequestBase request,
-            string service, string methodName)
-        {
-            var authData = request.Headers["Authorization"] ?? "";
-
-            if (authData.StartsWith("NTLM ")) return null;
-
-            if (authData.StartsWith("Basic ")) authData = authData.Replace("Basic ", "");
-
-            if (string.IsNullOrEmpty(authData)) return null;
-
-            string decodedString = Encoding.UTF8.GetString(Convert.FromBase64String(authData));
-            string[] credentials = decodedString.Split(':');
-
-            if (credentials.Count() > 1)
-            {
-                return new RestServerBasicAuthorizationData {UserName = credentials[0], Password = credentials[1]};
-            }
-
-            return null;
-        }
-        #endif
     }
 }

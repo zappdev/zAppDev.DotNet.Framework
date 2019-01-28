@@ -19,7 +19,6 @@ namespace Services
         public static OAuth2TokenData GetSessionToken(string serviceName, RestServiceConsumptionOptions options,
             HttpContext httpContext)
         {
-#if NETFRAMEWORK
             try
             {
                 //if (serviceName == null)
@@ -50,7 +49,7 @@ namespace Services
                         if (sessionAuth2Code == null)
                         {
                             OAuth2SessionData<OAuth2ReturnUrl>.Set(serviceName,
-                                new OAuth2ReturnUrl(HttpContext.Current.Request.Url.ToString()));
+                                new OAuth2ReturnUrl(CLMS.Framework.Utilities.Web.GetRequestUri().ToString()));
                             var simpleTask = Task.Run(() => { res = GetWebServerAuthorization(options, httpContext); });
                             simpleTask.Wait();
 
@@ -123,9 +122,6 @@ namespace Services
             {
                 return null;
             }
-#else
-            throw new NotImplementedException();
-#endif
         }
 
 
@@ -168,14 +164,13 @@ namespace Services
             string serviceName,
             HttpContext httpContext)
         {
-#if NETFRAMEWORK
             OAuth2TokenData sessionOAuth2TokenData = null;
             switch (options.oAuth2GrantType)
             {
                 case OAuth2GrantType.Password:
-                    return GetSessionToken(serviceName, options, HttpContext.Current);
+                    return GetSessionToken(serviceName, options, httpContext);
                 case OAuth2GrantType.WebServer:
-                    sessionOAuth2TokenData = GetSessionToken(serviceName, options, HttpContext.Current);
+                    sessionOAuth2TokenData = GetSessionToken(serviceName, options, httpContext);
                     if (sessionOAuth2TokenData == null)
                     {
                         throw new ApplicationException("sessionAuth2TokenData == null, " + options.oAuth2GrantType);
@@ -185,9 +180,6 @@ namespace Services
                 default:
                     throw new ApplicationException("Unknown OAuth2GrantType: " + options.oAuth2GrantType);
             }
-#else
-            throw new NotImplementedException();
-#endif
         }
 
 

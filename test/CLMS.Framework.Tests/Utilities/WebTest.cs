@@ -43,6 +43,31 @@ namespace CLMS.Framework.Tests.Utilities
         }
 
         [TestMethod]
+        public void GetRequestUrl()
+        {
+            var url = "http://clms.test.com/Add?_currentControllerAction=Test";
+#if NETFRAMEWORK
+            using (new HttpSimulator("/", Directory.GetCurrentDirectory()).SimulateRequest(new Uri(url)))
+            {
+                Assert.AreEqual(url, Web.GetRequestUri().ToString());
+            }
+#else
+            Helper.HttpCoreSimulate(() =>
+            {
+                var context = new DefaultHttpContext();
+
+                context.Request.Scheme = "http";
+                context.Request.Host = new HostString("clms.test.com");
+                context.Request.Path = new PathString("/Add");
+                context.Request.QueryString = new QueryString("?_currentControllerAction=Test");
+                return context;
+            });
+
+            Assert.AreEqual(url, Web.GetRequestUri().ToString());
+#endif
+        }
+
+        [TestMethod]
         public void IsUserInRoleTest()
         {
 #if NETFRAMEWORK
