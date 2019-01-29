@@ -17,9 +17,7 @@ namespace CLMS.Framework.Services
         Dictionary<string, object> FormData { get; set; }
         string Url { get; set; }
         string UserName { get; set; }
-#if NETFRAMEWORK
         RestHTTPVerb Verb { get; set; }
-#endif
 
         /// <summary>
         /// 
@@ -34,12 +32,10 @@ namespace CLMS.Framework.Services
 
     public interface IRestServiceConsumptionOptions
     {
-#if NETFRAMEWORK
         RestResultType Type { get; set; }
         PostType PostType { get; set; }
         RestSecurityType SecurityType { get; set; }
         OAuth2GrantType oAuth2GrantType { get; set; }
-#endif
         string Password { get; set; }
         string ClientSecret { get; set; }
         string AuthorizationURL { get; set; }
