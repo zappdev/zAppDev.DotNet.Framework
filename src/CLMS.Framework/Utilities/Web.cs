@@ -8,12 +8,33 @@ using System.Web;
 #if NETFRAMEWORK
 using System.Net.Http;
 #else
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Http;
 #endif
 
 namespace CLMS.Framework.Utilities
 {
+
+#if NETFRAMEWORK
+
+#else
+    public static class HttpRequestExtensions
+    {
+        public static void RedirectToAction(this HttpResponse response, string controller, string action)
+        {
+            var helper = ServiceLocator.Current.GetInstance<IUrlHelper>();
+            var path = helper.Action(action, controller);
+            response.Redirect(path);
+        }
+
+        public static void RedirectToAction(this HttpResponse response, string controller)
+        {
+            response.RedirectToAction(controller, "");
+        }
+    }
+#endif
+
     public class Web
     {
         public static Uri GetRequestUri()
