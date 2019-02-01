@@ -90,6 +90,31 @@ namespace CLMS.Framework.Utilities
             return GetFormArgument("_currentControllerAction") == action;
         }
 
+        public static string GetApplicationPath(bool isInNTierArchitecture = false)
+        {
+#if NETFRAMEWORK
+            string applicationPath = GetContext().Request.ApplicationPath;
+#else
+            var hosting = ServiceLocator.Current.GetInstance<IHostingEnvironment>();
+            string applicationPath = hosting.ContentRootPath;
+#endif
+
+            if (!isInNTierArchitecture)
+            {
+                return applicationPath;
+            }
+
+            string backEndAffix = "_BackEnd";
+            int lastIndexOfAffix = applicationPath.LastIndexOf(backEndAffix);
+
+            if (lastIndexOfAffix > -1)
+            {
+                return applicationPath.Substring(0, lastIndexOfAffix);
+            }
+
+            return applicationPath;
+        }
+
         public static string GetQuery()
         {
 #if NETFRAMEWORK
