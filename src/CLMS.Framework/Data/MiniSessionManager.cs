@@ -3,6 +3,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
+using CLMS.Framework.Utilities;
 using log4net;
 using NHibernate;
 using NHibernate.Cfg;
@@ -338,6 +339,7 @@ namespace CLMS.Framework.Data
             }
         }
 
+#if NETFRAMEWORK
         public static T ExecuteInUoW<T>(Func<MiniSessionManager,T> func, MiniSessionManager mgr = null)
         {
             var prevManager = _manager;
@@ -372,6 +374,26 @@ namespace CLMS.Framework.Data
                 return null;
             }), manager);
         }
+#else
+        public static T ExecuteInUoW<T>(Func<MiniSessionService, T> action)
+        {
+            var factory = ServiceLocator.Current.GetInstance<ISessionFactory>();
+            using (var manager = new MiniSessionService(factory))
+            {
+                return action(manager);
+            }
+        }
+
+        public static void ExecuteInUoW(Action<MiniSessionService> action)
+        {
+            var factory = ServiceLocator.Current.GetInstance<ISessionFactory>();
+            using (var manager = new MiniSessionService(factory))
+            {
+                action(manager);
+            }
+        }
+
+#endif
 
         public T ExecuteInTransaction<T>(Func<T> func)
         {

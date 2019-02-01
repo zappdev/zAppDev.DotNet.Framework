@@ -50,6 +50,7 @@
     <PackageReference Include="CacheManager.StackExchange.Redis" Version="1.0.1" />
     <PackageReference Include="EPPlus" Version="4.5.2.1" />
     <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="ncrontab" Version="3.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
@@ -105,7 +106,6 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.1.1" />
     <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.1.1" />
-    <PackageReference Include="ncrontab" Version="3.3.0" />
     <PackageReference Include="RSG.Promise.Core" Version="3.0.0" />
     <PackageReference Include="S22.Imap.Core" Version="3.6.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />
@@ -121,9 +121,6 @@
   <ItemGroup>
     <Reference Include="CLMS.AppDev.Cache">
       <HintPath>..\..\Lib\CLMS.AppDev.Cache.dll</HintPath>
-    </Reference>
-    <Reference Include="NCrontab">
-      <HintPath>..\..\Lib\NCrontab.dll</HintPath>
     </Reference>
   </ItemGroup>
 

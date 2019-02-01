@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using NHibernate;
 using System;
 using System.Data;
+using CLMS.Framework.Utilities;
 
 namespace CLMS.Framework.Data
 {
@@ -110,6 +111,24 @@ namespace CLMS.Framework.Data
         ~MiniSessionService()
         {
             Dispose(false);
+        }
+
+        public static T ExecuteInUoW<T>(Func<MiniSessionService, T> action)
+        {
+            var factory = ServiceLocator.Current.GetInstance<ISessionFactory>();
+            using (var manager = new MiniSessionService(factory))
+            {
+                return action(manager);
+            }
+        }
+
+        public static void ExecuteInUoW(Action<MiniSessionService> action)
+        {
+            var factory = ServiceLocator.Current.GetInstance<ISessionFactory>();
+            using (var manager = new MiniSessionService(factory))
+            {
+                action(manager);
+            }
         }
 
         public void Dispose()
