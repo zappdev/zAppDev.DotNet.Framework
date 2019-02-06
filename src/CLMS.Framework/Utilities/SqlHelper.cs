@@ -80,7 +80,7 @@ namespace CLMS.Framework.Utilities
             return RunStoredProcedure(procedureName, null, connectionString);
         }
 
-        public static List<Dictionary<string, object>> RunStoredProcedure(string procedureName, Dictionary<string, object> parameters = null, string connectionString = null)
+        public static List<Dictionary<string, object>> RunStoredProcedure(string procedureName, Dictionary<string, object> parameters = null, string connectionString = null, List<string> outParams = null)
         {
             var results = new List<Dictionary<string, object>>();
 
@@ -99,7 +99,16 @@ namespace CLMS.Framework.Utilities
                     {
                         foreach (var p in parameters)
                         {
-                            command.Parameters.Add(new System.Data.SqlClient.SqlParameter(p.Key, p.Value));
+                            var commandParam = new System.Data.SqlClient.SqlParameter(p.Key, p.Value);
+                            if (outParams != null)
+                            {
+                                if (outParams.Contains(p.Key))
+                                {
+                                    commandParam.Direction = System.Data.ParameterDirection.Output;
+                                    commandParam.Size = 1000;
+                                }
+                            }
+                            command.Parameters.Add(commandParam);
                         }
                     }
 
@@ -116,6 +125,14 @@ namespace CLMS.Framework.Utilities
                             }
 
                             results.Add(result);
+                        }
+                    }
+
+                    if (outParams != null)
+                    {
+                        foreach (var outP in outParams)
+                        {
+                            parameters[outP] = System.Convert.ToString(command.Parameters[outP].Value);
                         }
                     }
                 }
