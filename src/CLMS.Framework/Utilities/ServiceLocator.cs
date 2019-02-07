@@ -13,6 +13,8 @@ namespace CLMS.Framework.Utilities
         [ThreadStatic]
         private static IServiceProvider _serviceProvider;
 
+        public IServiceProvider CurrentServiceProvider { get => _currentServiceProvider; private set {} }
+
         public ServiceLocator(IServiceProvider currentServiceProvider)
         {
             _currentServiceProvider = currentServiceProvider;
