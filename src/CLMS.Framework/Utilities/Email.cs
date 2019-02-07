@@ -18,7 +18,16 @@ namespace CLMS.Framework.Utilities
         #region IMAP Settings structure
         public class ImapSettings
         {
+#if NETFRAMEWORK
+            public string Server { get; internal set; }
+            public int Port { get; internal set; }
+            public string Username { get; internal set; }
+            public string Password { get; internal set; }
+            public bool UseSSL { get; internal set; }
+#else
             public ImapConfiguration ImapConfiguration { get; internal set; }
+#endif
+
 
             public ImapSettings()
             {
@@ -29,6 +38,59 @@ namespace CLMS.Framework.Utilities
             {
                 var log = LogManager.GetLogger(typeof(ImapSettings));
 
+#if NETFRAMEWORK
+                var prefix = "IMAP:";
+
+                var server = ConfigurationManager.AppSettings[$"{prefix}host"];
+                var port = ConfigurationManager.AppSettings[$"{prefix}port"];
+                var username = ConfigurationManager.AppSettings[$"{prefix}username"];
+                var password = ConfigurationManager.AppSettings[$"{prefix}password"];
+                var useSSL = ConfigurationManager.AppSettings[$"{prefix}enableSSL"];
+
+                if (string.IsNullOrWhiteSpace(server)) throw new ArgumentNullException(nameof(smtpSettings), $"Missing setting: [{prefix}host]");
+                if (string.IsNullOrWhiteSpace(port)) throw new ArgumentNullException(nameof(smtpSettings), $"Missing setting: [{prefix}port]");
+
+                Server = server;
+
+                if (int.TryParse(port, out var p))
+                {
+                    Port = p;
+                }
+                else
+                {
+                    throw new ArgumentException("MailSettings", $"Invalid setting: [{prefix}port]");
+                }
+
+                Username = username;
+                if (string.IsNullOrWhiteSpace(Username))
+                {
+                    Username = smtpSettings?.Smtp?.Network?.UserName;
+                    if (string.IsNullOrWhiteSpace(Username))
+                        throw new ArgumentNullException(nameof(smtpSettings), $"Missing setting: [{prefix}username]");
+
+                    log.Warn($"Missing or incorrect setting: [{prefix}username]. Will try to use the username you set in your SMTP Settings.");
+                }
+
+                Password = password;
+                if (string.IsNullOrWhiteSpace(Password))
+                {
+                    Password = smtpSettings?.Smtp?.Network?.Password;
+                    if (string.IsNullOrWhiteSpace(Password))
+                        throw new ArgumentNullException(nameof(smtpSettings), $"Missing setting: [{prefix}password]");
+
+                    log.Warn($"Missing or incorrect setting: [{prefix}password]. Will try to use the password you set in your SMTP Settings.");
+                }
+
+                if (bool.TryParse(useSSL, out var s))
+                {
+                    UseSSL = s;
+                }
+                else
+                {
+                    log.Warn($"Missing or incorrect setting: [{prefix}enableSSL]. Will go with 'false'.");
+                }
+
+#else
                 const string prefix = "IMAP:";
 
                 ImapConfiguration = ConfigurationHandler.GetAppConfiguration().ImapConfiguration;
@@ -59,16 +121,17 @@ namespace CLMS.Framework.Utilities
                 {
                     log.Warn($"Missing or incorrect setting: [{prefix}enableSSL]. Will go with 'false'.");
                 }
+#endif
             }
         }
-        #endregion
+#endregion
 
         public static MailSettings FetchSmtpSettings()
         {
             return ConfigurationHandler.GetSmtpSettings();
         }
 
-        #region SMTP: Sending E-Mails
+#region SMTP: Sending E-Mails
         public static void SendMail(EMailMessage message, bool sendAsync = false)
         {
             var appConfiguration = ConfigurationHandler.GetAppConfiguration();
@@ -398,6 +461,17 @@ namespace CLMS.Framework.Utilities
             try
             {
                 _suppressExceptions = suppressExceptions;
+#if NETFRAMEWORK
+                _imapSettings = new ImapSettings
+                {
+                    Server = server,
+                    Port = port,
+                    Username = username,
+                    Password = password,
+                    UseSSL = useSSL
+                };
+
+#else
                 _imapSettings = new ImapSettings
                 {
                     ImapConfiguration = new ImapConfiguration
@@ -409,6 +483,7 @@ namespace CLMS.Framework.Utilities
                         EnableSsl = useSSL
                     }
                 };
+#endif
             }
             catch (Exception)
             {
@@ -608,6 +683,16 @@ namespace CLMS.Framework.Utilities
 
 	    private ImapClient GetClient()
         {
+#if NETFRAMEWORK
+            return new ImapClient(
+                _imapSettings.Server,
+                _imapSettings.Port,
+                _imapSettings.Username,
+                _imapSettings.Password,
+                AuthMethod.Login,
+                _imapSettings.UseSSL);
+#else
+
             Debug.Assert(_imapSettings.ImapConfiguration.Port != null, 
                 "_imapSettings.ImapConfiguration.Port != null");
             Debug.Assert(_imapSettings.ImapConfiguration.EnableSsl != null, 
@@ -620,8 +705,9 @@ namespace CLMS.Framework.Utilities
 	            _imapSettings.ImapConfiguration.Password,
 	            AuthMethod.Login,
 	            _imapSettings.ImapConfiguration.EnableSsl.Value);
+#endif
         }
 
-        #endregion
+#endregion
     }    
 }

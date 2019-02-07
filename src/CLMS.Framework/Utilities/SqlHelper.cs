@@ -7,8 +7,12 @@ namespace CLMS.Framework.Utilities
     {
         public static string GetConnectionString()
         {
+#if NETFRAMEWORK
+            return System.Configuration.ConfigurationManager.ConnectionStrings["Database"].ConnectionString;
+#else
             var config = ConfigurationHandler.GetAppConfiguration();
             return config.ConnectionStrings["Database"].ConnectionString;
+#endif
         }
 
         private static int GetCommandTimeout(int? timeOut = null)
@@ -17,8 +21,13 @@ namespace CLMS.Framework.Utilities
             {
                 return timeOut.Value;
             }
+#if NETFRAMEWORK
+            var timeoutParam = System.Configuration.ConfigurationManager.AppSettings["SQLQueryTimeoutInSeconds"];
+#else
             var config = ConfigurationHandler.GetAppConfiguration();
             var timeoutParam = config.AppSettings["SQLQueryTimeoutInSeconds"];
+#endif
+
             return int.TryParse(timeoutParam, out var commandTimeout) ? commandTimeout : 30;
         }
 
