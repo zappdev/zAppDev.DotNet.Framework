@@ -128,7 +128,12 @@ namespace CLMS.Framework.Utilities
 
         public static MailSettings FetchSmtpSettings()
         {
+#if NETFRAMEWORK
+            var config = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration(HttpContext.ContentRootPath);            
+            return config.GetSection("system.net:mailSettings").Get<MailSettingsSectionGroup>();
+#else
             return ConfigurationHandler.GetSmtpSettings();
+#endif
         }
 
 #region SMTP: Sending E-Mails

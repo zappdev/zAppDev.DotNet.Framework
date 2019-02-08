@@ -8,6 +8,9 @@ namespace CLMS.Framework.Configuration
 {   
     public class ConfigurationHandler
     {
+
+#if NETFRAMEWORK
+#else
         public static IConfiguration GetConfiguration()
         {
             return new ConfigurationBuilder()
@@ -23,8 +26,7 @@ namespace CLMS.Framework.Configuration
                 .Get<MailSettings>();
         }
 
-#if NETFRAMEWORK
-#else
+
         public static AppConfiguration GetAppConfiguration()
         {
             return GetInjectedConfig().Get<AppConfiguration>();
