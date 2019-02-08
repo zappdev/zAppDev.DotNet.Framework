@@ -1,11 +1,11 @@
 $srcBasePath = "D:\Work\CLMS\CLMS.Framework\src\CLMS.Framework\bin\Release"
 $dstBasePath = "D:\Work\zAppDev.CodingFacility.CSharp.MVP\CLMS.CodingFacility.CS.Resources\Libraries"
 
-cd ..\src\CLMS.Framework
+Set-Location ..\src\CLMS.Framework
 
 $res = dotnet build -c Release
 
-if ($res -ne $null)
+if ($null -ne $res)
 {
     Write-Host "Update net462"
     Copy-Item -Force -Confirm:$false "$srcBasePath\net462\CLMS.Framework.dll" "$dstBasePath"
@@ -14,4 +14,4 @@ if ($res -ne $null)
     Copy-Item -Force -Confirm:$false "$srcBasePath\netstandard2.0\CLMS.Framework.dll" "$dstBasePath\Standard"
 }
 
-cd ..\..\scripts
+Set-Location ..\..\scripts
