@@ -134,8 +134,11 @@ namespace CLMS.Framework.Utilities
 #region SMTP: Sending E-Mails
         public static void SendMail(EMailMessage message, bool sendAsync = false)
         {
-            var appConfiguration = ConfigurationHandler.GetAppConfiguration();
-
+#if NETFRAMEWORK
+             var appConfiguration = ConfigurationManager.AppSettings;
+#else
+            var appConfiguration = ConfigurationHandler.GetAppConfiguration().AppSettings;  
+#endif
             if (string.IsNullOrEmpty(message.From))
             {
                 var settings = FetchSmtpSettings();
@@ -146,7 +149,7 @@ namespace CLMS.Framework.Utilities
                 message.From = settings.Smtp.From;
             }
 
-            bool.TryParse(appConfiguration.AppSettings["TestMode"], out var testMode);
+            bool.TryParse(appConfiguration["TestMode"], out var testMode);
 
             if (testMode) {
                 var originalRecipients = "";
@@ -155,11 +158,11 @@ namespace CLMS.Framework.Utilities
                 }
 
                 message.To.Clear();
-                message.To.Add(appConfiguration.AppSettings["TestModeEmail"]);
+                message.To.Add(appConfiguration["TestModeEmail"]);
                 message.Body = "<b>TEST MODE</b> Original Recipients:" + originalRecipients + "<br/><br/>" + message.Body;
             }
 
-            var mailSeparatorCharacter = appConfiguration.AppSettings["EmailSeparatorCharacter"];
+            var mailSeparatorCharacter = appConfiguration["EmailSeparatorCharacter"];
             mailSeparatorCharacter = !string.IsNullOrWhiteSpace(mailSeparatorCharacter) ? mailSeparatorCharacter : ",";
 
             SendMail(message.Subject,

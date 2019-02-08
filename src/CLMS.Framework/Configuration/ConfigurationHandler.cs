@@ -23,11 +23,13 @@ namespace CLMS.Framework.Configuration
                 .Get<MailSettings>();
         }
 
+#if NETFRAMEWORK
+#else
         public static AppConfiguration GetAppConfiguration()
         {
             return GetInjectedConfig().Get<AppConfiguration>();
         }
-        
+#endif   
         public static ConfigurationBuilder SetUpConfigurationBuilder(ConfigurationBuilder config)
         {
             config.SetBasePath(Directory.GetCurrentDirectory());
