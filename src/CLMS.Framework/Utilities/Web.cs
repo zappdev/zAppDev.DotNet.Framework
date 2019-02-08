@@ -375,10 +375,17 @@ namespace CLMS.Framework.Utilities
 #endif
             }
 
-            public static object Get(string key)
+            public static T Get<T>(string key, T fallbackItem = default(T))
             {
                 key = $"{GetSessionId()}{key}";
-                return GetCache().Get<object>(key);
+                var value = GetCache().Get<T>(key);
+
+                return (value != null) ? value : fallbackItem;
+            }
+
+            public static object Get(string key, object fallbackItem = null)
+            {
+                return Get<object>(key, fallbackItem);
             }
 
             public static void Set(string key, object value)
