@@ -11,6 +11,11 @@ using CLMS.Framework.Configuration;
 using log4net;
 using S22.Imap;
 
+#if NETFRAMEWORK
+using System.Web;
+using System.Net.Configuration;
+#endif
+
 namespace CLMS.Framework.Utilities
 {
     public class Email
@@ -33,8 +38,11 @@ namespace CLMS.Framework.Utilities
             {
 
             }
-
+#if NETFRAMEWORK
+            public ImapSettings(MailSettingsSectionGroup smtpSettings)
+#else
             public ImapSettings(MailSettings smtpSettings)
+#endif
             {
                 var log = LogManager.GetLogger(typeof(ImapSettings));
 
@@ -126,12 +134,18 @@ namespace CLMS.Framework.Utilities
         }
 #endregion
 
-        public static MailSettings FetchSmtpSettings()
-        {
 #if NETFRAMEWORK
-            var config = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration(HttpContext.ContentRootPath);            
-            return config.GetSection("system.net:mailSettings").Get<MailSettingsSectionGroup>();
+	    public static MailSettingsSectionGroup FetchSmtpSettings()
+	    {
+
+	        var config =
+	            System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration(HttpContext.Current.Request
+	                .ApplicationPath);
+	        var settings = (MailSettingsSectionGroup) config.GetSectionGroup("system.net/mailSettings");
+	        return settings;
 #else
+        public static MailSettings FetchSmtpSettings()
+	    {
             return ConfigurationHandler.GetSmtpSettings();
 #endif
         }

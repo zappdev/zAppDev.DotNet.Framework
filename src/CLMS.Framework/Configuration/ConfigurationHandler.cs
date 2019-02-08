@@ -31,7 +31,7 @@ namespace CLMS.Framework.Configuration
         {
             return GetInjectedConfig().Get<AppConfiguration>();
         }
-#endif   
+
         public static ConfigurationBuilder SetUpConfigurationBuilder(ConfigurationBuilder config)
         {
             config.SetBasePath(Directory.GetCurrentDirectory());
@@ -44,6 +44,7 @@ namespace CLMS.Framework.Configuration
             var config = ServiceLocator.Current.GetInstance<IConfiguration>();
             return (config ?? GetConfiguration());
         }
+#endif
     }
 
     public class LegacyConfigurationProvider : ConfigurationProvider, IConfigurationSource
