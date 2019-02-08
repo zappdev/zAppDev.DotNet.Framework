@@ -21,6 +21,20 @@ namespace CLMS.Framework.Utilities
 #else
     public static class HttpRequestExtensions
     {
+        public static string RawUrl(this HttpRequest request)
+        {
+            return Microsoft.AspNetCore.Http.Extensions.UriHelper.GetEncodedUrl(request);
+        }
+
+        public static bool IsAjaxRequest(this HttpRequest request)
+        {
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+            if (request.Headers != null)
+                return request.Headers["X-Requested-With"] == "XMLHttpRequest";
+            return false;
+        }
+
         public static void RedirectToAction(this HttpResponse response, string controller, string action)
         {
             var helper = ServiceLocator.Current.GetInstance<IUrlHelper>();
@@ -96,7 +110,7 @@ namespace CLMS.Framework.Utilities
             string applicationPath = GetContext().Request.ApplicationPath;
 #else
             var hosting = ServiceLocator.Current.GetInstance<IHostingEnvironment>();
-            string applicationPath = hosting.ContentRootPath;
+            var applicationPath = hosting.ContentRootPath;
 #endif
 
             if (!isInNTierArchitecture)
@@ -104,15 +118,10 @@ namespace CLMS.Framework.Utilities
                 return applicationPath;
             }
 
-            string backEndAffix = "_BackEnd";
-            int lastIndexOfAffix = applicationPath.LastIndexOf(backEndAffix);
+            const string backEndAffix = "_BackEnd";
+            var lastIndexOfAffix = applicationPath.LastIndexOf(backEndAffix, StringComparison.Ordinal);
 
-            if (lastIndexOfAffix > -1)
-            {
-                return applicationPath.Substring(0, lastIndexOfAffix);
-            }
-
-            return applicationPath;
+            return lastIndexOfAffix > -1 ? applicationPath.Substring(0, lastIndexOfAffix) : applicationPath;
         }
 
         public static string GetQuery()
@@ -183,28 +192,28 @@ namespace CLMS.Framework.Utilities
 #endif
         }
 
-        public static string GetFormArgument(string argname)
+        public static string GetFormArgument(string argName)
         {
 #if NETFRAMEWORK
             //Good for links such as: ~/GoTo?aNumber=5&astring=xaxa
-            if (!string.IsNullOrEmpty(HttpContext.Current.Request.QueryString[argname]))
+            if (!string.IsNullOrEmpty(HttpContext.Current.Request.QueryString[argName]))
             {
-                return HttpContext.Current.Request.QueryString[argname];
+                return HttpContext.Current.Request.QueryString[argName];
             }
 
             //Good for links such as:  ~/GoTo/5/xaxa
-            var result = HttpContext.Current.Request.RequestContext.RouteData?.Values[argname];
+            var result = HttpContext.Current.Request.RequestContext.RouteData?.Values[argName];
             if (!string.IsNullOrEmpty(result?.ToString()))
             {
                 return result.ToString();
             }
 
-            if (HttpContext.Current.Items[argname] != null)
+            if (HttpContext.Current.Items[argName] != null)
             {
-                return HttpContext.Current.Items[argname].ToString();
+                return HttpContext.Current.Items[argName].ToString();
             }
 
-            if (argname == "returnUrl")
+            if (argName == "returnUrl")
             {
                 var returnUrl = GetReturnUrl();
 
@@ -218,20 +227,20 @@ namespace CLMS.Framework.Utilities
 #else
             var context = GetContext();
             // Good for links such as: ~/GoTo?aNumber=5&astring=xaxa
-            if (!string.IsNullOrEmpty(context.Request.Query[argname]))
+            if (!string.IsNullOrEmpty(context.Request.Query[argName]))
             {
-                return context.Request.Query[argname];
+                return context.Request.Query[argName];
             }
 
             // Good for links such as:  ~/GoTo/5/xaxa
             // Not supported by .NET Core
 
-            if (context.Items[argname] != null)
+            if (context.Items[argName] != null)
             {
-                return context.Items[argname].ToString();
+                return context.Items[argName].ToString();
             }
 
-            if (argname != "returnUrl") return string.Empty;
+            if (argName != "returnUrl") return string.Empty;
             
             var returnUrl = GetReturnUrl();
             return returnUrl != null ? returnUrl.TrimStart('~') : string.Empty;
