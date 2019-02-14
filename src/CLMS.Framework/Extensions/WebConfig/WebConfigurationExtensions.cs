@@ -4,7 +4,7 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
 
-namespace Configuration.Extensions.WebConfig 
+namespace CLMS.Framework.Extensions.WebConfig 
 {
     public static class WebConfigurationExtensions
     {

@@ -3,7 +3,7 @@
 using System.IO;
 using Microsoft.Extensions.Configuration;
 
-namespace Configuration.Extensions.WebConfig {
+namespace CLMS.Framework.Extensions.WebConfig {
     public class WebConfigurationProvider : FileConfigurationProvider
     {
         public WebConfigurationProvider(WebConfigurationSource source) : base(source) { }

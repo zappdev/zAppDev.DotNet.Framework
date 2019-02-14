@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Configuration.Extensions.WebConfig
+namespace CLMS.Framework.Extensions.WebConfig
 {
     internal class WebConfigurationFileParser
     {

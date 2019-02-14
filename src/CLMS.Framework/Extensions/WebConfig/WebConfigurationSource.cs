@@ -2,7 +2,7 @@
 #else
 using Microsoft.Extensions.Configuration;
 
-namespace Configuration.Extensions.WebConfig {
+namespace CLMS.Framework.Extensions.WebConfig {
     public class WebConfigurationSource : FileConfigurationSource
     {
         public override IConfigurationProvider Build(IConfigurationBuilder builder)
