@@ -15,6 +15,7 @@ namespace CLMS.Framework.Extensions.WebConfig
             new SortedDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
         private readonly Stack<string> _context = new Stack<string>();
+        private readonly Stack<string> _openElement = new Stack<string>();
 
         public async Task<IDictionary<string, string>> Parse(Stream stream)
         {
@@ -29,12 +30,17 @@ namespace CLMS.Framework.Extensions.WebConfig
                 {
                     switch (reader.NodeType)
                     {
-                        case XmlNodeType.Element:
+                        case XmlNodeType.Element:                            
                             VisitNode(reader);
                             break;
                         case XmlNodeType.EndElement:
                             Console.WriteLine("End Element {0} {1}", reader.Name, reader.Value);
-                            _context.Pop();
+                            var closedElement = _openElement.Pop();
+                            while (!_context.Pop().Equals(closedElement))
+                            {
+                                
+                            }
+
                             break;
                         default:
                             Console.WriteLine("Other node {0} with value {1}", reader.NodeType, reader.Value);
@@ -49,44 +55,59 @@ namespace CLMS.Framework.Extensions.WebConfig
         // Final 'leaf' call for each tree which records the setting's value 
         private void VisitNode(XmlReader reader)
         {
+            var name = reader.Name;
             if (reader.IsEmptyElement)
             {
-                _context.Push(reader.Name);
-
-                var key = "";
-                var values = new Dictionary<string, string>();
-
-                for (var attInd = 0; attInd < reader.AttributeCount; attInd++)
-                {
-                    reader.MoveToAttribute(attInd);
-
-
-                    switch (reader.Name)
-                    {
-                        case "key":
-                        case "name":
-                            key = reader.Value;
-                            break;
-                        default:
-                            values.Add(reader.Name, reader.Value);
-                            break;
-                    }                    
-                }
-
-                foreach (var value in values)
-                {
-                    var path = (string.IsNullOrEmpty(key))
-                        ? $"{GetCurrentPath()}:{value.Key}"
-                        : $"{GetCurrentPath()}:{key}:{value.Key}";
-                    _data.Add(path, value.Value);
-                }
-
+                _context.Push(name);
+                VisitAttributes(reader);
                 _context.Pop();
             }
             else
             {
-                _context.Push(reader.Name);
+                _context.Push(name);
+                _openElement.Push(name);
+                var key = VisitAttributes(reader);
+                if (!string.IsNullOrEmpty(key))
+                {
+                    _context.Push(key);
+                }
             }
+        }
+
+        private string VisitAttributes(XmlReader reader)
+        {
+            var key = "";
+            var values = new Dictionary<string, string>();
+
+            for (var attInd = 0; attInd < reader.AttributeCount; attInd++)
+            {
+                reader.MoveToAttribute(attInd);
+
+
+                switch (reader.Name)
+                {
+                    case "key":
+                    case "id":
+                    case "name":
+                    case "region":
+                    case "path":
+                        key = reader.Value;
+                        break;
+                    default:
+                        values.Add(reader.Name, reader.Value);
+                        break;
+                }
+            }
+
+            foreach (var value in values)
+            {
+                var path = (string.IsNullOrEmpty(key))
+                    ? $"{GetCurrentPath()}:{value.Key}"
+                    : $"{GetCurrentPath()}:{key}:{value.Key}";
+                _data.Add(path, value.Value);
+            }
+
+            return key;
         }
 
         private string GetCurrentPath() => string.Join(":", _context.Reverse().ToList());
