@@ -17,16 +17,16 @@ namespace CLMS.Framework.Extensions.WebConfig
         private readonly Stack<string> _context = new Stack<string>();
         private readonly Stack<string> _openElement = new Stack<string>();
 
-        public async Task<IDictionary<string, string>> Parse(Stream stream)
+        public IDictionary<string, string> Parse(Stream stream)
         {
             _data.Clear();
             _context.Clear();
 
-            var settings = new XmlReaderSettings { Async = true };
+            var settings = new XmlReaderSettings { Async = false };
 
             using (var reader = XmlReader.Create(stream, settings))
             {
-                while (await reader.ReadAsync())
+                while (reader.Read())
                 {
                     switch (reader.NodeType)
                     {

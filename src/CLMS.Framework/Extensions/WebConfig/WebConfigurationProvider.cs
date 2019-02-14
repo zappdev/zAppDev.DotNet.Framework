@@ -8,11 +8,11 @@ namespace CLMS.Framework.Extensions.WebConfig {
     {
         public WebConfigurationProvider(WebConfigurationSource source) : base(source) { }
 
-        public override async void Load(Stream stream)
+        public override void Load(Stream stream)
         {
             var parser = new WebConfigurationFileParser();
             
-            Data = await parser.Parse(stream);
+            Data = parser.Parse(stream);
         }
     }
 }
