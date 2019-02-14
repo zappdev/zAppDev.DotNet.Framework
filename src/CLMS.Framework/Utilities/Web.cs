@@ -10,6 +10,7 @@ using System.Net.Http;
 #else
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Http;
 #endif
 
@@ -102,6 +103,33 @@ namespace CLMS.Framework.Utilities
         public static bool IsInControllerAction(string action)
         {
             return GetFormArgument("_currentControllerAction") == action;
+        }
+
+        public static Dictionary<string, string> GetRouteData()
+        {
+            var result = new Dictionary<string, string>();
+#if NETFRAMEWORK
+
+				var keys = GetContext()?.Request?.RequestContext?.RouteData?.Values.Keys;
+				if(keys != null)
+				{
+					foreach (var key in keys){
+						var value = GetContext()?.Request?.RequestContext?.RouteData?.Values[key];
+						result.Add(key, value?.ToString());
+					}
+				}
+#else
+
+            var routedData = GetContext()?.GetRouteData();
+            if (routedData == null) return result;
+
+            foreach (var key in routedData.Values.Keys)
+            {
+                var value = routedData.Values[key];
+                result.Add(key, value?.ToString());
+            }
+#endif
+            return result;
         }
 
         public static string GetApplicationPath(bool isInNTierArchitecture = false)
