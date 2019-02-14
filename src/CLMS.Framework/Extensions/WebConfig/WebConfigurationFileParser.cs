@@ -34,7 +34,6 @@ namespace CLMS.Framework.Extensions.WebConfig
                             VisitNode(reader);
                             break;
                         case XmlNodeType.EndElement:
-                            Console.WriteLine("End Element {0} {1}", reader.Name, reader.Value);
                             var closedElement = _openElement.Pop();
                             while (!_context.Pop().Equals(closedElement))
                             {
@@ -43,7 +42,6 @@ namespace CLMS.Framework.Extensions.WebConfig
 
                             break;
                         default:
-                            Console.WriteLine("Other node {0} with value {1}", reader.NodeType, reader.Value);
                             break;
                     }
                 }
