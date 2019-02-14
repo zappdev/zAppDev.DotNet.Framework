@@ -138,4 +138,8 @@
     <Reference Include="System.Web.ApplicationServices" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Extensions\WebConfig\" />
+  </ItemGroup>
+
 </Project>
