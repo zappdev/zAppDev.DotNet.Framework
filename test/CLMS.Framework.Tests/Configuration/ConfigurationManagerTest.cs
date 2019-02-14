@@ -9,14 +9,14 @@ using System.Configuration;
 
 namespace CLMS.Framework.Tests.Configuration
 {
+#if NETFRAMEWORK
+#else
     [TestClass]
     public class ConfigurationManagerTest
     {
         [TestInitialize]
         public void Initialize()
         {
-#if NETFRAMEWORK
-#else
             var currentConfig =
                 ConfigurationManager.OpenExeConfiguration(
                     ConfigurationUserLevel.None);
@@ -31,7 +31,6 @@ namespace CLMS.Framework.Tests.Configuration
                     configFileMap, ConfigurationUserLevel.None);
 
             validConfig.SaveAs(currentConfig.FilePath, ConfigurationSaveMode.Full);
-#endif
         }
 
         [TestMethod]
@@ -56,4 +55,5 @@ namespace CLMS.Framework.Tests.Configuration
             Assert.AreEqual("false", appConfig.AppSettings["ZipWebRequests"]);
         }
     }
+#endif
 }

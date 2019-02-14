@@ -405,6 +405,11 @@ namespace CLMS.Framework.Utilities
                 key = $"{GetSessionId()}{key}";
                 GetCache().Remove<object>(key);
             }
+
+            public static bool HasKey(string key)
+            {
+                return GetCache().HasKey($"{GetSessionId()}{key}");
+            }
         }
 
         public enum ServerRole

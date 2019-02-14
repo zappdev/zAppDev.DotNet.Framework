@@ -6,6 +6,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CLMS.Framework.Tests.Utilities
 {
+#if NETFRAMEWORK
+#else
     [TestClass]
     public class SqlHelperTest
     {
@@ -71,4 +73,5 @@ namespace CLMS.Framework.Tests.Utilities
             Assert.AreEqual(1, result?.Count);
         }
     }
+#endif
 }
