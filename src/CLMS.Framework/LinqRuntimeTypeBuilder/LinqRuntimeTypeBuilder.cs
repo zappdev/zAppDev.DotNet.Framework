@@ -165,7 +165,7 @@ namespace CLMS.Framework.LinqRuntimeTypeBuilder
                     public override bool Equals(object obj)
                     {{
                         var o = ({groupClassName})obj;
-                        return { string.Join(" && ", groupFields.Select(a => "this." + SanitizeCSharpIdentifier(a.Key) + ".Equals(o." + SanitizeCSharpIdentifier(a.Key) + ")").ToArray()) };
+                        return o != null && ({ string.Join(" && ", groupFields.Select(a => $"((this.{SanitizeCSharpIdentifier(a.Key)} != null && this.{SanitizeCSharpIdentifier(a.Key)}.Equals(o.{SanitizeCSharpIdentifier(a.Key)})) || (this.{SanitizeCSharpIdentifier(a.Key)} == null && o.{SanitizeCSharpIdentifier(a.Key)} == null))").ToArray()) });
                     }}
 
                     public override int GetHashCode()
@@ -197,7 +197,7 @@ namespace CLMS.Framework.LinqRuntimeTypeBuilder
                     public override bool Equals(object obj)
                     {{
                         var o = ({selectClassName})obj;
-                        return { string.Join(" && ", selectFields.Select(a => "this." + SanitizeCSharpIdentifier(a.Key) + ".Equals(o." + SanitizeCSharpIdentifier(a.Key) + ")").ToArray()) };
+                        return o != null && ({ string.Join(" && ", selectFields.Select(a => $"((this.{SanitizeCSharpIdentifier(a.Key)} != null && this.{SanitizeCSharpIdentifier(a.Key)}.Equals(o.{SanitizeCSharpIdentifier(a.Key)})) || (this.{SanitizeCSharpIdentifier(a.Key)} == null && o.{SanitizeCSharpIdentifier(a.Key)} == null ))").ToArray()) });
                     }}
 
                     public override int GetHashCode()
@@ -273,7 +273,7 @@ namespace CLMS.Framework.LinqRuntimeTypeBuilder
                     public override bool Equals(object obj)
                     {{
                         var o = ({className})obj;
-                        return { string.Join(" && ", fields.Select(a => "this." + a.Key + ".Equals(o." + a.Key + ")").ToArray()) };
+                        return o != null && ({ string.Join(" && ", fields.Select(a => $"((this.{a.Key} != null && this.{a.Key}.Equals(o.{a.Key})) || (this.{a.Key} == null && o.{a.Key} == null))").ToArray()) });
                     }}
 
                     public override int GetHashCode()
