@@ -314,11 +314,13 @@ namespace CLMS.Framework.LinqRuntimeTypeBuilder
 
             var assemblyName = Path.GetRandomFileName();
 
+            var runtimeDirectory = Directory.GetParent(typeof(object).GetTypeInfo().Assembly.Location).FullName;
+
             var references = new MetadataReference[]
             {
-                MetadataReference.CreateFromFile(typeof(object).GetTypeInfo().Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(Enumerable).GetTypeInfo().Assembly.Location),
-                MetadataReference.CreateFromFile(typeof(BinaryExpression).GetTypeInfo().Assembly.Location), 
+                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Linq.Dll")),
+                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Private.CoreLib.Dll")),
+                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Linq.Expressions.Dll"))
             };
 
             var compilation = CSharpCompilation.Create(

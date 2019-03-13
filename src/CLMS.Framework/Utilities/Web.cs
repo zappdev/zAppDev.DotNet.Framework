@@ -215,7 +215,42 @@ namespace CLMS.Framework.Utilities
                 query = string.Join("&", result);
                 if (!string.IsNullOrWhiteSpace(query)) query = $"?{query}";
             }
-            
+
+            var routedData = GetContext().GetRouteData();
+            if (routedData != null)
+            {
+                var foundControllerKey = false;
+                var foundActionKey = false;
+
+                var result = new List<string>();
+
+                foreach (var key in routedData.Values.Keys)
+                {
+                    var value = $"{routedData.Values[key]}";
+
+                    /*
+                        Usually, the first keys are 'controller' and 'action'. However, I don't wanna ignore them COMPLETELY. Just the first ones.
+                        'Cause maybe a controller action has an 'action' parameter. Don't wanna lose that.
+                    */
+                    if ((!foundControllerKey) && (string.Compare(key, "controller", StringComparison.OrdinalIgnoreCase) == 0))
+                    {
+                        foundControllerKey = true;
+                        continue;
+                    }
+
+                    if ((!foundActionKey) && (string.Compare(key, "action", StringComparison.OrdinalIgnoreCase) == 0))
+                    {
+                        foundActionKey = true;
+                        continue;
+                    }
+
+                    result.Add(value);
+                }
+
+                routeData = string.Join("/", result);
+                if (!string.IsNullOrWhiteSpace(routeData)) routeData = $"/{routeData}";
+            }
+
             return routeData + query;
 #endif
         }
