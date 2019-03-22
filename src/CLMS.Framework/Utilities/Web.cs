@@ -132,13 +132,35 @@ namespace CLMS.Framework.Utilities
             return result;
         }
 
+        public static string GetApplicationPathUri(bool isInNTierArchitecture = false)
+        {
+#if NETFRAMEWORK
+            var baseUrl = $"{HttpContext.Current.Request.Url.Scheme}://{HttpContext.Current.Request.Url.Authority}";
+            var applicationPath = HttpContext.Current.Request.ApplicationPath;                  
+#else
+            var context = GetContext();
+            var baseUrl = $"{context.Request.Scheme}://{context.Request.Host}/";
+
+            var applicationPath =  $"{context.Request.PathBase}";
+#endif
+
+            if (!isInNTierArchitecture)
+            {
+                return applicationPath;
+            }
+
+            const string backEndAffix = "_BackEnd";
+            var lastIndexOfAffix = applicationPath.LastIndexOf(backEndAffix, StringComparison.Ordinal);
+
+            return lastIndexOfAffix > -1 ? applicationPath.Substring(0, lastIndexOfAffix) : applicationPath;
+        }
+
         public static string GetApplicationPath(bool isInNTierArchitecture = false)
         {
 #if NETFRAMEWORK
             string applicationPath = GetContext().Request.ApplicationPath;
 #else
-            var hosting = ServiceLocator.Current.GetInstance<IHostingEnvironment>();
-            var applicationPath = hosting.ContentRootPath;
+            var applicationPath = $"{GetContext().Request.PathBase}";
 #endif
 
             if (!isInNTierArchitecture)
