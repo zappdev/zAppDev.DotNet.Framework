@@ -26,6 +26,11 @@ namespace CLMS.Framework.Configuration
                 .Get<MailSettings>();
         }
 
+        public static string GetAppSetting(string key)
+        {
+            var config = ServiceLocator.Current.GetInstance<IConfiguration>();
+            return config?[$"configuration:appSettings:add:{key}:value"];
+        }
 
         public static AppConfiguration GetAppConfiguration()
         {
