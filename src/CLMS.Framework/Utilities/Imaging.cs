@@ -1,14 +1,16 @@
-﻿using System.Drawing;
+﻿using System.Collections.Generic;
+using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 
 namespace CLMS.Framework.Utilities
 {
     public class Imaging
     {
 
-        public static byte[] GetThumbnail(byte[] blob, int? width, int? height)
+        public static List<byte> GetThumbnail(byte[] blob, int? width, int? height)
         {
             using (var image = ByteArrayToImage(blob))
             {
@@ -16,7 +18,7 @@ namespace CLMS.Framework.Utilities
             }
         }
 
-        public static byte[] GetThumbnail(string path, int? width, int? height)
+        public static List<byte> GetThumbnail(string path, int? width, int? height)
         {
             using (var image = PathToImage(path))
             {
@@ -40,16 +42,16 @@ namespace CLMS.Framework.Utilities
             }
         }
 
-        public static byte[] ImageToByteArray(Image img)
+        public static List<byte> ImageToByteArray(Image img)
         {
             using (var stream = new MemoryStream())
             {
                 img.Save(stream, ImageFormat.Png);
-                return stream.ToArray();
+                return stream.ToArray().ToList();
             }
         }
 
-        public static byte[] Resize(Image image, int? width, int? height)
+        public static List<byte> Resize(Image image, int? width, int? height)
         {
             var resized = new Bitmap((width).GetValueOrDefault(0), (height).GetValueOrDefault(0));
             using (var graphics = Graphics.FromImage(resized))

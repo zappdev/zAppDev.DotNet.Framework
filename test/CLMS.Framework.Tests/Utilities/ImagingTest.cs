@@ -11,9 +11,9 @@ namespace CLMS.Framework.Tests.Utilities
         {
             var data = Imaging.GetThumbnail("./Assets/garden.png", 100, 100);
 
-            var result = Imaging.GetThumbnail(data, 100, 100);
+            var result = Imaging.GetThumbnail(data.ToArray(), 100, 100);
 
-            var resized = Imaging.ByteArrayToImage(result);
+            var resized = Imaging.ByteArrayToImage(result.ToArray());
 
             resized.Save($"./Assets/resized-garden-100.png", System.Drawing.Imaging.ImageFormat.Png); // Debuging
 
@@ -25,7 +25,7 @@ namespace CLMS.Framework.Tests.Utilities
         {
             var result = Imaging.GetThumbnail("./Assets/garden.png", 100, 100);
 
-            var resized = Imaging.ByteArrayToImage(result);
+            var resized = Imaging.ByteArrayToImage(result.ToArray());
 
             resized.Save($"./Assets/resized-garden.png", System.Drawing.Imaging.ImageFormat.Png); // Debuging
 
