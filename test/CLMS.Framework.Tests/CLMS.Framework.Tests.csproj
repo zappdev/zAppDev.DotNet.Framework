@@ -39,6 +39,9 @@
     <None Update="App_Data\CodeMap.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Assets\garden.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\hh2.golden.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

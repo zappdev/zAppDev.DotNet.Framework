@@ -10,6 +10,10 @@ namespace CLMS.Framework.Configuration
     {
 
 #if NETFRAMEWORK
+        public static string GetAppSetting(string key)
+        {
+            return System.Configuration.ConfigurationManager.AppSettings[key];
+        }
 #else
         public static IConfiguration GetConfiguration()
         {
