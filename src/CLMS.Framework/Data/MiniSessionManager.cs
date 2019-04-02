@@ -380,6 +380,7 @@ namespace CLMS.Framework.Data
             var factory = ServiceLocator.Current.GetInstance<ISessionFactory>();
             using (var manager = new MiniSessionService(factory))
             {
+                manager.OpenSessionWithTransaction();
                 var result = action(manager);
                 manager.CommitChanges();
                 return result;
@@ -391,6 +392,7 @@ namespace CLMS.Framework.Data
             var factory = ServiceLocator.Current.GetInstance<ISessionFactory>();
             using (var manager = new MiniSessionService(factory))
             {
+                manager.OpenSessionWithTransaction();
                 action(manager);
                 manager.CommitChanges();
             }

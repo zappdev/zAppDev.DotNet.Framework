@@ -5,6 +5,7 @@ using AppDevCache = CLMS.AppDev.Cache;
 using System.Configuration;
 using System.IO;
 using System.Web;
+using System.Text.RegularExpressions;
 #if NETFRAMEWORK
 using System.Net.Http;
 #else
@@ -136,12 +137,12 @@ namespace CLMS.Framework.Utilities
         {
 #if NETFRAMEWORK
             var baseUrl = $"{HttpContext.Current.Request.Url.Scheme}://{HttpContext.Current.Request.Url.Authority}";
-            var applicationPath = HttpContext.Current.Request.ApplicationPath;                  
+            var applicationPath = $"{baseUrl}/{HttpContext.Current.Request.ApplicationPath}";
 #else
             var context = GetContext();
             var baseUrl = $"{context.Request.Scheme}://{context.Request.Host}/";
 
-            var applicationPath =  $"{context.Request.PathBase}";
+            var applicationPath =  $"{baseUrl}/{context.Request.PathBase}";
 #endif
 
             if (!isInNTierArchitecture)
@@ -149,10 +150,9 @@ namespace CLMS.Framework.Utilities
                 return applicationPath;
             }
 
-            const string backEndAffix = "_BackEnd";
-            var lastIndexOfAffix = applicationPath.LastIndexOf(backEndAffix, StringComparison.Ordinal);
-
-            return lastIndexOfAffix > -1 ? applicationPath.Substring(0, lastIndexOfAffix) : applicationPath;
+            var pattern = @"[_\-]BackEnd";
+            var regex = new Regex(pattern, RegexOptions.Multiline | RegexOptions.IgnoreCase);
+            return regex.Replace(applicationPath, "");
         }
 
         public static string GetApplicationPath(bool isInNTierArchitecture = false)
@@ -168,10 +168,9 @@ namespace CLMS.Framework.Utilities
                 return applicationPath;
             }
 
-            const string backEndAffix = "_BackEnd";
-            var lastIndexOfAffix = applicationPath.LastIndexOf(backEndAffix, StringComparison.Ordinal);
-
-            return lastIndexOfAffix > -1 ? applicationPath.Substring(0, lastIndexOfAffix) : applicationPath;
+            var pattern = @"[_\-]BackEnd";
+            var regex = new Regex(pattern, RegexOptions.Multiline | RegexOptions.IgnoreCase);
+            return regex.Replace(applicationPath, "");
         }
 
         public static string GetQuery()
