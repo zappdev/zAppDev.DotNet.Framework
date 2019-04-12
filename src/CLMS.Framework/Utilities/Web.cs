@@ -452,7 +452,7 @@ namespace CLMS.Framework.Utilities
 
                 return httpRequestMessage.GetCorrelationId().ToString();
 #else
-                var sessionId = GetContext().Session?.Id;
+                var sessionId = GetContext().Connection?.Id?.ToString();
                 if (!string.IsNullOrWhiteSpace(sessionId)) return sessionId;
 
                 throw new ApplicationException("Session Id is empty");
