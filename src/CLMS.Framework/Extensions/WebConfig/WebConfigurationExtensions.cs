@@ -1,5 +1,6 @@
 #if NETFRAMEWORK
 #else
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.FileProviders;
@@ -21,6 +22,13 @@ namespace CLMS.Framework.Extensions.WebConfig
         public static IConfigurationBuilder AddWebConfigFile(this IConfigurationBuilder builder, string path, bool optional, bool reloadOnChange)
         {
             return AddWebConfigFile(builder, provider: null, path: path, optional: optional, reloadOnChange: reloadOnChange);
+        }
+
+        public static IConfigurationBuilder AddWebConfigFile(this IConfigurationBuilder builder, List<string> paths, bool optional, bool reloadOnChange)
+        {
+            foreach(var path in paths)
+                AddWebConfigFile(builder, provider: null, path: path, optional: optional, reloadOnChange: reloadOnChange);
+            return builder;
         }
 
         private static IConfigurationBuilder AddWebConfigFile(this IConfigurationBuilder builder, IFileProvider provider, string path, bool optional, bool reloadOnChange)
