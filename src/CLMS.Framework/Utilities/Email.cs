@@ -560,6 +560,7 @@ namespace CLMS.Framework.Utilities
 
             if (!readAll) return emailMessage;
 
+            emailMessage.Id = (int)id;
             emailMessage.Body = message.Body;
             emailMessage.IsBodyHtml = message.IsBodyHtml;
             emailMessage.To = message.To.Select(x => x.Address).ToList();
@@ -703,7 +704,34 @@ namespace CLMS.Framework.Utilities
             }
         }
 
-	    private ImapClient GetClient()
+        public byte[] GetAttachment(int? mailId, string attachmentName)
+        {
+            try
+            {
+                using (var client = GetClient())
+                {
+                    var message = client.GetMessage((uint)mailId, FetchOptions.Normal, false);
+                    if (message == null) return null;
+
+                    var attachment = message.Attachments.First(at => at.Name == attachmentName);
+                    if (attachment == null) return null;
+
+                    using (var memStream = new MemoryStream())
+                    {
+                        attachment.ContentStream.Seek(0, SeekOrigin.Begin);
+                        attachment.ContentStream.CopyTo(memStream);
+                        return memStream.ToArray();
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                if (!_suppressExceptions) throw;
+                return null;
+            }
+        }
+
+        private ImapClient GetClient()
         {
 #if NETFRAMEWORK
             return new ImapClient(
