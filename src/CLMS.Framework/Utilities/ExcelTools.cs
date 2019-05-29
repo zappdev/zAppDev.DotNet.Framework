@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using OfficeOpenXml.Style;
+using ExcelDataReader;
+using System.Data;
 
 namespace CLMS.Framework.Utilities
 {
@@ -156,6 +158,72 @@ namespace CLMS.Framework.Utilities
             }
 
             return result;
+        }
+
+        public static List<string> GetSheetNames(string filePath)
+        {
+            var results = new List<string>();
+
+            using (var stream = File.Open(filePath, FileMode.Open, FileAccess.Read))
+            {
+                // Auto-detect format, supports:
+                //  - Binary Excel files (2.0-2003 format; *.xls)
+                //  - OpenXml Excel files (2007 format; *.xlsx)
+                using (var reader = ExcelReaderFactory.CreateReader(stream))
+                {
+                    var dataset = reader.AsDataSet();
+                    foreach (DataTable table in dataset.Tables)
+                    {
+                        results.Add(table.TableName);
+                    }
+                }
+            }
+
+            return results;
+        }
+
+        public static List<Dictionary<string, object>> GetExcelTableContents(string filePath, string sheetname, bool hasHeaderRow)
+        {
+            var results = new List<Dictionary<string, object>>();
+
+            using (var stream = File.Open(filePath, FileMode.Open, FileAccess.Read))
+            {
+                // Auto-detect format, supports:
+                //  - Binary Excel files (2.0-2003 format; *.xls)
+                //  - OpenXml Excel files (2007 format; *.xlsx)
+                using (var reader = ExcelReaderFactory.CreateReader(stream))
+                {
+                    var dataset = reader.AsDataSet(new ExcelDataSetConfiguration()
+                    {
+                        // Gets or sets a callback to obtain configuration options for a DataTable. 
+                        ConfigureDataTable = (tableReader) => new ExcelDataTableConfiguration()
+                        {
+                            // Gets or sets a value indicating the prefix of generated column names.
+                            EmptyColumnNamePrefix = "Column",
+
+                            // Gets or sets a value indicating whether to use a row from the 
+                            // data as column names.
+                            UseHeaderRow = hasHeaderRow
+                        }
+                    });
+                    foreach (DataTable table in dataset.Tables)
+                    {
+                        if (table.TableName != sheetname) continue;
+                        foreach (DataRow row in table.Rows)
+                        {
+                            var rowContents = new Dictionary<string, object>();
+
+                            for (var i = 0; i < table.Columns.Count; i++)
+                            {
+                                rowContents.Add(table.Columns[i].ColumnName, row.ItemArray[i]);
+                            }
+                            results.Add(rowContents);
+                        }
+                    }
+                }
+            }
+
+            return results;
         }
     }
 
