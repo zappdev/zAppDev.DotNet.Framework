@@ -52,7 +52,7 @@ namespace CLMS.Framework.Data.Encryption.Types
         public virtual object NullSafeGet(DbDataReader rs, string[] names, ISessionImplementor session, object owner)
         {
             var passwordString = NHibernateUtil.Binary.NullSafeGet(rs, names[0], session);
-            var result = passwordString != null ? EncryptionManager.Instance.DecryptObject((byte[])passwordString) : null;
+            var result = passwordString != null ? EncryptionManagerBase.Instance.DecryptObject((byte[])passwordString) : null;
             return GetValue(result);
         }
 
@@ -71,7 +71,7 @@ namespace CLMS.Framework.Data.Encryption.Types
                 NHibernateUtil.String.NullSafeSet(cmd, null, index, session);
                 return;
             }
-            var hashedPassword = EncryptionManager.Instance.EncryptObject(GetString(value));
+            var hashedPassword = EncryptionManagerBase.Instance.EncryptObject(GetString(value));
             NHibernateUtil.Binary.NullSafeSet(cmd, hashedPassword, index, session);
         }
 

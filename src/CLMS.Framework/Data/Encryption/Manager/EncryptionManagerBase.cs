@@ -6,16 +6,16 @@ using log4net;
 
 namespace CLMS.Framework.Data.Encryption.Manager
 {
-    public class EncryptionManager : IEncryptionManager
+    public class EncryptionManagerBase : IEncryptionManager
     {
         public string StringEncryptionKey;
 
-        private static EncryptionManager _instance;
-        private static readonly ILog Logger = LogManager.GetLogger(typeof(EncryptionManager));
+        private static EncryptionManagerBase _instance;
+        private static readonly ILog Logger = LogManager.GetLogger(typeof(EncryptionManagerBase));
 
-        public static EncryptionManager Instance => _instance ?? (_instance = new EncryptionManager());
+        public static EncryptionManagerBase Instance => _instance ?? (_instance = new EncryptionManagerBase());
 
-        private EncryptionManager()
+        public EncryptionManagerBase()
         {
             InitializeKey();
         }
@@ -28,7 +28,7 @@ namespace CLMS.Framework.Data.Encryption.Manager
         #region Security Keys
 
 
-        public string GetEncryptionKey()
+        public virtual string GetEncryptionKey()
         {
             throw new NotImplementedException("GetEncryptionKey");
         }

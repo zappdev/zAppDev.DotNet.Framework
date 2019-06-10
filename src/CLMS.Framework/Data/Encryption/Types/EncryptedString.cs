@@ -74,7 +74,7 @@ namespace CLMS.Framework.Data.Encryption.Types
         public override object NullSafeGet(DbDataReader rs, string[] names, ISessionImplementor session, object owner)
         {
             var passwordString = NHibernateUtil.String.NullSafeGet(rs, names[0], session);
-            var result = passwordString != null ? EncryptionManager.Instance.DecryptString((string)passwordString) : null;
+            var result = passwordString != null ? EncryptionManagerBase.Instance.DecryptString((string)passwordString) : null;
             return GetValue(result);
         }
 
@@ -93,7 +93,7 @@ namespace CLMS.Framework.Data.Encryption.Types
                 NHibernateUtil.String.NullSafeSet(cmd, null, index, session);
                 return;
             }
-            var hashedPassword = EncryptionManager.Instance.EncryptString(GetString(value));
+            var hashedPassword = EncryptionManagerBase.Instance.EncryptString(GetString(value));
             NHibernateUtil.String.NullSafeSet(cmd, hashedPassword, index, session);
         }
     }
