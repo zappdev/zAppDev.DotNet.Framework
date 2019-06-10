@@ -3,6 +3,9 @@ using System.Xml.Serialization;
 using Newtonsoft.Json;
 using System;
 using System.Text;
+using System.Collections.Generic;
+using System.Xml;
+using System.Xml.Schema;
 
 namespace CLMS.Framework.Utilities
 {
@@ -75,6 +78,37 @@ namespace CLMS.Framework.Utilities
         {
             if (string.IsNullOrEmpty(data)) return default(T);
             return (T)Convert.ChangeType(Enum.Parse(typeof(T), data), typeof(T));
+        }
+
+        public static List<string> ValidateXmlAgainstXsd(string xml, string xsdPath, Type type)
+        {
+            var errors = new List<string>();
+            XmlReaderSettings settings = new XmlReaderSettings();
+
+            settings.Schemas.Add(null, xsdPath);
+            settings.ValidationType = ValidationType.Schema;
+            settings.ValidationFlags |= XmlSchemaValidationFlags.ProcessInlineSchema;
+            settings.ValidationFlags |= XmlSchemaValidationFlags.ProcessSchemaLocation;
+            settings.ValidationFlags |= XmlSchemaValidationFlags.ReportValidationWarnings;
+            settings.ValidationEventHandler += new ValidationEventHandler((sender, args) =>
+            {
+                if (args.Severity == XmlSeverityType.Warning) return;
+
+                errors.Add($"{args.Message} (Line: {args.Exception?.LineNumber}, Position: {args.Exception?.LinePosition})");
+            });
+
+            using (var reader = new StringReader(xml))
+            {
+                using (var xmlReader = XmlReader.Create(reader, settings))
+                {
+                    while (xmlReader.Read());
+                    xmlReader.Close();
+                }
+
+                reader.Close();
+            }
+
+            return errors;
         }
     }
 }
