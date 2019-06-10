@@ -80,7 +80,7 @@ namespace CLMS.Framework.Utilities
             return (T)Convert.ChangeType(Enum.Parse(typeof(T), data), typeof(T));
         }
 
-        public static List<string> ValidateXmlAgainstXsd(string xml, string xsdPath, Type type)
+        public static List<string> ValidateXmlAgainstXsd(string xmlContent, string xsdPath)
         {
             var errors = new List<string>();
             XmlReaderSettings settings = new XmlReaderSettings();
@@ -97,7 +97,7 @@ namespace CLMS.Framework.Utilities
                 errors.Add($"{args.Message} (Line: {args.Exception?.LineNumber}, Position: {args.Exception?.LinePosition})");
             });
 
-            using (var reader = new StringReader(xml))
+            using (var reader = new StringReader(xmlContent))
             {
                 using (var xmlReader = XmlReader.Create(reader, settings))
                 {
