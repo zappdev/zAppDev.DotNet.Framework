@@ -1,5 +1,6 @@
 ﻿using System;
 using CLMS.Framework.Data;
+using CLMS.Framework.Data.DAL;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CLMS.Framework.Tests.Data

@@ -5,6 +5,7 @@ using NHibernate;
 using System;
 using System.Data;
 using CLMS.Framework.Utilities;
+using CLMS.Framework.Data.DAL;
 
 namespace CLMS.Framework.Data
 {

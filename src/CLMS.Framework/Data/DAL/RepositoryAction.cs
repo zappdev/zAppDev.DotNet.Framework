@@ -1,4 +1,4 @@
-﻿namespace CLMS.Framework.Data
+﻿namespace CLMS.Framework.Data.DAL
 {
     public enum RepositoryAction
     {

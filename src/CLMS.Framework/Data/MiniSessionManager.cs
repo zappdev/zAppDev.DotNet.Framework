@@ -7,6 +7,7 @@ using CLMS.Framework.Utilities;
 using log4net;
 using NHibernate;
 using NHibernate.Cfg;
+using CLMS.Framework.Data.DAL;
 
 #if NETFRAMEWORK
 using Microsoft.AspNet.Identity.Owin;

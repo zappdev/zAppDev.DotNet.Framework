@@ -1,4 +1,5 @@
-﻿using NHibernate;
+﻿using CLMS.Framework.Data.DAL;
+using NHibernate;
 using System;
 
 namespace CLMS.Framework.Data
