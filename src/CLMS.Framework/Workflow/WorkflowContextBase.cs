@@ -465,6 +465,19 @@ namespace CLMS.Framework.Workflow
 
         #endregion
 
+        public virtual IWorkflowExecutionResult Continue()
+        {
+            return WorkflowManager.Current.Continue(this?.Id ?? default);
+        }
 
+        public virtual IWorkflowExecutionResult Cancel()
+        {
+            return WorkflowManager.Current.Cancel(this?.Id ?? default);
+        }
+
+        public virtual IWorkflowExecutionResult Expire()
+        {
+            return WorkflowManager.Current.Expire(this?.Id ?? default);
+        }
     }
 }

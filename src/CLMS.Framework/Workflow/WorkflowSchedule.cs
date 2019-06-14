@@ -10,6 +10,8 @@ using System.Linq.Expressions;
 using CLMS.Framework.Linq;
 using CLMS.Framework.Data.Domain;
 using CLMS.Framework.Exceptions;
+using System.Data.SqlTypes;
+using NCrontab;
 
 namespace CLMS.Framework.Workflow
 {
@@ -213,7 +215,7 @@ namespace CLMS.Framework.Workflow
         {
             get
             {
-                var __valToGet = GetHumanReadableExpression();
+                var __valToGet = GetHumanReadableExpressionImplementation();
                 return __valToGet;
             }
             set
@@ -230,7 +232,7 @@ namespace CLMS.Framework.Workflow
         {
             get
             {
-                var __valToGet = GetNextExecutionTime();
+                var __valToGet = GetNextExecutionTimeImplementation();
                 return __valToGet;
             }
             set
@@ -248,15 +250,15 @@ namespace CLMS.Framework.Workflow
         public WorkflowSchedule() { }
         #endregion
         #region Accessors Implementation
-        private string GetHumanReadableExpression()
+        private string GetHumanReadableExpressionImplementation()
         {
-            if ((((NCrontab.CrontabSchedule.TryParse((this?.cronExpression ?? "")) == null)) == false))
+            if (CrontabSchedule.TryParse((this?.cronExpression ?? "")) == null == false)
             {
                 return null;
             }
             return Utilities.CronExpressionDescriptor.ExpressionDescriptor.GetDescription((this?.cronExpression ?? ""));
         }
-        private DateTime? GetNextExecutionTime()
+        private DateTime? GetNextExecutionTimeImplementation()
         {
             if ((((this?.active ?? false)) == false) || (this?.expireOn ?? System.Data.SqlTypes.SqlDateTime.MinValue.Value) >= DateTime.UtcNow || (((NCrontab.CrontabSchedule.TryParse((this?.cronExpression ?? "")) == null)) == false))
             {
@@ -483,5 +485,33 @@ namespace CLMS.Framework.Workflow
         }
 
         #endregion
+
+        public virtual string GetHumanReadableExpression()
+        {
+            if (CrontabSchedule.TryParse(CronExpression ?? "") == null == false)
+            {
+                return null;
+            }
+            return Utilities.CronExpressionDescriptor.ExpressionDescriptor.GetDescription(CronExpression ?? "");
+        }
+
+        public virtual DateTime? GetNextExecutionTime()
+        {
+            if ((Active == false) || (ExpireOn ?? SqlDateTime.MinValue.Value) >= DateTime.UtcNow || (CrontabSchedule.TryParse(CronExpression ?? "") == null == false))
+            {
+                return null;
+            }
+            if (StartDateTime == null || (StartDateTime ?? SqlDateTime.MinValue.Value) <= DateTime.UtcNow)
+            {
+                return Utilities.Common.GetNextExecutionTime(CronExpression ?? "", DateTime.UtcNow);
+            }
+            return Utilities.Common.GetNextExecutionTime(CronExpression ?? "", (StartDateTime ?? SqlDateTime.MinValue.Value));
+        }
+
+        public virtual IWorkflowExecutionResult Execute()
+        {
+            return new ScheduleManager().ExecuteSchedule(this);
+        }
+
     }
 }
