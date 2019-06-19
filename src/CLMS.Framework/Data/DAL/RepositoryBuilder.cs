@@ -4,20 +4,6 @@ namespace CLMS.Framework.Data.DAL
 {
     public class RepositoryBuilder : IRepositoryBuilder
     {
-        public IRetrieveRepository CreateRetrieveRepository()
-        {
-            return null;
-        }
-
-        public IWorkflowRepository CreateWorkflowRepository()
-        {
-            return null;
-        }
-
-        public IUpdateRepository CreateUpdateRepository()
-        {
-            return null;
-        }
 
 
 #if NETFRAMEWORK
@@ -25,16 +11,54 @@ namespace CLMS.Framework.Data.DAL
         {
             return null;
         }
+
+        public IRetrieveRepository CreateRetrieveRepository(MiniSessionManager manager)
+        {
+            return null;
+        }
+
+        public IWorkflowRepository CreateWorkflowRepository(MiniSessionManager manager)
+        {
+            return null;
+        }
+
+        public IUpdateRepository CreateUpdateRepository(MiniSessionManager manager)
+        {
+            return null;
+        }
+
+        public IDeleteRepository CreateDeleteRepository(MiniSessionManager manager)
+        {
+            return null;
+        }
 #else
+
         public ICreateRepository CreateCreateRepository(MiniSessionService manager)
+        {
+            return null;
+        }
+
+        public IRetrieveRepository CreateRetrieveRepository(MiniSessionService manager)
+        {
+            return null;
+        }
+
+        public IWorkflowRepository CreateWorkflowRepository(MiniSessionService manager)
+        {
+            return null;
+        }
+
+        public IUpdateRepository CreateUpdateRepository(MiniSessionService manager)
+        {
+            return null;
+        }
+
+        public IDeleteRepository CreateDeleteRepository(MiniSessionService manager)
         {
             return null;
         }
 #endif
 
-        public IDeleteRepository CreateDeleteRepository()
-        {
-            return null;
-        }
+
     }
 }

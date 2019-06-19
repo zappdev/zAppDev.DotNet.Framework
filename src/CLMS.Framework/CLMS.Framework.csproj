@@ -31,6 +31,14 @@
   <PropertyGroup Condition="'$(IsLinux)'=='true'">
     <DefineConstants>Linux</DefineConstants>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Workflow\WorkflowContextBase.hbm.xml" />
+    <None Remove="Workflow\WorkflowSchedule.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Workflow\WorkflowContextBase.hbm.xml" />
+    <EmbeddedResource Include="Workflow\WorkflowSchedule.hbm.xml" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CacheManager.Core" Version="1.0.1" />

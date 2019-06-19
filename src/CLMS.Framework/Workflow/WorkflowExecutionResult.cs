@@ -20,8 +20,6 @@ namespace CLMS.Framework.Workflow
     [DataContract]
     public class WorkflowExecutionResult : IWorkflowExecutionResult
     {
-        #region WorkflowExecutionResult's Fields
-
         protected Guid _transientId = Guid.NewGuid();
         public virtual Guid TransientId
         {
@@ -38,8 +36,7 @@ namespace CLMS.Framework.Workflow
         protected WorkflowStatus? status;
         [DataMember(Name = "WorkflowExecutionResultKey")]
         protected int? workflowExecutionResultKey = 0;
-        #endregion
-        #region WorkflowExecutionResult's Properties
+     
         /// <summary>
         /// The Status property
         ///
@@ -73,11 +70,10 @@ namespace CLMS.Framework.Workflow
                 workflowExecutionResultKey = value;
             }
         }
-        #endregion
-        #region WorkflowExecutionResult's Participant Properties
+
         [DataMember(Name = "Context")]
-        protected IWorkflowContext context;
-        public virtual IWorkflowContext Context
+        protected WorkflowContextBase context;
+        public virtual WorkflowContextBase Context
         {
             get
             {
@@ -108,16 +104,13 @@ namespace CLMS.Framework.Workflow
                 }
             }
         }
-        #endregion
-        #region Constructors
+
         /// <summary>
         /// Public constructors of the WorkflowExecutionResult class
         /// </summary>
         /// <returns>New WorkflowExecutionResult object</returns>
         /// <remarks></remarks>
         public WorkflowExecutionResult() { }
-        #endregion
-        #region Methods
 
         public virtual List<string> _Validate(bool throwException = true)
         {
@@ -183,9 +176,9 @@ namespace CLMS.Framework.Workflow
                 else
                 {
                     if (asNew)
-                        copy.Context = (IWorkflowContext)copiedObjects[Context];
+                        copy.Context = (WorkflowContextBase) copiedObjects[Context];
                     else
-                        copy.context = (IWorkflowContext)copiedObjects[Context];
+                        copy.context = (WorkflowContextBase) copiedObjects[Context];
                 }
             }
             return copy;
@@ -306,9 +299,6 @@ namespace CLMS.Framework.Workflow
         {
             return !IsTransient() && !compareTo.IsTransient() && WorkflowExecutionResultKey.Equals(compareTo.WorkflowExecutionResultKey);
         }
-
-        #endregion
-
 
     }
 }

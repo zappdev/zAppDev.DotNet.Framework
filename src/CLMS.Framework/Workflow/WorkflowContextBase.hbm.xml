@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" default-lazy="true" auto-import="false" assembly="CLMS.Framework" namespace="CLMS.Framework.Workflow">
+    <class name="WorkflowContextBase" table="`WorkflowContextBases`" schema="`wf`">
+        <cache usage="read-write" region="security" />
+        <id name="Id" column="`Id`" type="Guid">
+            <generator class="guid.comb" />
+        </id>
+        <property name="Name" column="`Name`" type="String" not-null="false" length="512" />
+        <property name="Error" column="`Error`" type="String" not-null="false" length="4000" />
+        <property name="Expires" column="`Expires`" type="System.Boolean" not-null="false" />
+        <property name="ExpirationDateTime" type="System.Nullable`1[[System.DateTime, mscorlib]], mscorlib" not-null="false">
+            <column name="`ExpirationDateTime`" sql-type="datetime" />
+        </property>
+        <property name="PendingSince" type="System.Nullable`1[[System.DateTime, mscorlib]], mscorlib" not-null="false">
+            <column name="`PendingSince`" sql-type="datetime" />
+        </property>
+        <property name="PendingJobCreatedBy" column="`PendingJobCreatedBy`" type="String" not-null="false" length="512" />
+        <property name="PendingStep" column="`PendingStep`" type="String" not-null="false" length="512" />
+        <property name="Status" column="`Status`" type="" not-null="false" />
+    </class>
+</hibernate-mapping>

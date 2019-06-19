@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -6,75 +6,35 @@ using CLMS.Framework.Data.DAL;
 
 namespace CLMS.Framework.Workflow
 {
-    public abstract class WorkflowImplementation
-    {
-        public static IRepositoryBuilder Builder;
-
-        public abstract WorkflowStatus? Execute();
-        public abstract WorkflowStatus? Continue(string stepName);
-        public abstract T GetStep<T>() where T : class;
-        public abstract IWorkflowContext GetContext();
-        public abstract void RestoreState(IWorkflowContext wfBase);
-        public abstract void CreatePendingJob(string stepName);
-
-        public abstract WorkflowStatus? Status
-        {
-            get;
-            set;
-        }
-
-        public static void RemovePendingJob(Guid id)
-        {
-            var instance = Builder.CreateRetrieveRepository().GetById<IWorkflowContext>(id);
-            Builder.CreateWorkflowRepository().DeleteWorkflowContextBase(instance);
-        }
-
-        public static void GetAllPending<T>()
-        {
-            Builder.CreateRetrieveRepository().GetAll<T>();
-        }
-
-        public static T GetPendingByKey<T>(Guid id) where T : class
-        {
-            return Builder.CreateRetrieveRepository().GetById<T>(id);
-        }
-    }
-
-    public interface IWorkflowStep
-    {
-        WorkflowStatus? Run();
-        Guid? Id
-        {
-            get;
-            set;
-        }
-    }
-
     public class WorkflowManager
     {
-        public static IRepositoryBuilder Builder;
+        public IRepositoryBuilder Builder;
 
         private static readonly Lazy<WorkflowManager> Lazy =
             new Lazy<WorkflowManager>(() => new WorkflowManager());
 
         public static WorkflowManager Current => Lazy.Value;
 
-
         private List<Type> _workflowImplementationTypes = new List<Type>();
+
+        public WorkflowManager(IRepositoryBuilder builder = null)
+        {
+            Builder = builder;
+        }
 
         public void Init(Assembly workflowAssembly)
         {
             _workflowImplementationTypes = workflowAssembly.GetTypes().Where(t => t.BaseType == typeof(WorkflowImplementation)).ToList();
         }
 
-        public IEnumerable<IWorkflowContext> GetAllPendingJobs(int pageSize, int currentPage)
+        public IEnumerable<WorkflowContextBase> GetAllPendingJobs(int pageSize, int currentPage)
         {
-            return Builder.CreateRetrieveRepository().GetAll<IWorkflowContext>();
+            return Builder.CreateRetrieveRepository().GetAll<WorkflowContextBase>();
         }
 
         public IWorkflowExecutionResult ExecuteWorkflow(string wfName)
         {
-            var wf = GetWorkflowInstance(wfName + "Workflow");
+            var wf = GetWorkflowInstance($"{wfName}Workflow");
             try
             {
                 if (wf == null)
@@ -94,33 +54,9 @@ namespace CLMS.Framework.Workflow
             }
         }
 
-        private WorkflowImplementation GetWorkflowInstance(IWorkflowContext pendingJob)
-        {
-            return GetWorkflowInstance(pendingJob.Name);
-        }
-
-        private WorkflowImplementation GetWorkflowInstance(string wfName)
-        {
-            try
-            {
-                var typeofWf = _workflowImplementationTypes.FirstOrDefault(t => t.Name == wfName);
-                if (typeofWf == null)
-                {
-                    return null;
-                }
-                var wf = Activator.CreateInstance(typeofWf) as WorkflowImplementation;
-                return wf;
-            }
-            catch (Exception e)
-            {
-                log4net.LogManager.GetLogger(GetType()).Error($"Error getting Workflow Instance '{wfName}'!", e);
-                return null;
-            }
-        }
-
         public IWorkflowExecutionResult Continue(Guid? id)
         {
-            var pendingWorkflow = Builder.CreateRetrieveRepository().GetById<IWorkflowContext>(id);
+            var pendingWorkflow = Builder.CreateRetrieveRepository().GetById<WorkflowContextBase>(id);
             try
             {
                 return Continue(pendingWorkflow);
@@ -132,7 +68,7 @@ namespace CLMS.Framework.Workflow
             }
         }
 
-        public IWorkflowExecutionResult Continue(IWorkflowContext pendingWorkflow)
+        public IWorkflowExecutionResult Continue(WorkflowContextBase pendingWorkflow)
         {
             try
             {
@@ -157,7 +93,7 @@ namespace CLMS.Framework.Workflow
 
         public IWorkflowExecutionResult Cancel(Guid id)
         {
-            var pendingWorkflow = Builder.CreateRetrieveRepository().GetById<IWorkflowContext>(id);
+            var pendingWorkflow = Builder.CreateRetrieveRepository().GetById<WorkflowContextBase>(id);
             try
             {
                 return Cancel(pendingWorkflow);
@@ -169,7 +105,7 @@ namespace CLMS.Framework.Workflow
             }
         }
 
-        public IWorkflowExecutionResult Cancel(IWorkflowContext pendingWorkflow)
+        public IWorkflowExecutionResult Cancel(WorkflowContextBase pendingWorkflow)
         {
             try
             {
@@ -183,7 +119,7 @@ namespace CLMS.Framework.Workflow
             }
         }
 
-        private IWorkflowExecutionResult RemovePendingJob(IWorkflowContext pendingWorkflow)
+        private IWorkflowExecutionResult RemovePendingJob(WorkflowContextBase pendingWorkflow)
         {
             try
             {
@@ -200,6 +136,30 @@ namespace CLMS.Framework.Workflow
         public IWorkflowExecutionResult Expire(Guid value)
         {
             throw new NotImplementedException();
+        }
+
+        private WorkflowImplementation GetWorkflowInstance(WorkflowContextBase pendingJob)
+        {
+            return GetWorkflowInstance(pendingJob.Name);
+        }
+
+        private WorkflowImplementation GetWorkflowInstance(string wfName)
+        {
+            try
+            {
+                var typeofWf = _workflowImplementationTypes.FirstOrDefault(t => t.Name == wfName);
+                if (typeofWf == null)
+                {
+                    return null;
+                }
+                var wf = Activator.CreateInstance(typeofWf) as WorkflowImplementation;
+                return wf;
+            }
+            catch (Exception e)
+            {
+                log4net.LogManager.GetLogger(GetType()).Error($"Error getting Workflow Instance '{wfName}'!", e);
+                return null;
+            }
         }
     }
 }

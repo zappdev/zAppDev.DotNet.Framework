@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" default-lazy="true" auto-import="false" assembly="CLMS.Framework" namespace="CLMS.Framework.Workflow">
+    <class name="WorkflowSchedule" table="`WorkflowSchedules`" schema="`wf`">
+        <cache usage="read-write" region="security" />
+        <id name="Workflow" column="`Workflow`" type="String" length="255">
+            <generator class="assigned" />
+        </id>
+        <property name="Description" column="`Description`" type="String" not-null="false" length="1000" />
+        <property name="StartDateTime" type="System.Nullable`1[[System.DateTime, mscorlib]], mscorlib" not-null="false">
+            <column name="`StartDateTime`" sql-type="datetime" />
+        </property>
+        <property name="ExpireOn" type="System.Nullable`1[[System.DateTime, mscorlib]], mscorlib" not-null="false">
+            <column name="`ExpireOn`" sql-type="datetime" />
+        </property>
+        <property name="CronExpression" column="`CronExpression`" type="String" not-null="false" length="100" />
+        <property name="LastExecution" type="System.Nullable`1[[System.DateTime, mscorlib]], mscorlib" not-null="false">
+            <column name="`LastExecution`" sql-type="datetime" />
+        </property>
+        <property name="LastExecutionMessage" column="`LastExecutionMessage`" type="String" not-null="false" length="4001" />
+        <property name="IsLastExecutionSuccess" column="`IsLastExecutionSuccess`" type="System.Boolean" not-null="false" />
+        <property name="Active" column="`Active`" type="System.Boolean" not-null="false" />
+    </class>
+</hibernate-mapping>
