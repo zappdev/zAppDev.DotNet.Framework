@@ -21,14 +21,15 @@ namespace CLMS.Framework.Workflow
         private static volatile Thread _scheduleThread = null;
         private static ILog _vScheduleLog = null;
 
-        private static ILog ScheduleLog
-        => _vScheduleLog ?? (_vScheduleLog = LogManager.GetLogger(typeof(ScheduleThread)));
+        private static ILog ScheduleLog => _vScheduleLog ?? (_vScheduleLog = LogManager.GetLogger(typeof(ScheduleThread)));
 
         private static volatile bool _scheduleThreadAnalyticDebugOn = false;
         private static volatile int _scheduleThreadHttpRequestTimeOutMin = 0;
         private static volatile bool _scheduleThreadEnabled = true;
         private static volatile int _scheduleThreadWorkIntervalInMsec = 5000;
         private static volatile string _httpRuntimeUrl = "";
+
+        public static ScheduleManager Manager {get; set;}
 
         public static long NumberOfSessions
         {
@@ -42,9 +43,9 @@ namespace CLMS.Framework.Workflow
             private ScheduleManager _scheduler = null;
             private DateTime _start;
 
-            public ScheduleWorker()
+            public ScheduleWorker(ScheduleManager manager)
             {
-                _scheduler = new ScheduleManager();
+                _scheduler = manager ?? new ScheduleManager();
             }
 
             public void DoWork()
@@ -127,7 +128,6 @@ namespace CLMS.Framework.Workflow
                 _scheduler = null;
             }
         }
-
 
         public static void CheckScheduleThreadStatus(HttpContext httpContext)
         {
@@ -248,7 +248,7 @@ namespace CLMS.Framework.Workflow
                         ScheduleLog.Debug("_scheduleThread is already running");
                     return;
                 }
-                _scheduleWorker = new ScheduleWorker();
+                _scheduleWorker = new ScheduleWorker(Manager);
                 _scheduleThread = new Thread(new ThreadStart(() =>
                 {
 #if NETFRAMEWORK

@@ -91,7 +91,7 @@ namespace CLMS.Framework.Workflow
             }
         }
 
-        public IWorkflowExecutionResult Cancel(Guid id)
+        public IWorkflowExecutionResult Cancel(Guid? id)
         {
             var pendingWorkflow = Builder.CreateRetrieveRepository().GetById<WorkflowContextBase>(id);
             try
@@ -133,7 +133,7 @@ namespace CLMS.Framework.Workflow
             }
         }
 
-        public IWorkflowExecutionResult Expire(Guid value)
+        public IWorkflowExecutionResult Expire(Guid? value)
         {
             throw new NotImplementedException();
         }
