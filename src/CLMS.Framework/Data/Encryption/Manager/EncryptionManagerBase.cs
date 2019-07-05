@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using CLMS.Framework.Utilities;
 using log4net;
 
 namespace CLMS.Framework.Data.Encryption.Manager
@@ -10,10 +11,10 @@ namespace CLMS.Framework.Data.Encryption.Manager
     {
         public string StringEncryptionKey;
 
-        private static EncryptionManagerBase _instance;
         private static readonly ILog Logger = LogManager.GetLogger(typeof(EncryptionManagerBase));
 
-        public static EncryptionManagerBase Instance => _instance ?? (_instance = new EncryptionManagerBase());
+        public static EncryptionManagerBase Instance => 
+            System.Web.Http.GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(EncryptionManagerBase)) as EncryptionManagerBase;
 
         public EncryptionManagerBase()
         {
