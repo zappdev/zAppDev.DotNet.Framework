@@ -13,8 +13,12 @@ namespace CLMS.Framework.Data.Encryption.Manager
 
         private static readonly ILog Logger = LogManager.GetLogger(typeof(EncryptionManagerBase));
 
+#if NETFRAMEWORK
         public static EncryptionManagerBase Instance => 
             System.Web.Http.GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(EncryptionManagerBase)) as EncryptionManagerBase;
+#else
+        public static EncryptionManagerBase Instance => ServiceLocator.Current.GetInstance<EncryptionManagerBase>();
+#endif
 
         public EncryptionManagerBase()
         {
@@ -26,7 +30,7 @@ namespace CLMS.Framework.Data.Encryption.Manager
             StringEncryptionKey = GetEncryptionKey();
         }
 
-        #region Security Keys
+#region Security Keys
 
 
         public virtual string GetEncryptionKey()
@@ -34,9 +38,9 @@ namespace CLMS.Framework.Data.Encryption.Manager
             throw new NotImplementedException("GetEncryptionKey");
         }
         
-        #endregion
+#endregion
 
-        #region String Value
+#region String Value
 
         public static string EncryptString(string stringValue, string encryptionKey)
         {
@@ -121,9 +125,9 @@ namespace CLMS.Framework.Data.Encryption.Manager
             return DecryptString(encryptedString, StringEncryptionKey);
         }
 
-        #endregion
+#endregion
 
-        #region Integer Value
+#region Integer Value
 
         public static string EncryptInteger(string stringValue, string encryptionKey)
         {
@@ -208,9 +212,9 @@ namespace CLMS.Framework.Data.Encryption.Manager
             return DecryptInteger(encryptedString, StringEncryptionKey);
         }
 
-        #endregion
+#endregion
 
-        #region Object Value
+#region Object Value
 
         public static byte[] EncryptObject(string value, string encryptionKey)
         {
@@ -237,7 +241,7 @@ namespace CLMS.Framework.Data.Encryption.Manager
             return DecryptObject(encryptedString, StringEncryptionKey);
         }
 
-        #endregion
+#endregion
 
         public static bool IsBase64String(string s)
         {

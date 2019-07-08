@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using CLMS.Framework.Data.DAL;
+using CLMS.Framework.Utilities;
 
 namespace CLMS.Framework.Workflow
 {
@@ -10,10 +11,8 @@ namespace CLMS.Framework.Workflow
     {
         public IRepositoryBuilder Builder;
 
-        private static readonly Lazy<WorkflowManager> Lazy =
-            new Lazy<WorkflowManager>(() => new WorkflowManager());
-
-        public static WorkflowManager Current => Lazy.Value;
+        public static WorkflowManager Current => 
+            ServiceLocator.Current.GetInstance<WorkflowManager>(); //Lazy.Value;
 
         private List<Type> _workflowImplementationTypes = new List<Type>();
 

@@ -1,6 +1,10 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
 
+#if NETFRAMEWORK
+using CommonServiceLocator;
+#endif
+
 namespace CLMS.Framework.Utilities
 {
     /// <summary>
@@ -20,7 +24,11 @@ namespace CLMS.Framework.Utilities
             _currentServiceProvider = currentServiceProvider;
         }
 
+#if NETFRAMEWORK
+        public static IServiceLocator Current => CommonServiceLocator.ServiceLocator.Current;
+#else
         public static ServiceLocator Current => new ServiceLocator(_serviceProvider);
+#endif
 
         public static void SetLocatorProvider(IServiceProvider serviceProvider)
         {
