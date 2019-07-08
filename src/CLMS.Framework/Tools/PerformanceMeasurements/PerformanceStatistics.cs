@@ -9,6 +9,8 @@ namespace CLMS.Framework.Tools.PerformanceMeasurements
     {
         public string Controller;
         public string Action;
+        public string UserHostAddress;
+        public string DateTime;
 
         public ControllerActionStatistics ControllerActionStatistics { get; set; }
         public DataStatistics RequestStatistics { get; set; }

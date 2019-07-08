@@ -97,7 +97,7 @@ namespace CLMS.Framework.Tools.PerformanceMeasurements
             }
         }//end Get()
 
-        public void Log(string controller, string action)
+        public void Log(string controller, string action, string userHostAddress)
         {
             try
             {
@@ -106,6 +106,8 @@ namespace CLMS.Framework.Tools.PerformanceMeasurements
 
                 statistics.Controller = controller;
                 statistics.Action = action;
+                statistics.UserHostAddress = userHostAddress;
+                statistics.DateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss,fff");
 
                 var logText = statistics.GetLog(true);
                 _monitorLog.Info(logText);
