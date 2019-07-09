@@ -1,6 +1,6 @@
 ﻿namespace CLMS.Framework.Data.DAL
 {
-    public interface ICreateRepository
+    public interface ICreateRepository: IRetrieveRepository
     {
         void SaveWithoutTransaction<T>(T entity) where T : class;
 
