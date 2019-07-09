@@ -15,6 +15,7 @@ using CLMS.Framework.Data;
 using Newtonsoft.Json;
 using CLMS.Framework.Identity.Model;
 using CLMS.Framework.Utilities;
+using CLMS.Framework.Hubs;
 
 namespace CLMS.Framework.Identity
 {
@@ -69,7 +70,9 @@ namespace CLMS.Framework.Identity
                 DefaultAuthenticationTypes.ExternalCookie,
                 DefaultAuthenticationTypes.TwoFactorCookie,
                 DefaultAuthenticationTypes.TwoFactorRememberBrowserCookie);
-            Hubs.EventsHub.RaiseSignOut(HttpContext.Current.User.Identity.Name, DateTime.UtcNow);
+
+            ServiceLocator.Current.GetInstance<IApplicationHub>()?
+                .RaiseSignOutEvent(HttpContext.Current.User.Identity.Name, DateTime.UtcNow);
         }
 
         public static string GetUserProfile()
@@ -240,7 +243,8 @@ namespace CLMS.Framework.Identity
         {
             try
             {
-                Hubs.EventsHub.RaiseExternalUserCreating(user.User);
+                ServiceLocator.Current.GetInstance<IApplicationHub>()?
+                    .RaiseExternalUserCreatingEvent(user.User);
             }
             catch (Exception e)
             {
@@ -651,7 +655,8 @@ namespace CLMS.Framework.Identity
                                               HttpContext.Current.Request.Browser.Type,
                                               HttpContext.Current.Request.UserHostAddress,
                                               HttpContext.Current.Session != null ? HttpContext.Current.Session.SessionID : string.Empty);
-                Hubs.EventsHub.RaiseSignIn(username, DateTime.UtcNow);
+                ServiceLocator.Current.GetInstance<IApplicationHub>()?
+                    .RaiseSignInEvent(username, DateTime.UtcNow);
                 return true;
             case SignInStatus.RequiresVerification:
                 log.Error("Requires Verification!");
@@ -676,7 +681,7 @@ namespace CLMS.Framework.Identity
                                               HttpContext.Current.Request.Browser.Type,
                                               HttpContext.Current.Request.UserHostAddress,
                                               HttpContext.Current.Session != null ? HttpContext.Current.Session.SessionID : string.Empty);
-                Hubs.EventsHub.RaiseSignIn(loginInfo.DefaultUserName, DateTime.UtcNow);
+                ServiceLocator.Current.GetInstance<IApplicationHub>()?.RaiseSignInEvent(loginInfo.DefaultUserName, DateTime.UtcNow);
                 return true;
             case SignInStatus.RequiresVerification:
                 log.Error("Requires Verification!");
