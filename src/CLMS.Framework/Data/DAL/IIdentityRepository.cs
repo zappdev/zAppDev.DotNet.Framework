@@ -4,6 +4,6 @@ namespace CLMS.Framework.Data.DAL
 {
     public interface IIdentityRepository: ICreateRepository
     {
-        void DeleteApplicationUser(ApplicationUser user);
+        void DeleteApplicationUser(ApplicationUser applicationuser, bool doNotCallDeleteForThis = false, bool isCascaded = false, object calledBy = null);
     }
 }
