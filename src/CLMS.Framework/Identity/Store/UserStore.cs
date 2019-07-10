@@ -37,7 +37,7 @@ namespace CLMS.Framework.Identity
         public UserStore(MiniSessionManager sessionManager, Data.DAL.IRepositoryBuilder repositoryBuilder = null)
         {
             _sessionManager = sessionManager;
-            _repositoryBuilder = repositoryBuilder;
+            _repositoryBuilder = repositoryBuilder ?? ServiceLocator.Current.GetInstance<Data.DAL.IRepositoryBuilder>();
         }
 
         private ISession GetCurrentSession()

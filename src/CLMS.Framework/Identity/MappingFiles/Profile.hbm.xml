@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" default-lazy="true" auto-import="false" assembly="CLMS.Framework" namespace="CLMS.Framework.Identity.Model">
+    <class name="Profile" table="`Profiles`" schema="`security`">
+        <cache usage="read-write" region="security" />
+        <id name="Id" column="`Id`" type="System.Int32">
+            <generator class="NHibernate.Id.Enhanced.TableGenerator">
+                <param name="increment_size">200</param>
+                <param name="segment_value">Profiles</param>
+                <param name="optimizer">pooled-lo</param>
+            </generator>
+        </id>
+        <version name="VersionTimestamp" column="`VersionTimestamp`" type="Byte[]" generated="always">
+            <column name="`VersionTimestamp`" not-null="false" sql-type="timestamp" />
+        </version>
+        <property name="LanguageLCID" column="`LanguageLCID`" type="System.Nullable`1[[System.Int32, mscorlib]], mscorlib" not-null="false" />
+        <property name="LocaleLCID" column="`LocaleLCID`" type="System.Nullable`1[[System.Int32, mscorlib]], mscorlib" not-null="false" />
+        <property name="Theme" column="`Theme`" type="String" not-null="false" length="100" />
+        <bag batch-size="100" name="Settings" access="field.camelcase" inverse="true" cascade="persist,merge,all-delete-orphan">
+            <cache usage="read-write" region="security" />
+            <key column="`ParentProfile`" foreign-key="FK_Profiles_To_ProfileSettings_On_Settings" />
+            <one-to-many class="ProfileSetting" />
+        </bag>
+    </class>
+</hibernate-mapping>

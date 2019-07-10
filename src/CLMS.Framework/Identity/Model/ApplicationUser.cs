@@ -1223,6 +1223,31 @@ namespace CLMS.Framework.Identity.Model
 
         #endregion
 
+        public virtual bool IsInRole(string roleName)
+        {
+#if NETFRAMEWORK
+            using (new Profiling.Profiler(nameof(ApplicationUser), Profiling.AppDevSymbolType.ClassOperation, nameof(ApplicationUser.IsInRole)))
+            {
+                return Roles?.Any((r) => r.Name == roleName) ?? false;
+            }
+#else
+            return Roles?.Any((r) => r.Name == roleName) ?? false;
+#endif
+        }
+
+        public virtual bool HasPermission(string permission)
+        {
+#if NETFRAMEWORK
+            using (new Profiling.Profiler(nameof(ApplicationUser), Profiling.AppDevSymbolType.ClassOperation, nameof(ApplicationUser.HasPermission)))
+            {
+                bool hasPermissionfromRoles = (Roles?.Any((rr) => rr.Permissions.Any((pp) => pp.Name == permission)) ?? false);
+                return hasPermissionfromRoles || (Permissions?.Any((pp) => pp.Name == permission) ?? false);
+            }
+#else
+            bool hasPermissionfromRoles = (Roles?.Any((rr) => rr.Permissions.Any((pp) => pp.Name == permission)) ?? false);
+            return hasPermissionfromRoles || (Permissions?.Any((pp) => pp.Name == permission) ?? false);
+#endif
+        }
 
     }
 }

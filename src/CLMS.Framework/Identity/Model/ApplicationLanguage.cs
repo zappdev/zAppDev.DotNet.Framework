@@ -379,7 +379,5 @@ namespace CLMS.Framework.Identity.Model
         }
 
         #endregion
-
-
     }
 }

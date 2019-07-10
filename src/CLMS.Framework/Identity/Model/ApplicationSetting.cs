@@ -10,6 +10,8 @@ using System.Linq.Expressions;
 using CLMS.Framework.Linq;
 using CLMS.Framework.Data.Domain;
 using CLMS.Framework.Workflow;
+using CLMS.Framework.Utilities;
+using CLMS.Framework.Data.DAL;
 
 namespace CLMS.Framework.Identity.Model
 {
@@ -23,7 +25,7 @@ namespace CLMS.Framework.Identity.Model
     {
         #region ApplicationSetting's Fields
 
-        protected Guid _transientId= Guid.NewGuid();
+        protected Guid _transientId = Guid.NewGuid();
         public virtual Guid TransientId
         {
             get
@@ -35,24 +37,24 @@ namespace CLMS.Framework.Identity.Model
                 _transientId = value;
             }
         }
-        [DataMember(Name="Id")]
+        [DataMember(Name = "Id")]
         protected int? id = 0;
-        [DataMember(Name="Key")]
+        [DataMember(Name = "Key")]
         protected string key;
-        [DataMember(Name="Value")]
+        [DataMember(Name = "Value")]
         protected string _value;
-        [DataMember(Name="IsCustom")]
+        [DataMember(Name = "IsCustom")]
         protected bool isCustom;
-        [DataMember(Name="VersionTimestamp")]
+        [DataMember(Name = "VersionTimestamp")]
         protected byte[] versionTimestamp;
 
         #endregion
         #region ApplicationSetting's Properties
-/// <summary>
-/// The Id property
-///
-/// </summary>
-///
+        /// <summary>
+        /// The Id property
+        ///
+        /// </summary>
+        ///
         [Key]
         public virtual int? Id
         {
@@ -65,11 +67,11 @@ namespace CLMS.Framework.Identity.Model
                 id = value;
             }
         }
-/// <summary>
-/// The Key property
-///
-/// </summary>
-///
+        /// <summary>
+        /// The Key property
+        ///
+        /// </summary>
+        ///
         public virtual string Key
         {
             get
@@ -81,11 +83,11 @@ namespace CLMS.Framework.Identity.Model
                 key = value;
             }
         }
-/// <summary>
-/// The Value property
-///
-/// </summary>
-///
+        /// <summary>
+        /// The Value property
+        ///
+        /// </summary>
+        ///
         public virtual string Value
         {
             get
@@ -97,11 +99,11 @@ namespace CLMS.Framework.Identity.Model
                 _value = value;
             }
         }
-/// <summary>
-/// The IsCustom property
-///
-/// </summary>
-///
+        /// <summary>
+        /// The IsCustom property
+        ///
+        /// </summary>
+        ///
         public virtual bool IsCustom
         {
             get
@@ -113,11 +115,11 @@ namespace CLMS.Framework.Identity.Model
                 isCustom = value;
             }
         }
-/// <summary>
-/// The VersionTimestamp property
-///Provides concurrency control for the class
-/// </summary>
-///
+        /// <summary>
+        /// The VersionTimestamp property
+        ///Provides concurrency control for the class
+        /// </summary>
+        ///
         public virtual byte[] VersionTimestamp
         {
             get
@@ -131,12 +133,12 @@ namespace CLMS.Framework.Identity.Model
         }
         #endregion
         #region Constructors
-/// <summary>
-/// Public constructors of the ApplicationSetting class
-/// </summary>
-/// <returns>New ApplicationSetting object</returns>
-/// <remarks></remarks>
-        public ApplicationSetting() {}
+        /// <summary>
+        /// Public constructors of the ApplicationSetting class
+        /// </summary>
+        /// <returns>New ApplicationSetting object</returns>
+        /// <remarks></remarks>
+        public ApplicationSetting() { }
         #endregion
         #region Methods
 
@@ -157,7 +159,7 @@ namespace CLMS.Framework.Identity.Model
             }
             if (throwException && __errors.Any())
             {
-                throw new CLMS.Framework.Exceptions.BusinessException("An instance of TypeClass 'ApplicationSetting' has validation errors:\r\n\r\n" + string.Join("\r\n", __errors));
+                throw new Exceptions.BusinessException("An instance of TypeClass 'ApplicationSetting' has validation errors:\r\n\r\n" + string.Join("\r\n", __errors));
             }
             return __errors;
         }
@@ -168,7 +170,7 @@ namespace CLMS.Framework.Identity.Model
             hashCode = hashCode * -1521134295 + (Id?.GetHashCode() ?? 0);
             hashCode = hashCode * -1521134295 + (Key?.GetHashCode() ?? 0);
             hashCode = hashCode * -1521134295 + (Value?.GetHashCode() ?? 0);
-            hashCode = hashCode * -1521134295 + (IsCustom.GetHashCode() );
+            hashCode = hashCode * -1521134295 + (IsCustom.GetHashCode());
             return hashCode;
         }
 
@@ -177,18 +179,18 @@ namespace CLMS.Framework.Identity.Model
 
 
 
-/// <summary>
-/// Copies the current object to a new instance
-/// </summary>
-/// <param name="deep">Copy members that refer to objects external to this class (not dependent)</param>
-/// <param name="copiedObjects">Objects that should be reused</param>
-/// <param name="asNew">Copy the current object as a new one, ready to be persisted, along all its members.</param>
-/// <param name="reuseNestedObjects">If asNew is true, this flag if set, forces the reuse of all external objects.</param>
-/// <param name="copy">Optional - An existing [ApplicationSetting] instance to use as the destination.</param>
-/// <returns>A copy of the object</returns>
-        public virtual ApplicationSetting Copy(bool deep=false, Hashtable copiedObjects=null, bool asNew=false, bool reuseNestedObjects = false, ApplicationSetting copy = null)
+        /// <summary>
+        /// Copies the current object to a new instance
+        /// </summary>
+        /// <param name="deep">Copy members that refer to objects external to this class (not dependent)</param>
+        /// <param name="copiedObjects">Objects that should be reused</param>
+        /// <param name="asNew">Copy the current object as a new one, ready to be persisted, along all its members.</param>
+        /// <param name="reuseNestedObjects">If asNew is true, this flag if set, forces the reuse of all external objects.</param>
+        /// <param name="copy">Optional - An existing [ApplicationSetting] instance to use as the destination.</param>
+        /// <returns>A copy of the object</returns>
+        public virtual ApplicationSetting Copy(bool deep = false, Hashtable copiedObjects = null, bool asNew = false, bool reuseNestedObjects = false, ApplicationSetting copy = null)
         {
-            if(copiedObjects == null)
+            if (copiedObjects == null)
             {
                 copiedObjects = new Hashtable();
             }
@@ -231,7 +233,7 @@ namespace CLMS.Framework.Identity.Model
             return this.IsTransient() && compareTo.IsTransient() && (base.Equals(compareTo) || this.TransientId.Equals(compareTo.TransientId));
         }
 
-// Maintain equality operator semantics for entities.
+        // Maintain equality operator semantics for entities.
         public static bool operator ==(ApplicationSetting x, ApplicationSetting y)
         {
             // By default, == and Equals compares references. In order to
@@ -241,7 +243,7 @@ namespace CLMS.Framework.Identity.Model
             return Equals(x, y);
         }
 
-// Maintain inequality operator semantics for entities.
+        // Maintain inequality operator semantics for entities.
         public static bool operator !=(ApplicationSetting x, ApplicationSetting y)
         {
             return !(x == y);
@@ -258,13 +260,13 @@ namespace CLMS.Framework.Identity.Model
         }
 
 
-/// <summary>
-///     To help ensure hashcode uniqueness, a carefully selected random number multiplier
-///     is used within the calculation.  Goodrich and Tamassia's Data Structures and
-///     Algorithms in Java asserts that 31, 33, 37, 39 and 41 will produce the fewest number
-///     of collissions.  See http://computinglife.wordpress.com/2008/11/20/why-do-hash-functions-use-prime-numbers/
-///     for more information.
-/// </summary>
+        /// <summary>
+        ///     To help ensure hashcode uniqueness, a carefully selected random number multiplier
+        ///     is used within the calculation.  Goodrich and Tamassia's Data Structures and
+        ///     Algorithms in Java asserts that 31, 33, 37, 39 and 41 will produce the fewest number
+        ///     of collissions.  See http://computinglife.wordpress.com/2008/11/20/why-do-hash-functions-use-prime-numbers/
+        ///     for more information.
+        /// </summary>
         private const int HashMultiplier = 31;
         private int? cachedHashcode;
 
@@ -293,34 +295,34 @@ namespace CLMS.Framework.Identity.Model
             return this.cachedHashcode.Value;
         }
 
-/// <summary>
-///     Transient objects are not associated with an item already in storage.  For instance,
-///     a Customer is transient if its Id is 0.  It's virtual to allow NHibernate-backed
-///     objects to be lazily loaded.
-/// </summary>
+        /// <summary>
+        ///     Transient objects are not associated with an item already in storage.  For instance,
+        ///     a Customer is transient if its Id is 0.  It's virtual to allow NHibernate-backed
+        ///     objects to be lazily loaded.
+        /// </summary>
         public virtual bool IsTransient()
         {
             return this.Id == default(int) || this.Id.Equals(default(int));
         }
 
-/// <summary>
-///     When NHibernate proxies objects, it masks the type of the actual entity object.
-///     This wrapper burrows into the proxied object to get its actual type.
-///
-///     Although this assumes NHibernate is being used, it doesn't require any NHibernate
-///     related dependencies and has no bad side effects if NHibernate isn't being used.
-///
-///     Related discussion is at http://groups.google.com/group/sharp-architecture/browse_thread/thread/ddd05f9baede023a ...thanks Jay Oliver!
-/// </summary>
-        protected virtual System.Type GetTypeUnproxied()
+        /// <summary>
+        ///     When NHibernate proxies objects, it masks the type of the actual entity object.
+        ///     This wrapper burrows into the proxied object to get its actual type.
+        ///
+        ///     Although this assumes NHibernate is being used, it doesn't require any NHibernate
+        ///     related dependencies and has no bad side effects if NHibernate isn't being used.
+        ///
+        ///     Related discussion is at http://groups.google.com/group/sharp-architecture/browse_thread/thread/ddd05f9baede023a ...thanks Jay Oliver!
+        /// </summary>
+        protected virtual Type GetTypeUnproxied()
         {
             return this.GetType();
         }
 
-/// <summary>
-///     Returns true if self and the provided entity have the same Id values
-///     and the Ids are not of the default Id value
-/// </summary>
+        /// <summary>
+        ///     Returns true if self and the provided entity have the same Id values
+        ///     and the Ids are not of the default Id value
+        /// </summary>
         protected bool HasSameNonDefaultIdAs(ApplicationSetting compareTo)
         {
             return !this.IsTransient() && !compareTo.IsTransient() && this.Id.Equals(compareTo.Id);
@@ -328,6 +330,69 @@ namespace CLMS.Framework.Identity.Model
 
         #endregion
 
+        public static string GetValue(string key)
+        {
+            var repo = ServiceLocator.Current.GetInstance<IRepositoryBuilder>().CreateRetrieveRepository();
+
+#if NETFRAMEWORK
+            using (new Profiling.Profiler(nameof(ApplicationSetting), Profiling.AppDevSymbolType.ClassOperation, nameof(ApplicationSetting.GetValue)))
+            {
+                var setting = repo.GetAsQueryable<ApplicationSetting>((s) => s.Key == key)?.FirstOrDefault();
+                if (setting == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    return setting?.Value ?? "";
+                }
+            }
+#else
+            var setting = repo.GetAsQueryable<ApplicationSetting>((s) => s.Key == key)?.FirstOrDefault();
+            if (setting == null)
+            {
+                return null;
+            }
+            else
+            {
+                return setting?.Value ?? "";
+            }
+#endif            
+        }
+
+        public static void SetValue(string key, string value)
+        {
+            var repo = ServiceLocator.Current.GetInstance<IRepositoryBuilder>().CreateCreateRepository();
+
+#if NETFRAMEWORK
+            using (new Profiling.Profiler(nameof(ApplicationSetting), Profiling.AppDevSymbolType.ClassOperation, nameof(ApplicationSetting.SetValue)))
+            {
+                var setting = repo.GetAsQueryable<ApplicationSetting>((s) => s.Key == key)?.FirstOrDefault();
+                if (setting == null)
+                {
+                    setting = new ApplicationSetting
+                    {
+                        Key = key,
+                        IsCustom = true
+                    };
+                }
+                setting.Value = value;
+                repo.Save(setting);
+            }
+#else
+            var setting = repo.GetAsQueryable<ApplicationSetting>((s) => s.Key == key)?.FirstOrDefault();
+            if (setting == null)
+            {
+                setting = new ApplicationSetting
+                {
+                    Key = key,
+                    IsCustom = true
+                };
+            }
+            setting.Value = value;
+            repo.Save(setting);
+#endif
+        }
 
     }
 }
