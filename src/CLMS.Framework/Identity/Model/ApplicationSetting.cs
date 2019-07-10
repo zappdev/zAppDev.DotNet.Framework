@@ -10,6 +10,8 @@ using System.Linq.Expressions;
 using CLMS.Framework.Linq;
 using CLMS.Framework.Data.Domain;
 using CLMS.Framework.Workflow;
+using CLMS.Framework.Utilities;
+using CLMS.Framework.Data.DAL;
 
 namespace CLMS.Framework.Identity.Model
 {
@@ -157,7 +159,7 @@ namespace CLMS.Framework.Identity.Model
             }
             if (throwException && __errors.Any())
             {
-                throw new CLMS.Framework.Exceptions.BusinessException("An instance of TypeClass 'ApplicationSetting' has validation errors:\r\n\r\n" + string.Join("\r\n", __errors));
+                throw new Exceptions.BusinessException("An instance of TypeClass 'ApplicationSetting' has validation errors:\r\n\r\n" + string.Join("\r\n", __errors));
             }
             return __errors;
         }
@@ -312,7 +314,7 @@ namespace CLMS.Framework.Identity.Model
 ///
 ///     Related discussion is at http://groups.google.com/group/sharp-architecture/browse_thread/thread/ddd05f9baede023a ...thanks Jay Oliver!
 /// </summary>
-        protected virtual System.Type GetTypeUnproxied()
+        protected virtual Type GetTypeUnproxied()
         {
             return this.GetType();
         }
@@ -328,6 +330,43 @@ namespace CLMS.Framework.Identity.Model
 
         #endregion
 
+        public static string GetValue(string key)
+        {
+            var repo = ServiceLocator.Current.GetInstance<IRepositoryBuilder>().CreateRetrieveRepository();
+
+            using (new Profiling.Profiler(nameof(ApplicationSetting), Profiling.AppDevSymbolType.ClassOperation, nameof(ApplicationSetting.GetValue)))
+            {
+                var setting = repo.GetAsQueryable<ApplicationSetting>((s) => s.Key == key)?.FirstOrDefault();
+                if (setting == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    return setting?.Value ?? "";
+                }
+            }
+        }
+
+        public static void SetValue(string key, string value)
+        {
+            var repo = ServiceLocator.Current.GetInstance<IRepositoryBuilder>().CreateCreateRepository();
+
+            using (new Profiling.Profiler(nameof(ApplicationSetting), Profiling.AppDevSymbolType.ClassOperation, nameof(ApplicationSetting.SetValue)))
+            {
+                var setting = repo.GetAsQueryable<ApplicationSetting>((s) => s.Key == key)?.FirstOrDefault();
+                if (setting == null)
+                {
+                    setting = new ApplicationSetting
+                    {
+                        Key = key,
+                        IsCustom = true
+                    };
+                }
+                setting.Value = value;
+                repo.Save(setting);
+            }
+        }
 
     }
 }

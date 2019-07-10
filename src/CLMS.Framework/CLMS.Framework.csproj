@@ -34,10 +34,40 @@
     <DefineConstants>Linux</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Identity\MappingFiles\ApplicationClient.hbm.xml" />
+    <None Remove="Identity\MappingFiles\ApplicationLanguage.hbm.xml" />
+    <None Remove="Identity\MappingFiles\ApplicationOperation.hbm.xml" />
+    <None Remove="Identity\MappingFiles\ApplicationPermission.hbm.xml" />
+    <None Remove="Identity\MappingFiles\ApplicationRole.hbm.xml" />
+    <None Remove="Identity\MappingFiles\ApplicationSetting.hbm.xml" />
+    <None Remove="Identity\MappingFiles\ApplicationTheme.hbm.xml" />
+    <None Remove="Identity\MappingFiles\ApplicationUser.hbm.xml" />
+    <None Remove="Identity\MappingFiles\ApplicationUserAction.hbm.xml" />
+    <None Remove="Identity\MappingFiles\ApplicationUserClaim.hbm.xml" />
+    <None Remove="Identity\MappingFiles\ApplicationUserExternalProfile.hbm.xml" />
+    <None Remove="Identity\MappingFiles\ApplicationUserLogin.hbm.xml" />
+    <None Remove="Identity\MappingFiles\DateTimeFormat.hbm.xml" />
+    <None Remove="Identity\MappingFiles\Profile.hbm.xml" />
+    <None Remove="Identity\MappingFiles\ProfileSetting.hbm.xml" />
     <None Remove="Workflow\WorkflowContextBase.hbm.xml" />
     <None Remove="Workflow\WorkflowSchedule.hbm.xml" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Identity\MappingFiles\ApplicationClient.hbm.xml" />
+    <EmbeddedResource Include="Identity\MappingFiles\ApplicationLanguage.hbm.xml" />
+    <EmbeddedResource Include="Identity\MappingFiles\ApplicationOperation.hbm.xml" />
+    <EmbeddedResource Include="Identity\MappingFiles\ApplicationPermission.hbm.xml" />
+    <EmbeddedResource Include="Identity\MappingFiles\ApplicationRole.hbm.xml" />
+    <EmbeddedResource Include="Identity\MappingFiles\ApplicationSetting.hbm.xml" />
+    <EmbeddedResource Include="Identity\MappingFiles\ApplicationTheme.hbm.xml" />
+    <EmbeddedResource Include="Identity\MappingFiles\ApplicationUser.hbm.xml" />
+    <EmbeddedResource Include="Identity\MappingFiles\ApplicationUserAction.hbm.xml" />
+    <EmbeddedResource Include="Identity\MappingFiles\ApplicationUserClaim.hbm.xml" />
+    <EmbeddedResource Include="Identity\MappingFiles\ApplicationUserExternalProfile.hbm.xml" />
+    <EmbeddedResource Include="Identity\MappingFiles\ApplicationUserLogin.hbm.xml" />
+    <EmbeddedResource Include="Identity\MappingFiles\DateTimeFormat.hbm.xml" />
+    <EmbeddedResource Include="Identity\MappingFiles\Profile.hbm.xml" />
+    <EmbeddedResource Include="Identity\MappingFiles\ProfileSetting.hbm.xml" />
     <EmbeddedResource Include="Workflow\WorkflowContextBase.hbm.xml" />
     <EmbeddedResource Include="Workflow\WorkflowSchedule.hbm.xml" />
   </ItemGroup>

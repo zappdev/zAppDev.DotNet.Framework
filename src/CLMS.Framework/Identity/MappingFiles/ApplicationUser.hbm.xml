@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" default-lazy="true" auto-import="false" assembly="TestService.Backend" namespace="TestService.BO">
+    <class name="ApplicationUser" table="`ApplicationUsers`" schema="`security`">
+        <cache usage="read-write" region="security" />
+        <id name="UserName" column="`UserName`" type="String" length="256">
+            <generator class="assigned" />
+        </id>
+        <version name="VersionTimestamp" column="`VersionTimestamp`" type="Byte[]" generated="always">
+            <column name="`VersionTimestamp`" not-null="false" sql-type="timestamp" />
+        </version>
+        <property name="PasswordHash" column="`PasswordHash`" type="String" not-null="false" length="4001" />
+        <property name="SecurityStamp" column="`SecurityStamp`" type="String" not-null="false" length="4001" />
+        <property name="EmailConfirmed" column="`EmailConfirmed`" type="System.Boolean" not-null="false" />
+        <property name="LockoutEnabled" column="`LockoutEnabled`" type="System.Boolean" not-null="false" />
+        <property name="PhoneNumberConfirmed" column="`PhoneNumberConfirmed`" type="System.Boolean" not-null="false" />
+        <property name="TwoFactorEnabled" column="`TwoFactorEnabled`" type="System.Boolean" not-null="false" />
+        <property name="AccessFailedCount" column="`AccessFailedCount`" type="System.Nullable`1[[System.Int32, mscorlib]], mscorlib" not-null="false" />
+        <property name="Name" column="`Name`" type="String" not-null="false" length="256" />
+        <property name="Email" column="`Email`" type="String" not-null="false" length="255" />
+        <property name="PhoneNumber" column="`PhoneNumber`" type="String" not-null="false" length="255" />
+        <property name="LockoutEndDate" type="System.Nullable`1[[System.DateTime, mscorlib]], mscorlib" not-null="false">
+            <column name="`LockoutEndDate`" sql-type="datetime" />
+        </property>
+        <bag batch-size="100" name="Permissions" table="`ApplicationPermissions_To_ApplicationUsers`" schema="`security`" access="field.camelcase" cascade="persist,merge,save-update">
+            <cache usage="read-write" region="security" />
+            <key column="`Users`" foreign-key="FK_ApplicationUsers_To_ApplicationPermissions_On_Permissions" />
+            <many-to-many class="ApplicationPermission" column="`Permissions`" />
+        </bag>
+        <bag batch-size="100" name="Roles" table="`ApplicationRoles_To_ApplicationUsers`" schema="`security`" access="field.camelcase" cascade="persist,merge,save-update">
+            <cache usage="read-write" region="security" />
+            <key column="`Users`" foreign-key="FK_ApplicationUsers_To_ApplicationRoles_On_Roles" />
+            <many-to-many class="ApplicationRole" column="`Roles`" />
+        </bag>
+        <bag batch-size="100" name="Clients" access="field.camelcase" inverse="true" cascade="persist,merge,all-delete-orphan">
+            <cache usage="read-write" region="security" />
+            <key column="`User`" foreign-key="FK_ApplicationUsers_To_ApplicationClients_On_Clients" />
+            <one-to-many class="ApplicationClient" />
+        </bag>
+        <bag batch-size="100" name="Logins" access="field.camelcase" inverse="true" cascade="persist,merge,all-delete-orphan">
+            <cache usage="read-write" region="security" />
+            <key column="`User`" foreign-key="FK_ApplicationUsers_To_ApplicationUserLogins_On_Logins" />
+            <one-to-many class="ApplicationUserLogin" />
+        </bag>
+        <bag batch-size="100" name="Claims" access="field.camelcase" inverse="true" cascade="persist,merge,all-delete-orphan">
+            <cache usage="read-write" region="security" />
+            <key column="`User`" foreign-key="FK_ApplicationUsers_To_ApplicationUserClaims_On_Claims" />
+            <one-to-many class="ApplicationUserClaim" />
+        </bag>
+        <many-to-one name="Profile" access="field.camelcase" class="Profile" column="`Profile`" cascade="all" unique="false" foreign-key="FK_ApplicationUsers_To_Profiles_On_Profile" />
+    </class>
+</hibernate-mapping>
