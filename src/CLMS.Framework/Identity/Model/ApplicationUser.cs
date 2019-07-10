@@ -1223,7 +1223,7 @@ namespace CLMS.Framework.Identity.Model
 
         #endregion
 
-        public bool IsInRole(string roleName)
+        public virtual bool IsInRole(string roleName)
         {
 #if NETFRAMEWORK
             using (new Profiling.Profiler(nameof(ApplicationUser), Profiling.AppDevSymbolType.ClassOperation, nameof(ApplicationUser.IsInRole)))
@@ -1235,7 +1235,7 @@ namespace CLMS.Framework.Identity.Model
 #endif
         }
 
-        public bool HasPermission(string permission)
+        public virtual bool HasPermission(string permission)
         {
 #if NETFRAMEWORK
             using (new Profiling.Profiler(nameof(ApplicationUser), Profiling.AppDevSymbolType.ClassOperation, nameof(ApplicationUser.HasPermission)))
