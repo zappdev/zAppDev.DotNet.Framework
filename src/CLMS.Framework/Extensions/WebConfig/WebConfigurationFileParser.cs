@@ -89,6 +89,7 @@ namespace CLMS.Framework.Extensions.WebConfig
                     case "name":
                     case "region":
                     case "path":
+                    case "assembly":
                         key = reader.Value;
                         break;
                     default:
