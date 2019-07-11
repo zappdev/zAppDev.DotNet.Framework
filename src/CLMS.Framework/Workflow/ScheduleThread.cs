@@ -241,7 +241,7 @@ namespace CLMS.Framework.Workflow
                         ScheduleLog.Debug("Exit StartScheduleThread() !_scheduleThreadEnabled");
                     return;
                 }
-                HttpContext lHttpContext = httpContext ?? Web.GetContext();
+                HttpContext lHttpContext = httpContext ?? Utilities.Web.GetContext();
                 if (_scheduleThread != null)
                 {
                     if (_scheduleThreadAnalyticDebugOn)

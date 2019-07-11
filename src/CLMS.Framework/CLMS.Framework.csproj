@@ -106,14 +106,12 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net472' OR '$(TargetFramework)' == 'net462'">
     <PackageReference Include="DotNetZip" Version="1.12.0" />
-
     <PackageReference Include="Autofac" Version="4.5.0" />
     <PackageReference Include="Autofac.Extras.CommonServiceLocator" Version="5.0.0" />
-
     <PackageReference Include="CacheManager.SystemRuntimeCaching" Version="1.0.1" />
     <PackageReference Include="CSharpVerbalExpressions" Version="0.1.0" />
     <PackageReference Include="Glimpse" Version="1.8.6" />
-
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.3" />
     <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.6" />
@@ -122,13 +120,13 @@
     <PackageReference Include="Microsoft.Owin" Version="3.1.0" />
     <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="3.1.0" />
     <PackageReference Include="Microsoft.Owin.Security" Version="3.1.0" />
-
     <PackageReference Include="NLog" Version="4.5.11" />
     <PackageReference Include="Owin" Version="1.0" />
     <PackageReference Include="Purplelight.Framework.Autofac.Integration.WebApi" Version="0.2.2" />
+    <PackageReference Include="PDFsharp" Version="1.50.5147" />
+    <PackageReference Include="PDFsharp-MigraDoc" Version="1.50.5147" />
     <PackageReference Include="S22.Imap" Version="3.6.0.0" />
     <PackageReference Include="System.Runtime.Caching" Version="4.5.0" />
-
     <PackageReference Include="System.IO.Compression" Version="4.3.0" />
     <PackageReference Include="System.Management.Automation" Version="6.1.7601.17515" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
@@ -138,7 +136,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
-    <PackageReference Include="Iconic.Zlib.Netstandard" Version="1.0.0" />
+    <PackageReference Include="DotNetZip.NetStandard" Version="1.12.0" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
@@ -156,12 +154,15 @@
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.2.0" />
     <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.1.1" />
     <PackageReference Include="RSG.Promise.Core" Version="3.0.0" />
+    <PackageReference Include="PdfSharp.MigraDoc.Standard" Version="1.51.*" />
+    <PackageReference Include="PDFSharp.Standard" Version="1.51.*" />
     <PackageReference Include="S22.Imap.Core" Version="3.6.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />
     <PackageReference Include="System.CodeDom" Version="4.5.0" />
@@ -197,6 +198,9 @@
     </Reference>
     <Reference Include="WebApi.OutputCache.Core">
       <HintPath>..\..\Lib\WebApi.OutputCache.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="WebApiThrottle">
+      <HintPath>..\..\Lib\WebApiThrottle.dll</HintPath>
     </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.ApplicationServices" />
