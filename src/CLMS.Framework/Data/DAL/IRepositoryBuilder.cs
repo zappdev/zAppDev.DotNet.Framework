@@ -1,4 +1,6 @@
-﻿using CLMS.Framework.Workflow;
+﻿using CLMS.Framework.Auditing;
+using CLMS.Framework.Identity;
+using CLMS.Framework.Workflow;
 
 namespace CLMS.Framework.Data.DAL
 {
@@ -13,6 +15,7 @@ namespace CLMS.Framework.Data.DAL
         ICreateRepository CreateCreateRepository(MiniSessionManager manager = null);
         IDeleteRepository CreateDeleteRepository(MiniSessionManager manager = null);
         IIdentityRepository CreateIdentityRepository(MiniSessionManager sessionManager);
+        IAuditingRepository CreateAuditingRepository(MiniSessionManager sessionManager = null);
 #else
         IRetrieveRepository CreateRetrieveRepository(MiniSessionService manager = null);
         IWorkflowRepository CreateWorkflowRepository(MiniSessionService manager = null);
@@ -27,6 +30,7 @@ namespace CLMS.Framework.Data.DAL
         ICreateRepository CreateCreateRepository(IMiniSessionService sessionManager);
         IDeleteRepository CreateDeleteRepository(IMiniSessionService manager);
         IIdentityRepository CreateIdentityRepository(IMiniSessionService sessionManager);
+        IAuditingRepository CreateAuditingRepository(IMiniSessionService sessionManager = null);
 #endif
 
 

@@ -34,6 +34,11 @@
     <DefineConstants>Linux</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Auditing\MappingFiles\AuditEntityConfiguration.hbm.xml" />
+    <None Remove="Auditing\MappingFiles\AuditLogEntry.hbm.xml" />
+    <None Remove="Auditing\MappingFiles\AuditLogEntryType.hbm.xml" />
+    <None Remove="Auditing\MappingFiles\AuditLogPropertyActionType.hbm.xml" />
+    <None Remove="Auditing\MappingFiles\AuditPropertyConfiguration.hbm.xml" />
     <None Remove="Identity\MappingFiles\ApplicationClient.hbm.xml" />
     <None Remove="Identity\MappingFiles\ApplicationLanguage.hbm.xml" />
     <None Remove="Identity\MappingFiles\ApplicationOperation.hbm.xml" />
@@ -53,6 +58,11 @@
     <None Remove="Workflow\WorkflowSchedule.hbm.xml" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Auditing\MappingFiles\AuditEntityConfiguration.hbm.xml" />
+    <EmbeddedResource Include="Auditing\MappingFiles\AuditLogEntry.hbm.xml" />
+    <EmbeddedResource Include="Auditing\MappingFiles\AuditLogEntryType.hbm.xml" />
+    <EmbeddedResource Include="Auditing\MappingFiles\AuditLogPropertyActionType.hbm.xml" />
+    <EmbeddedResource Include="Auditing\MappingFiles\AuditPropertyConfiguration.hbm.xml" />
     <EmbeddedResource Include="Identity\MappingFiles\ApplicationClient.hbm.xml" />
     <EmbeddedResource Include="Identity\MappingFiles\ApplicationLanguage.hbm.xml" />
     <EmbeddedResource Include="Identity\MappingFiles\ApplicationOperation.hbm.xml" />

@@ -1,6 +1,7 @@
-﻿using CLMS.Framework.Identity.Model;
+﻿using CLMS.Framework.Data.DAL;
+using CLMS.Framework.Identity.Model;
 
-namespace CLMS.Framework.Data.DAL
+namespace CLMS.Framework.Identity
 {
     public interface IIdentityRepository: ICreateRepository
     {

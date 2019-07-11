@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" default-lazy="true" auto-import="false" assembly="CLMS.Framework" namespace="CLMS.Framework.Auditing.Model">
+    <class name="AuditLogEntry" table="`AuditLogEntries`" schema="`audit`">
+        <cache usage="read-write" region="audit" />
+        <id name="Id" column="`Id`" type="System.Int32">
+            <generator class="NHibernate.Id.Enhanced.TableGenerator">
+                <param name="increment_size">200</param>
+                <param name="segment_value">AuditLogEntries</param>
+                <param name="optimizer">pooled-lo</param>
+            </generator>
+        </id>
+        <property name="UserName" column="`UserName`" type="String" not-null="false" length="4000" />
+        <property name="IPAddress" column="`IPAddress`" type="String" not-null="false" length="4000" />
+        <property name="EntityFullName" column="`EntityFullName`" type="String" not-null="false" length="4000" />
+        <property name="EntityShortName" column="`EntityShortName`" type="String" not-null="false" length="4000" />
+        <property name="EntityId" column="`EntityId`" type="String" not-null="false" length="4000" />
+        <property name="Timestamp" type="System.Nullable`1[[System.DateTime, mscorlib]], mscorlib" not-null="false">
+            <column name="`Timestamp`" sql-type="datetime" />
+        </property>
+        <property name="EntryTypeId" column="`EntryTypeId`" type="System.Nullable`1[[System.Int32, mscorlib]], mscorlib" not-null="false" />
+        <property name="ActionTypeId" column="`ActionTypeId`" type="System.Nullable`1[[System.Int32, mscorlib]], mscorlib" not-null="false" />
+        <property name="OldValue" column="`OldValue`" type="String" not-null="false" length="4000" />
+        <property name="NewValue" column="`NewValue`" type="String" not-null="false" length="4000" />
+        <property name="PropertyName" column="`PropertyName`" type="String" not-null="false" length="4000" />
+    </class>
+</hibernate-mapping>
