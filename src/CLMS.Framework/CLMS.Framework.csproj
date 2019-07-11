@@ -117,7 +117,8 @@
     <PackageReference Include="Owin" Version="1.0" />
     <PackageReference Include="Purplelight.Framework.Autofac.Integration.WebApi" Version="0.2.2" />
     <PackageReference Include="S22.Imap" Version="3.6.0.0" />
-    <PackageReference Include="Strathweb.CacheOutput.WebApi2" Version="0.11.0" />
+    <PackageReference Include="System.Runtime.Caching" Version="4.5.0" />
+
     <PackageReference Include="System.IO.Compression" Version="4.3.0" />
     <PackageReference Include="System.Management.Automation" Version="6.1.7601.17515" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
@@ -180,6 +181,12 @@
     </Reference>
     <Reference Include="CLMS.PDF.Helper">
       <HintPath>..\..\Lib\CLMS.PDF.Helper.dll</HintPath>
+    </Reference>
+    <Reference Include="WebApi.OutputCache.V2">
+      <HintPath>..\..\Lib\WebApi.OutputCache.V2.dll</HintPath>
+    </Reference>
+    <Reference Include="WebApi.OutputCache.Core">
+      <HintPath>..\..\Lib\WebApi.OutputCache.Core.dll</HintPath>
     </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.ApplicationServices" />
