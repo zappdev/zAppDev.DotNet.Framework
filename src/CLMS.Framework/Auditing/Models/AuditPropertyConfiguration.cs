@@ -412,18 +412,26 @@ namespace CLMS.Framework.Auditing.Model
         #endregion
 
         public virtual void UpdateAuditPropertyConfiguration(AuditPropertyConfiguration tmp)
-        {
-            using (new Profiling.Profiler(nameof(AuditPropertyConfiguration), Profiling.AppDevSymbolType.ClassOperation, "UpdateAuditPropertyConfiguration"))
+        {            
+#if NETFRAMEWORK
+            using (new Profiling.Profiler(nameof(AuditEntityConfiguration), Profiling.AppDevSymbolType.ClassOperation, nameof(AuditEntityConfiguration.ExemptEntity)))
             {
                 IsAuditable = (tmp?.IsAuditable ?? false);
                 IsCollection = (tmp?.IsCollection ?? false);
                 IsComplex = (tmp?.IsComplex ?? false);
                 DataType = (tmp?.DataType ?? "");
             }
+#else
+            IsAuditable = (tmp?.IsAuditable ?? false);
+            IsCollection = (tmp?.IsCollection ?? false);
+            IsComplex = (tmp?.IsComplex ?? false);
+            DataType = (tmp?.DataType ?? "");
+#endif
         }
 
         public static List<AuditPropertyConfiguration> GetAuditEntityProperties(Type runtimeEntityProperty)
         {
+#if NETFRAMEWORK
             using (new Profiling.Profiler(nameof(AuditPropertyConfiguration), Profiling.AppDevSymbolType.ClassOperation, "GetAuditEntityProperties"))
             {
                 var repo = ServiceLocator.Current.GetInstance<IRepositoryBuilder>().CreateRetrieveRepository();
@@ -470,6 +478,51 @@ namespace CLMS.Framework.Auditing.Model
                 }
                 return properties;
             }
+#else
+            var repo = ServiceLocator.Current.GetInstance<IRepositoryBuilder>().CreateRetrieveRepository();
+
+            List<AuditPropertyConfiguration> properties = new List<AuditPropertyConfiguration>();
+            AuditPropertyConfiguration newproperty = new AuditPropertyConfiguration();
+            List<AuditEntityConfiguration> existingEntities = repo.GetAll<AuditEntityConfiguration>();
+            AuditEntityConfiguration existingEntity = new AuditEntityConfiguration();
+            foreach (var currentProperty in MambaRuntimeType.FromPropertiesList(runtimeEntityProperty.GetProperties()) ?? Enumerable.Empty<MambaRuntimeType>())
+            {
+                if ((ExemptProperty(currentProperty.Name)))
+                {
+                    continue;
+                }
+                newproperty = new AuditPropertyConfiguration();
+                existingEntity = existingEntities?.FirstOrDefault((a) => a.FullName == Common.GetTypeName(runtimeEntityProperty, true));
+                newproperty.Name = currentProperty.Name;
+                newproperty.IsComplex = ((Common.IsPropertyPrimitiveOrSimple(currentProperty)) == false);
+                if ((currentProperty.PropertyType.GenericTypeArguments.Length > 0) && (currentProperty.PropertyType.GenericTypeArguments.ToList().FirstOrDefault() != null))
+                {
+                    newproperty.DataType = Common.GetTypeName(currentProperty.PropertyType.GenericTypeArguments.ToList().FirstOrDefault(), true);
+                }
+                else
+                {
+                    newproperty.DataType = Common.GetTypeName(currentProperty.PropertyType, true);
+                }
+                if (newproperty?.DataType == "System.String")
+                {
+                    newproperty.IsCollection = false;
+                }
+                else
+                {
+                    newproperty.IsCollection = Common.IsPropertyCollection(currentProperty);
+                }
+                if (existingEntity != null && existingEntity?.Properties?.FirstOrDefault((x) => x.Name == currentProperty.Name) != null)
+                {
+                    newproperty.IsAuditable = (existingEntity?.Properties?.FirstOrDefault((x) => x.Name == currentProperty.Name)?.IsAuditable ?? false);
+                }
+                else
+                {
+                    newproperty.IsAuditable = false;
+                }
+                properties?.Add(newproperty);
+            }
+            return properties;
+#endif
         }
 
         public static bool ExemptProperty(string property)
