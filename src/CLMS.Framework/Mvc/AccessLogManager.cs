@@ -4,9 +4,9 @@ using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 
-namespace AppCode
+namespace CLMS.Framework.Mvc
 {
-    internal class AccessLogManager
+    public class AccessLogManager
     {
         private bool DoDisable { get; set; }
         private readonly string _applicationSettingsKey = "OperationAccessLog";
