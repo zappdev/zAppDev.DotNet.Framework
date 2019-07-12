@@ -206,6 +206,7 @@
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.IdentityModel" />
     <Reference Include="System.IdentityModel.Services" />
+    <Reference Include="System.ServiceModel.Activation" />
   </ItemGroup>
 
   <ItemGroup>
