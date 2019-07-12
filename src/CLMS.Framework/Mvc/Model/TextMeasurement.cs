@@ -10,11 +10,11 @@ namespace CLMS.Framework.Mvc
     {
         public MigraDoc.DocumentObjectModel.Font Font
         {
-            get { return font; }
+            get => this.font;
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException("value");
+                    throw new ArgumentNullException(nameof(value));
                 if (font != value)
                 {
                     font = value;
