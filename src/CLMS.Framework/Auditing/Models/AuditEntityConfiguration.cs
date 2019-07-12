@@ -447,6 +447,8 @@ namespace CLMS.Framework.Auditing.Model
 
         public static bool ExemptEntity(string entity)
         {
+
+#if NETFRAMEWORK
             using (new Profiling.Profiler(nameof(AuditEntityConfiguration), Profiling.AppDevSymbolType.ClassOperation, nameof(AuditEntityConfiguration.ExemptEntity)))
             {
                 List<string> list = new List<string>();
@@ -458,6 +460,16 @@ namespace CLMS.Framework.Auditing.Model
                 }
                 return false;
             }
+#else
+            List<string> list = new List<string>();
+            list.Add("IDomainModelClass");
+            list.Add("BusinessException");
+            if (list.Contains(entity))
+            {
+                return true;
+            }
+            return false;
+#endif
         }
 
         public virtual void UpdateAuditEntityConfiguration(AuditEntityConfiguration tmpEntity)
@@ -465,6 +477,7 @@ namespace CLMS.Framework.Auditing.Model
             var repo = ServiceLocator.Current.GetInstance<IRepositoryBuilder>().CreateCreateRepository();
             var auditRepo = ServiceLocator.Current.GetInstance<IRepositoryBuilder>().CreateAuditingRepository();
 
+#if NETFRAMEWORK
             using (new Profiling.Profiler(nameof(AuditEntityConfiguration), Profiling.AppDevSymbolType.ClassOperation, nameof(AuditEntityConfiguration.UpdateAuditEntityConfiguration)))
             {
                 AuditPropertyConfiguration tmpProperty = new AuditPropertyConfiguration();
@@ -487,8 +500,33 @@ namespace CLMS.Framework.Auditing.Model
                 {
                     this?.AddProperties(tmpEntity?.Properties);
                 }
+
                 repo.Save(this);
             }
+#else
+            AuditPropertyConfiguration tmpProperty = new AuditPropertyConfiguration();
+            foreach (var current in this?.Properties ?? Enumerable.Empty<AuditPropertyConfiguration>())
+            {
+                var _var0 = current?.Name;
+                tmpProperty = tmpEntity?.Properties?.FirstOrDefault((a) => a.Name == _var0);
+                if (tmpProperty == null)
+                {
+                    tmpProperty = current;
+                    auditRepo.DeleteAuditPropertyConfiguration(tmpProperty);
+                }
+                else
+                {
+                    current?.UpdateAuditPropertyConfiguration(tmpProperty);
+                    tmpEntity?.RemoveProperties(tmpProperty);
+                }
+            }
+            if ((tmpEntity?.Properties?.Count() ?? 0) > 0)
+            {
+                this?.AddProperties(tmpEntity?.Properties);
+            }
+
+            repo.Save(this);
+#endif
         }
 
         internal static void SetAuditableTypes(List<Type> auditableTypes)
@@ -500,7 +538,8 @@ namespace CLMS.Framework.Auditing.Model
 
         public static List<AuditEntityConfiguration> GetAllEntityConfigurations()
         {
-            using (new Profiling.Profiler(nameof(AuditEntityConfiguration), Profiling.AppDevSymbolType.ClassOperation, nameof(AuditEntityConfiguration.GetAllEntityConfigurations)))
+#if NETFRAMEWORK
+           using (new Profiling.Profiler(nameof(AuditEntityConfiguration), Profiling.AppDevSymbolType.ClassOperation, nameof(AuditEntityConfiguration.GetAllEntityConfigurations)))
             {
                 List<AuditEntityConfiguration> entities = new List<AuditEntityConfiguration>();
                 AuditEntityConfiguration newEntity = new AuditEntityConfiguration();
@@ -520,6 +559,27 @@ namespace CLMS.Framework.Auditing.Model
                 }
                 return entities;
             }
+#else
+            List<AuditEntityConfiguration> entities = new List<AuditEntityConfiguration>();
+            AuditEntityConfiguration newEntity = new AuditEntityConfiguration();
+
+            foreach (var currentClassType in _auditableTypes)
+            {
+                if (ExemptEntity(Common.GetTypeName(currentClassType, false)))
+                {
+                    continue;
+                }
+
+                newEntity = new AuditEntityConfiguration();
+                newEntity.FullName = Common.GetTypeName(currentClassType, true);
+                newEntity.ShortName = Common.GetTypeName(currentClassType, false);
+                newEntity.Properties = AuditPropertyConfiguration.GetAuditEntityProperties(currentClassType).ToList();
+                entities?.Add(newEntity);
+            }
+            return entities;
+#endif
+
+
         }
 
     }
