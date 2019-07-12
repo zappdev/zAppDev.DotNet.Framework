@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using CLMS.Framework.Identity.Model;
 
 namespace CLMS.Framework.Hubs
@@ -8,5 +9,7 @@ namespace CLMS.Framework.Hubs
         void RaiseSignOutEvent(string UserName, DateTime? Time, string _groupName = null);
         void RaiseSignInEvent(string UserName, DateTime? Time, string _groupName = null);
         void RaiseExternalUserCreatingEvent(ApplicationUser user, string _groupName = null);
+        List<string> GetAllConnectedUsers();
+        bool IsUserConnected(string username);
     }
 }

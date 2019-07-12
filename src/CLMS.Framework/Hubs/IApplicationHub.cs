@@ -11,8 +11,6 @@ namespace CLMS.Framework.Hubs
         void RaiseSessionStartEvent(string _groupName = null);
         void RaiseOnInstanceSaveEvent(object Instance, string _groupName = null);
         void RaiseFileDownloadEvent(string path, string username, string _groupName = null);
-        void RaiseSignOut(string username, DateTime time);
-        void ForceUserPageReload(string user);
-        List<string> GetAllConnectedUsers();
+        void ForceUserPageReloadEvent(string user);
     }
 }

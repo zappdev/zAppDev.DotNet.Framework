@@ -123,7 +123,7 @@ namespace CLMS.Framework.Identity
                 DefaultAuthenticationTypes.TwoFactorRememberBrowserCookie);
             RemoveUserSession(HttpContext.Current?.Session?.SessionID);
 
-            ServiceLocator.Current.GetInstance<IApplicationHub>()?.RaiseSignOut(HttpContext.Current.User.Identity.Name, DateTime.UtcNow);
+            ServiceLocator.Current.GetInstance<IApplicationHub>()?.RaiseSignOutEvent(HttpContext.Current.User.Identity.Name, DateTime.UtcNow);
         }
 
         public static string GetUserProfile()
@@ -612,7 +612,7 @@ namespace CLMS.Framework.Identity
             {
                 RemoveUserSession(id);
             }
-            ServiceLocator.Current.GetInstance<IApplicationHub>()?.ForceUserPageReload(user.UserName);
+            ServiceLocator.Current.GetInstance<IApplicationHub>()?.ForceUserPageReloadEvent(user.UserName);
             InvalidateUserSecurityData(user);
         }
         public static void InvalidateUserSecurityData(ApplicationUser user)
