@@ -7,7 +7,7 @@ using System.Net.Http;
 using WebApiThrottle;
 using WebApiThrottle.Models;
 
-namespace cfTests.Web.Code.WebApi
+namespace CLMS.Framework.WebApi
 {
     public class ExternalTableRateEnrty
     {

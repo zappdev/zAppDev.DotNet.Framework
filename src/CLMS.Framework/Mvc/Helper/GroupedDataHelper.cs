@@ -146,14 +146,16 @@ namespace CLMS.Framework.Mvc
             return root;
         }
 
-        public static GroupTree<T> GetAllGroupsClosed<T>(IQueryable<T> filtered, DynamicClosedGroupsInfo<T> closedGroupsInfo, Dictionary<string, string> ColumnsToFormattings)
+        public static GroupTree<T> GetAllGroupsClosed<T>(IQueryable<T> filtered, DynamicClosedGroupsInfo<T> closedGroupsInfo, Dictionary<string, string> ColumnsToFormattings, bool fetchAllBeforeGrouping = false)
         {
             var groupByAnonType = closedGroupsInfo.GroupByAnonymousType;
             var groupByExpression = closedGroupsInfo.GroupByExpression;
             var selectorsAnonType = closedGroupsInfo.SelectorsAnonymousType;
             var combinedSelector = closedGroupsInfo.CombinedSelectorExpression;
 
-            var groupedData = filtered.GroupBy(groupByExpression).Select(combinedSelector);
+            var groupedData = fetchAllBeforeGrouping ? filtered.ToList().AsQueryable().GroupBy(groupByExpression).Select(combinedSelector)
+                : filtered.GroupBy(groupByExpression).Select(combinedSelector);
+
             var groupedFields = groupByAnonType.GetFields();
             var selectedFields = selectorsAnonType.GetFields();
 

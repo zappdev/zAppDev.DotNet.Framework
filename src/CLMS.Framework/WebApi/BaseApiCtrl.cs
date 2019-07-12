@@ -10,7 +10,7 @@ using System.Web.Http;
 using Identity = CLMS.Framework.Identity;
 using CLMS.Framework.Identity;
 
-namespace cfTests.Web
+namespace CLMS.Framework.WebApi
 {
     public class BasicApiCtrl : ApiController
     {
