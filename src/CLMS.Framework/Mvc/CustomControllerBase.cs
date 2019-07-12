@@ -11,30 +11,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CLMS.Framework.Mvc
 {
-    public interface IControllerBase
-    {
-        bool IsDirty
-        {
-            get;
-            set;
-        }
-    }
-
-    [JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-    public enum MessageType
-    {
-        Success = 0,
-        Error,
-        Warning,
-        Info
-    }
-
 #if NETFRAMEWORK
     [SessionState(SessionStateBehavior.Required)]
 #endif
     public class CustomControllerBase : Controller
     {
-
         protected IControllerBase _parentController = null;
 
         public virtual void CommitAllFiles()

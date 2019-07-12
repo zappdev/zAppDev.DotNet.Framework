@@ -5,6 +5,7 @@ using System.Reflection;
 using Newtonsoft.Json.Linq;
 using Ionic.Zip;
 using System.IO;
+using Newtonsoft.Json;
 
 #if NETFRAMEWORK
 using System.Web;
@@ -21,10 +22,28 @@ using CLMS.Framework.Identity;
 
 namespace CLMS.Framework.Mvc
 {
-    public class ControllerBase<T, Y> : CustomControllerBase, IControllerBase
+    public interface IControllerBase
+    {
+        bool IsDirty
+        {
+            get;
+            set;
+        }
+    }
+
+    [JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+    public enum MessageType
+    {
+        Success = 0,
+        Error,
+        Warning,
+        Info
+    }
+
+    public class ClmsControllerBase<T, Y> : CustomControllerBase, IControllerBase
     {
         protected T @model;
-        internal ViewDTO viewDTO = new ViewDTO();
+        protected ViewDTO viewDTO = new ViewDTO();
 
         protected bool _redirectionFromSameController = false; //TODO: Fill this
         protected log4net.ILog _logger;
@@ -34,7 +53,7 @@ namespace CLMS.Framework.Mvc
             get;
             set;
         }
-
+        
         protected static Dictionary<int, ViewDTO> _viewDTOsDic = new Dictionary<int, ViewDTO>();
 
         protected static int AddToViewDTOsDicAndGetHash(ViewDTO dto)
