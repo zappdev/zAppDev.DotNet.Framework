@@ -1,9 +1,13 @@
 ﻿#if NETFRAMEWORK
 using CLMS.Framework.Tools.PerformanceMeasurements.Components;
 using CLMS.Framework.Tools.PerformanceMeasurements.Configuration;
+using CLMS.Framework.Tools.PerformanceMeasurements.Contracts;
 using log4net;
+using Newtonsoft.Json;
 using NHibernate;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CLMS.Framework.Tools.PerformanceMeasurements
 {
@@ -25,13 +29,18 @@ namespace CLMS.Framework.Tools.PerformanceMeasurements
         private string _nameOfThis => nameof(PerformanceMonitor);
         private Type _typeOfThis => typeof(PerformanceMonitor);
 
-        public PerformanceMonitor(PerformanceMonitorConfiguration configuration, ISession session, ILog log = null)
+        public PerformanceMonitor(PerformanceMonitorConfiguration configuration, ISession session, ILog log = null, bool? forceEnabledState = null)
         {
             _configuration = configuration;
             ContinueOnError = true;
 
             _monitorLog = log ?? _configuration.GetLogger();
             _genericLog = LogManager.GetLogger(_typeOfThis);
+
+            if(_configuration != null && forceEnabledState.HasValue)
+            {
+                _configuration.Enabled = forceEnabledState.Value;
+            }
 
             try
             {
@@ -114,8 +123,34 @@ namespace CLMS.Framework.Tools.PerformanceMeasurements
             }
             catch (Exception e)
             {
-                _genericLog.Error($"{_nameOfThis} - Exception while Logging Statistics: {e.Message}");
-                _genericLog.Debug($"{_nameOfThis} - Exception while Logging Statistics: {e.StackTrace}");
+                _genericLog.Error($"{_nameOfThis} - Exception while Logging Back-End Statistics: {e.Message}");
+                _genericLog.Debug($"{_nameOfThis} - Exception while Logging Back-End Statistics: {e.StackTrace}");
+                if (!ContinueOnError) throw;
+            }
+        }//end Log()
+
+        public void Log(List<FrontEndPerformance> frontEndPerformanceRecords)
+        {
+            try
+            {
+                if (frontEndPerformanceRecords?.Any() != true) return;
+
+                foreach(var frontEndPerformanceRecord in frontEndPerformanceRecords)
+                {
+                    var logText = JsonConvert.SerializeObject(frontEndPerformanceRecord, new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore,
+                        Formatting = Formatting.Indented
+                    });
+
+                    _monitorLog.Info(logText);
+                }
+
+            }
+            catch (Exception e)
+            {
+                _genericLog.Error($"{_nameOfThis} - Exception while Logging Front-End Statistics: {e.Message}");
+                _genericLog.Debug($"{_nameOfThis} - Exception while Logging Front-End Statistics: {e.StackTrace}");
                 if (!ContinueOnError) throw;
             }
         }//end Log()

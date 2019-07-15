@@ -39,6 +39,7 @@ namespace CLMS.Framework.Tools.PerformanceMeasurements.Configuration
 
 
     #region Simple Elements
+    public class FrontEndElement: Enabled_Attribute { }
     public class SizeElement : MinimumBytes_Enabled_Attribute { }
     public class TimeElement : MinimumMilliseconds_Enabled_Attribute { }
     public class RAMElement : MinimumBytes_Enabled_Attribute
@@ -101,6 +102,9 @@ namespace CLMS.Framework.Tools.PerformanceMeasurements.Configuration
 
     public class ControllerActionElement : Enabled_Attribute
     {
+        [ConfigurationProperty("frontEnd", IsRequired = false)]
+        public FrontEndElement FrontEnd => this["frontEnd"] as FrontEndElement;
+
         [ConfigurationProperty("time", IsRequired = false)]
         public TimeElement Time => this["time"] as TimeElement;
 

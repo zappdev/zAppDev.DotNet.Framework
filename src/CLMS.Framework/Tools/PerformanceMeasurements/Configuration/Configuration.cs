@@ -39,6 +39,7 @@ namespace CLMS.Framework.Tools.PerformanceMeasurements.Configuration
 
 
     #region Simple Configurations
+    public class FrontEndConfiguration : Enabled_Configuration { }
     public class SizeConfiguration : MinimumBytes_Enabled_Configuration { }
     public class TimeConfiguration : MinimumMilliseconds_Enabled_Configuration { }
     public class RAMConfiguration : MinimumBytes_Enabled_Configuration
@@ -115,6 +116,8 @@ namespace CLMS.Framework.Tools.PerformanceMeasurements.Configuration
 
     public class ControllerActionConfiguration : Enabled_Configuration
     {
+        public FrontEndConfiguration FrontEnd { get; set; }
+
         public TimeConfiguration Time { get; set; }
 
         public CPUConfiguration CPU { get; set; }
@@ -125,6 +128,7 @@ namespace CLMS.Framework.Tools.PerformanceMeasurements.Configuration
 
         public ControllerActionConfiguration()
         {
+            FrontEnd = new FrontEndConfiguration();
             Time = new TimeConfiguration();
             CPU = new CPUConfiguration();
             RAM = new RAMConfiguration();
@@ -244,6 +248,8 @@ namespace CLMS.Framework.Tools.PerformanceMeasurements.Configuration
                 ControllerAction.Enabled = configuration.ControllerAction?.Enabled ?? false;
                 if (ControllerAction.Enabled)
                 {
+                    ControllerAction.FrontEnd.Enabled = configuration.ControllerAction?.FrontEnd.Enabled ?? false; 
+
                     ControllerAction.Time.Enabled = configuration.ControllerAction?.Time?.Enabled ?? false;
                     if (ControllerAction.Time.Enabled)
                     {
