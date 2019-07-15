@@ -322,7 +322,7 @@ namespace CLMS.Framework.Mvc
                 //when the query is executed
                 if (filter.Column.IsEncrypted && !(filter.Operator == FilterOperator.EQUAL_TO || filter.Operator == FilterOperator.NOT_EQUAL_TO))
                 {
-                    filter.Value = BaseViewPage<object>.EncryptValue(filter.Value);
+                    filter.Value = BaseViewPageBase<object>.EncryptValue(filter.Value);
                 }
 
                 // Since filters are ordered with OR preceeding AND, when operator changes,

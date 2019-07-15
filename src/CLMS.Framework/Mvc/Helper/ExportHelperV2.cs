@@ -229,7 +229,7 @@ namespace CLMS.Framework.Mvc
                 }
                 if (aggregators.Any())
                 {
-                    ws.Cells[1, _totalColumns].Value = BaseViewPage<object>.GetResourceValue("GlobalResources", "RES_DATALIST_EXPORTV2_Totals");
+                    ws.Cells[1, _totalColumns].Value = BaseViewPageBase<object>.GetResourceValue("GlobalResources", "RES_DATALIST_EXPORTV2_Totals");
                 }
                 _writtenHeaders = true;
 
@@ -274,7 +274,7 @@ namespace CLMS.Framework.Mvc
                             }
                         }
 
-                        ws.Cells[currentLine, Options.ColumnInfo.Count + 1].Value = BaseViewPage<object>.GetResourceValue("GlobalResources", _aggregatorResources[aggregatorType.ToString()]);
+                        ws.Cells[currentLine, Options.ColumnInfo.Count + 1].Value = BaseViewPageBase<object>.GetResourceValue("GlobalResources", _aggregatorResources[aggregatorType.ToString()]);
 
                         //Set aggregator style
                         ws.Cells[currentLine, 1, currentLine, _totalColumns].Style.Font.Bold = true;
@@ -396,7 +396,7 @@ namespace CLMS.Framework.Mvc
                 }
                 if (Options.ColumnInfo.Count < _totalColumns)
                 {
-                    ws.Cells[1, _totalColumns].Value = BaseViewPage<object>.GetResourceValue("GlobalResources", "RES_DATALIST_EXPORTV2_Totals");
+                    ws.Cells[1, _totalColumns].Value = BaseViewPageBase<object>.GetResourceValue("GlobalResources", "RES_DATALIST_EXPORTV2_Totals");
                 }
                 SetExcelHeaderStyle(ws);
                 _writtenHeaders = true;
@@ -461,7 +461,7 @@ namespace CLMS.Framework.Mvc
 
                     if (isAggregatorWritten)
                     {
-                        var displayAggregatorInfo = BaseViewPage<object>.GetResourceValue("GlobalResources", _aggregatorResources[(group.Key.ToString() == "ROOT" ? "TOTAL_" : "") + aggregatorType.ToString()]);
+                        var displayAggregatorInfo = BaseViewPageBase<object>.GetResourceValue("GlobalResources", _aggregatorResources[(group.Key.ToString() == "ROOT" ? "TOTAL_" : "") + aggregatorType.ToString()]);
                         if (group.Key?.ToString() != "ROOT")
                         {
                             displayAggregatorInfo += $" ({Options.ColumnInfo.SingleOrDefault(c => c.Name == group.Column.Name)?.Caption}: {group.Key})";
@@ -592,7 +592,7 @@ namespace CLMS.Framework.Mvc
             }
             if (aggregators.Any())
             {
-                headerRow.Cells[_totalColumns - 1].AddParagraph(BaseViewPage<object>.GetResourceValue("GlobalResources", "RES_DATALIST_EXPORTV2_Totals"));
+                headerRow.Cells[_totalColumns - 1].AddParagraph(BaseViewPageBase<object>.GetResourceValue("GlobalResources", "RES_DATALIST_EXPORTV2_Totals"));
                 SetParagraphFormatting(headerRow.Cells[_totalColumns - 1].Format);
             }
 
@@ -633,7 +633,7 @@ namespace CLMS.Framework.Mvc
                         SetParagraphFormatting(aggregatorRow.Cells[i].Format);
                     }
 
-                    aggregatorRow.Cells[Options.ColumnInfo.Count].AddParagraph(BaseViewPage<object>.GetResourceValue("GlobalResources", _aggregatorResources[aggregatorType.ToString()]));
+                    aggregatorRow.Cells[Options.ColumnInfo.Count].AddParagraph(BaseViewPageBase<object>.GetResourceValue("GlobalResources", _aggregatorResources[aggregatorType.ToString()]));
                     SetParagraphFormatting(aggregatorRow.Cells[Options.ColumnInfo.Count].Format);
                     aggregatorRow.Format.Font.Bold = true;
                     aggregatorRow.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
@@ -743,7 +743,7 @@ namespace CLMS.Framework.Mvc
                     }
                     if (Options.ColumnInfo.Count < _totalColumns)
                     {
-                        headerRow.Cells[_totalColumns - 1].AddParagraph(BaseViewPage<object>.GetResourceValue("GlobalResources", "RES_DATALIST_EXPORTV2_Totals"));
+                        headerRow.Cells[_totalColumns - 1].AddParagraph(BaseViewPageBase<object>.GetResourceValue("GlobalResources", "RES_DATALIST_EXPORTV2_Totals"));
                         SetParagraphFormatting(headerRow.Cells[_totalColumns - 1].Format);
                     }
 
@@ -826,7 +826,7 @@ namespace CLMS.Framework.Mvc
                     if (isAggregatorWritten)
                     {
                         var aggregatorRow = table.AddRow();
-                        var displayAggregatorInfo = BaseViewPage<object>.GetResourceValue("GlobalResources", _aggregatorResources[(group.Key.ToString() == "ROOT" ? "TOTAL_" : "") + aggregatorType.ToString()]);
+                        var displayAggregatorInfo = BaseViewPageBase<object>.GetResourceValue("GlobalResources", _aggregatorResources[(group.Key.ToString() == "ROOT" ? "TOTAL_" : "") + aggregatorType.ToString()]);
                         if (group.Key?.ToString() != "ROOT")
                         {
                             displayAggregatorInfo += $" ({Options.ColumnInfo.SingleOrDefault(c => c.Name == group.Column.Name)?.Caption}: {group.Key})";

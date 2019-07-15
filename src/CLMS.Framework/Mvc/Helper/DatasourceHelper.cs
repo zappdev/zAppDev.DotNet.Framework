@@ -388,7 +388,7 @@ namespace CLMS.Framework.Mvc
         public ManualValuesData(string key, string formName, string controlName, bool isPickList)
         {
             _key = key;
-            Value = BaseViewPage<object>.GetResourceValue(formName, $"RES_{(isPickList ? "PICKLIST" : "LIST")}_{controlName}_VALUE_{key}");
+            Value = BaseViewPageBase<object>.GetResourceValue(formName, $"RES_{(isPickList ? "PICKLIST" : "LIST")}_{controlName}_VALUE_{key}");
         }
 
         public string _key { get; }

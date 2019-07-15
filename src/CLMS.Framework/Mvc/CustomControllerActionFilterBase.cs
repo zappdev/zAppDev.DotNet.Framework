@@ -133,7 +133,7 @@ namespace CLMS.Framework.Mvc
             Thread.CurrentThread.CurrentUICulture = new CultureInfo(id.Value);
         }
 
-        private static NHibernate.StaleObjectStateException EnrichStaleObjectStateException(NHibernate.StaleObjectStateException staleObjectStateException)
+        protected static NHibernate.StaleObjectStateException EnrichStaleObjectStateException(NHibernate.StaleObjectStateException staleObjectStateException)
         {
             //If it's already enriched, return it and get out
             if (staleObjectStateException.Data["ZAPPDEV_MESSAGE"] != null)
@@ -144,8 +144,8 @@ namespace CLMS.Framework.Mvc
             //Otherwise, enrich it
             string defaultMessage = @"Somebody already committed modifications to the data you are about to commit. <br/>You have been working with <i>stale data</i>.<br/>Please, refresh your page in order to restart with fresh data.";
             string defaultTitle = "Stale Data";
-            string message = BaseViewPage<string>.GetResourceValue("GlobalResources", "RES_SITE_StaleObjectStateExceptionMessage").ToString();
-            string title = BaseViewPage<string>.GetResourceValue("GlobalResources", "RES_SITE_StaleObjectStateExceptionTitle").ToString();
+            string message = BaseViewPageBase<string>.GetResourceValue("GlobalResources", "RES_SITE_StaleObjectStateExceptionMessage").ToString();
+            string title = BaseViewPageBase<string>.GetResourceValue("GlobalResources", "RES_SITE_StaleObjectStateExceptionTitle").ToString();
             if (string.IsNullOrWhiteSpace(message)) message = defaultMessage;
             if (string.IsNullOrWhiteSpace(title)) title = defaultTitle;
             staleObjectStateException.Data.Add("ZAPPDEV_MESSAGE", message);
@@ -156,48 +156,6 @@ namespace CLMS.Framework.Mvc
         public override void OnActionExecuted(ActionExecutedContext filterContext)
         {
             base.OnActionExecuted(filterContext);
-            try
-            {
-                var miniSessionManagerWillFlush = MiniSessionManager.Instance.WillFlush;
-                var controller = (CustomControllerBase)filterContext.Controller;
-
-                if (miniSessionManagerWillFlush)
-                {
-                    controller.CommitAllFiles();
-                }
-
-                MiniSessionManager.Instance.CommitChanges(filterContext.Exception, () =>
-                {
-                    if (miniSessionManagerWillFlush)
-                    {
-                        controller.CommitAllFilesLegacy();
-                    }
-
-                    if (!HasException(filterContext) && filterContext.Result is EmptyResult)
-                    {
-                        filterContext.Result = controller.PostActionFilterHook(HasDefaultResultView, FillDropDownInitialValues);
-                    }
-                });
-
-            }
-            catch (NHibernate.StaleObjectStateException staleObjectStateException)
-            {
-                filterContext.Exception = EnrichStaleObjectStateException(staleObjectStateException);
-            }
-            catch (Exception x)
-            {
-                filterContext.Exception = x;
-            }
-            if (LogEnabled)
-            {
-                IdentityHelper.LogAction(
-                    filterContext.ActionDescriptor.ControllerDescriptor.ControllerName,
-                    filterContext.ActionDescriptor.ActionName,
-                    filterContext.Exception == null,
-                    filterContext.Exception?.Message);
-            }
-
-            HandleException(filterContext);
         }
 
         protected ActionResult PrepareUnauthorizedResult(AuthorizationContext filterContext)
@@ -257,8 +215,7 @@ namespace CLMS.Framework.Mvc
 
             filterContext.ExceptionHandled = true;
             LogManager.GetLogger(filterContext.Controller.GetType()).Error(filterContext.Exception);
-            CLMS.Framework.Utilities.Common.SetLastError(filterContext.Exception);
-            filterContext.Result = GetErrorResult(filterContext, "{ErrorPageAction}", "{ErrorPageController}");
+            Common.SetLastError(filterContext.Exception);            
         }
 
         protected static bool HasException(ActionExecutedContext context)

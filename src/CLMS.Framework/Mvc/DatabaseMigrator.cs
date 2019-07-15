@@ -14,7 +14,7 @@ using CLMS.Framework.Utilities;
 
 namespace CLMS.Framework.Mvc
 {
-    internal class DatabaseMigrator
+    public class DatabaseMigrator
     {
         private List<string> _migrationFiles { get; set; }
 

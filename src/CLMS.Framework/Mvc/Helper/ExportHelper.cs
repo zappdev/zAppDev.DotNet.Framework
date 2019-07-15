@@ -295,7 +295,7 @@ namespace CLMS.Framework.Mvc
             builder.AppendLine("<tfoot>");
             if (options.NonGroupCount)
             {
-                builder.AppendLine($"<tr><td colspan='{columns?.Count}'>{BaseViewPage<object>.GetResourceValue("GlobalResources", "RES_DATALIST_AGGREGATORS_GrandCount")}{totalRows}</td></tr>");
+                builder.AppendLine($"<tr><td colspan='{columns?.Count}'>{BaseViewPageBase<object>.GetResourceValue("GlobalResources", "RES_DATALIST_AGGREGATORS_GrandCount")}{totalRows}</td></tr>");
             }
             builder.AppendLine("</tfoot>");
             builder.AppendLine("</table>");
@@ -506,7 +506,7 @@ namespace CLMS.Framework.Mvc
             {
                 var totalsRow = table.AddRow();
                 totalsRow.Cells[0].MergeRight = visibleColumns.Count();
-                totalsRow.Cells[0].AddParagraph($"{BaseViewPage<object>.GetResourceValue("GlobalResources", "RES_DATALIST_AGGREGATORS_GrandCount")}{totalRows}");
+                totalsRow.Cells[0].AddParagraph($"{BaseViewPageBase<object>.GetResourceValue("GlobalResources", "RES_DATALIST_AGGREGATORS_GrandCount")}{totalRows}");
             }
 
             //Add the table to the section and the document is ready for render

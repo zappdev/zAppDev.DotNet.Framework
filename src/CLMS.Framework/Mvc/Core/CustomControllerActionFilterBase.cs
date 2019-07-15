@@ -66,7 +66,7 @@ namespace CLMS.Framework.Mvc
             response.Headers.Add("Culture", new string[] { code });
         }
 
-        private static NHibernate.StaleObjectStateException EnrichStaleObjectStateException(NHibernate.StaleObjectStateException staleObjectStateException)
+        protected static NHibernate.StaleObjectStateException EnrichStaleObjectStateException(NHibernate.StaleObjectStateException staleObjectStateException)
         {
             //If it's already enriched, return it and get out
             if (staleObjectStateException.Data["ZAPPDEV_MESSAGE"] != null)
@@ -77,8 +77,8 @@ namespace CLMS.Framework.Mvc
             //Otherwise, enrich it
             string defaultMessage = @"Somebody already committed modifications to the data you are about to commit. <br/>You have been working with <i>stale data</i>.<br/>Please, refresh your page in order to restart with fresh data.";
             string defaultTitle = "Stale Data";
-            string message = BaseViewPage<string>.GetResourceValue("GlobalResources", "RES_SITE_StaleObjectStateExceptionMessage").ToString();
-            string title = BaseViewPage<string>.GetResourceValue("GlobalResources", "RES_SITE_StaleObjectStateExceptionTitle").ToString();
+            string message = BaseViewPageBase<string>.GetResourceValue("GlobalResources", "RES_SITE_StaleObjectStateExceptionMessage").ToString();
+            string title = BaseViewPageBase<string>.GetResourceValue("GlobalResources", "RES_SITE_StaleObjectStateExceptionTitle").ToString();
             if (string.IsNullOrWhiteSpace(message)) message = defaultMessage;
             if (string.IsNullOrWhiteSpace(title)) title = defaultTitle;
             staleObjectStateException.Data.Add("ZAPPDEV_MESSAGE", message);

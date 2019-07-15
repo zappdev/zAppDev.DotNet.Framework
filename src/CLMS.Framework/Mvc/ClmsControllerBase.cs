@@ -43,7 +43,7 @@ namespace CLMS.Framework.Mvc
     public class ClmsControllerBase<T, Y> : CustomControllerBase, IControllerBase
     {
         protected T @model;
-        protected ViewDTO viewDTO = new ViewDTO();
+        public ViewDTO viewDTO = new ViewDTO();
 
         protected bool _redirectionFromSameController = false; //TODO: Fill this
         protected log4net.ILog _logger;

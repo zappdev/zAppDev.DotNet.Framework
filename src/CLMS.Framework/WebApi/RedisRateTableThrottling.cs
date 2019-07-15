@@ -117,7 +117,7 @@ namespace CLMS.Framework.WebApi
         public void UpdateIdentity(RequestIdentity identity, HttpRequestMessage request)
         {
             identity.ClientId = GetClientId(request);
-            identity.ProductName = GetEntry(request)?.ProductName + "_" + BaseViewPage<string>.AppVersion;
+            identity.ProductName = GetEntry(request)?.ProductName + "_" + BaseViewPageBase<string>.AppVersion;
         }
 
         public string GetClientSecret(HttpRequestMessage request)

@@ -22,9 +22,9 @@ using Microsoft.AspNetCore.Mvc.Razor;
 namespace CLMS.Framework.Mvc
 {
 #if NETFRAMEWORK
-    public class BaseViewPage<T> : WebViewPage<T>
+    public class BaseViewPageBase<T> : WebViewPage<T>
 #else
-    public class BaseViewPage<T> : RazorPage<T>
+    public class BaseViewPageBase<T> : RazorPage<T>
 #endif
     {
         private string _formName;
@@ -134,7 +134,7 @@ namespace CLMS.Framework.Mvc
                 return;
             }
             _lastOnChange = DateTime.Now.Ticks;
-            log4net.LogManager.GetLogger(typeof(BaseViewPage<IControllerBase>)).Info("Project Info Changed, updating app version");
+            log4net.LogManager.GetLogger(typeof(BaseViewPageBase<IControllerBase>)).Info("Project Info Changed, updating app version");
             UpdateAppVersion(e.FullPath);
         }
 
@@ -157,12 +157,12 @@ namespace CLMS.Framework.Mvc
                 if (@try < 5)
                 {
                     Thread.Sleep(100);
-                    log4net.LogManager.GetLogger(typeof(BaseViewPage<IControllerBase>)).Info($"Failed to read Project Info, retry... ({@try + 1})");
+                    log4net.LogManager.GetLogger(typeof(BaseViewPageBase<IControllerBase>)).Info($"Failed to read Project Info, retry... ({@try + 1})");
                     UpdateAppVersion(path, ++@try);
                     return;
                 }
                 _appVersion = Guid.NewGuid().ToString();
-                log4net.LogManager.GetLogger(typeof(BaseViewPage<IControllerBase>)).Error($"Failed to get app version from path {path}", e);
+                log4net.LogManager.GetLogger(typeof(BaseViewPageBase<IControllerBase>)).Error($"Failed to get app version from path {path}", e);
             }
         }
 
@@ -334,7 +334,7 @@ namespace CLMS.Framework.Mvc
                 }
                 catch (Exception e)
                 {
-                    log4net.LogManager.GetLogger(typeof(BaseViewPage<IControllerBase>)).Error("Could not get best language match!", e);
+                    log4net.LogManager.GetLogger(typeof(BaseViewPageBase<IControllerBase>)).Error("Could not get best language match!", e);
                     lang = _defaultLang;
                 }
             }
@@ -448,7 +448,7 @@ namespace CLMS.Framework.Mvc
             }
             catch (Exception e)
             {
-                log4net.LogManager.GetLogger(typeof(BaseViewPage<IControllerBase>))
+                log4net.LogManager.GetLogger(typeof(BaseViewPageBase<IControllerBase>))
                 .Error("JS string sanitization failed!", e);
                 return withXssSanitazation ? @this.ToXssSafeString() : @this;
             }
