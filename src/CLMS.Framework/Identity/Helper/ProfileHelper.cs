@@ -321,7 +321,7 @@ namespace CLMS.Framework.Identity
             if (_AllThemes == null)
             {
                 _AllThemes = new List<ApplicationTheme>();
-                var availableThemes = Directory.GetDirectories(Web.MapPath("~/Themes"));
+                var availableThemes = Directory.GetDirectories(Utilities.Web.MapPath("~/Themes"));
                 foreach (var themeDirectory in availableThemes)
                 {
                     var dirInfo = new DirectoryInfo(themeDirectory);

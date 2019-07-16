@@ -1,0 +1,13 @@
+﻿namespace CLMS.Framework.Mvc
+{
+    public interface ICacheKeyHasher
+    {
+        string ApiName { get; set; }
+        string Operation { get; set; }
+        string OriginalKey { get; set; }
+        string UserName { get; set; }
+
+        string GetHashedKey();
+        ICacheKeyHasher SplitToObject(string hashedKey, string deliminator = "|", bool throwOnException = false);
+    }
+}
