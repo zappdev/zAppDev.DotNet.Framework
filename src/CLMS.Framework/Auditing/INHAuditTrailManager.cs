@@ -1,4 +1,6 @@
 ﻿using NHibernate.Event;
+using System;
+using System.Collections.Generic;
 
 namespace CLMS.Framework.Auditing
 {
@@ -11,5 +13,6 @@ namespace CLMS.Framework.Auditing
         void OnPostInsertLogEvent(PostInsertEvent postInsertEvent);
         void OnPostDeleteLogEvent(PostDeleteEvent postDeleteEvent);
         void OnPreCollectionUpdateLogEvent(PreCollectionUpdateEvent preCollectionUpdateEvent);
+        void Enable(List<Type> auditableTypes, Func<AuditContext> getAuditContext);
     }
 }
