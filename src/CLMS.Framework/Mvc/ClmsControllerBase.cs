@@ -40,7 +40,7 @@ namespace CLMS.Framework.Mvc
         Info
     }
 
-    public class ClmsControllerBase<T, Y> : CustomControllerBase, IControllerBase
+    public abstract class ClmsControllerBase<T, Y> : CustomControllerBase, IControllerBase
     {
         protected T @model;
         public ViewDTO viewDTO = new ViewDTO();
@@ -342,26 +342,8 @@ namespace CLMS.Framework.Mvc
             return data;
         }
 
-        protected MethodInfo GetViewModelTypeForPartialControl(Type viewModelType, string dataType, Type[] partialTypes = null)
-        {
-            if (partialTypes == null)
-            {
-                var type = Assembly.GetExecutingAssembly().GetType($"{viewModelType.Namespace}.{dataType}");
-                return type.GetMethod("GetInstance");
-            }
-            else
-            {
-                foreach (var partialType in partialTypes)
-                {
-                    var type = Assembly.GetExecutingAssembly().GetType($"{partialType.Namespace}.{dataType}");
-                    if (type == null) continue;
-                    var getInstanceMethod = type.GetMethod("GetInstance");
-                    if (getInstanceMethod == null) continue;
-                    return getInstanceMethod;
-                }
-                return null;
-            }
-        }
+        protected abstract MethodInfo GetViewModelTypeForPartialControl(Type viewModelType, string dataType,
+            Type[] partialTypes = null);
 
         protected virtual CustomControllerBase GetPartialController(string partialControlName)
         {
@@ -609,22 +591,10 @@ namespace CLMS.Framework.Mvc
             return Json(new {Data = views});
         }
 
-        public ActionResult _RaiseEvent()
-        {
-            var _data = _LoadViewModel();
-            var methodName = "Raise" + _data["eventName"];
-            var assemblyName = "cfTests.Hubs";
-            ReflectionHelper.InvokeStaticVoidMethod(assemblyName, methodName, _data["parameters"], false, false);
-            // Logging. Parameters may not be exactly 'parseable'
-            // to Logger requirements, but this is handled by DebugHelper class
-            var parameters = _data["parameters"]?.ToString();
-            var paramsArray = Utilities.Deserialize<List<string>>(parameters);
-            CLMS.Framework.Utilities.DebugHelper.Log(paramsArray, this.GetType().Name);
-            return Content("OK");
-        }
+        public abstract ActionResult _RaiseEvent();
 
-        private int ClientResponseIndex = 0;
-        private Dictionary<string, ClientUpdateInfo> _clientData = null;
+        protected int ClientResponseIndex = 0;
+        protected Dictionary<string, ClientUpdateInfo> _clientData = null;
 
         protected void InitClientResponse()
         {

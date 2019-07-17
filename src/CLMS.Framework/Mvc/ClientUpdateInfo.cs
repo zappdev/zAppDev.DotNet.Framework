@@ -2,7 +2,7 @@
 
 namespace CLMS.Framework.Mvc
 {
-    class ClientUpdateInfo
+    public class ClientUpdateInfo
     {
         public object Instance
         {
