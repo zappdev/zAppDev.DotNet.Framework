@@ -4,6 +4,7 @@ using System;
 #if NETFRAMEWORK
 using System.Web.Mvc;
 using System.Web.SessionState;
+using CLMS.Framework.Tools.PerformanceMeasurements;
 #else
 using Microsoft.AspNetCore.Mvc;
 #endif
@@ -16,6 +17,10 @@ namespace CLMS.Framework.Mvc
 #endif
     public class CustomControllerBase : Controller
     {
+#if NETFRAMEWORK
+        public PerformanceMonitor PerformanceMonitor;
+#endif
+
         protected IControllerBase _parentController = null;
 
         public virtual void CommitAllFiles()
