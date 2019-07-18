@@ -18,6 +18,7 @@ using System.Collections.Concurrent;
 using CLMS.Framework.Identity.Model;
 using CLMS.Framework.Utilities;
 using CLMS.Framework.Hubs;
+using CLMS.Framework.Owin;
 
 namespace CLMS.Framework.Identity
 {
@@ -38,7 +39,7 @@ namespace CLMS.Framework.Identity
 
         public static SignInManager<IdentityUser, string> GetSignInManager()
         {
-            return HttpContext.Current?.GetOwinContext()?.Get<SignInManager<IdentityUser, string>>();
+            return OwinHelper.GetOwinContext(HttpContext.Current)?.Get<SignInManager<IdentityUser, string>>();
         }
 
         public static bool SignIn(string username, string password, bool isPersistent)
@@ -145,9 +146,9 @@ namespace CLMS.Framework.Identity
 
         public static IdentityUser GetCurrentIdentityUser()
         {
-            if (!HttpContext.Current.GetOwinContext().Request.User.Identity.IsAuthenticated) return null;
+            if (!OwinHelper.GetOwinContext(HttpContext.Current).Request.User.Identity.IsAuthenticated) return null;
             var manager = GetUserManager();
-            return manager.FindById(HttpContext.Current.GetOwinContext().Request.User.Identity.Name);
+            return manager.FindById(OwinHelper.GetOwinContext(HttpContext.Current).Request.User.Identity.Name);
         }
 
         public static ApplicationUser GetCurrentApplicationUser()
@@ -171,7 +172,7 @@ namespace CLMS.Framework.Identity
         }
         public static string GetCurrentUserName()
         {
-            return HttpContext.Current.GetOwinContext().Request.User.Identity.Name;
+            return OwinHelper.GetOwinContext(HttpContext.Current).Request.User.Identity.Name;
         }
 
         public static List<string> GetCurrentApplicationUserRoles()
@@ -202,7 +203,7 @@ namespace CLMS.Framework.Identity
 
         public static bool IsAuthenticatedInMode(Type authType)
         {
-            var identity = HttpContext.Current.GetOwinContext().Request?.User?.Identity;
+            var identity = OwinHelper.GetOwinContext(HttpContext.Current).Request?.User?.Identity;
             return
                 (
                     (
@@ -295,7 +296,7 @@ namespace CLMS.Framework.Identity
 
         public static IEnumerable<string> CreateAndLoginUser(string username, string email, string name, string userClass = null)
         {
-            var loginInfo = HttpContext.Current.GetOwinContext().Authentication.GetExternalLoginInfo();
+            var loginInfo = OwinHelper.GetOwinContext(HttpContext.Current).Authentication.GetExternalLoginInfo();
             if (loginInfo == null)
             {
                 //RedirectOnFail(HttpContext.Current.Response);
@@ -366,7 +367,7 @@ namespace CLMS.Framework.Identity
             appUser = null;
             // Get external login info
             var manager = GetUserManager();
-            var loginInfo = HttpContext.Current.GetOwinContext().Authentication.GetExternalLoginInfo();
+            var loginInfo = OwinHelper.GetOwinContext(HttpContext.Current).Authentication.GetExternalLoginInfo();
             if (loginInfo == null)
             {
                 //RedirectOnFail(HttpContext.Current.Response);
@@ -387,7 +388,7 @@ namespace CLMS.Framework.Identity
             {
                 // If the external login is not associated with the currently logged in User -> associate
                 // Apply Xsrf check when linking
-                loginInfo = HttpContext.Current.GetOwinContext().Authentication.GetExternalLoginInfo(XsrfKey, HttpContext.Current.User.Identity.GetUserId());
+                loginInfo = OwinHelper.GetOwinContext(HttpContext.Current).Authentication.GetExternalLoginInfo(XsrfKey, HttpContext.Current.User.Identity.GetUserId());
                 if (loginInfo == null)
                 {
                     errors = new[] {"No External Login information found."};

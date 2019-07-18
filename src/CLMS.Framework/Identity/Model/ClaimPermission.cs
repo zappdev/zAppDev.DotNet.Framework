@@ -12,6 +12,7 @@ using System.Security.Permissions;
 using System.Security.Policy;
 using System.Text;
 using System.Web;
+using CLMS.Framework.Owin;
 using Microsoft.AspNet.Identity.Owin;
 
 namespace CLMS.Framework.Identity.Model
@@ -106,7 +107,7 @@ namespace CLMS.Framework.Identity.Model
             if (user == null)
             {
                 log4net.LogManager.GetLogger(nameof(ClaimPermission)).Warn($"A user with username '{userName}' was not found by user manager. Creating Claims Identity from Owin Context Request User.Identity ...");
-                userIdentity = (HttpContext.Current.GetOwinContext().Request.User.Identity as ClaimsIdentity);
+                userIdentity = (OwinHelper.GetOwinContext(HttpContext.Current).Request.User.Identity as ClaimsIdentity);
             }
             else
             {
