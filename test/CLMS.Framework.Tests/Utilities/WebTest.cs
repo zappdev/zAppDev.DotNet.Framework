@@ -27,7 +27,7 @@ namespace CLMS.Framework.Tests.Utilities
 #if NETFRAMEWORK
             using (new HttpSimulator("/", Directory.GetCurrentDirectory()).SimulateRequest())
             {
-                Assert.AreEqual("127.0.0.1", Web.GetClientIp());
+                Assert.AreEqual("127.0.0.1", Framework.Utilities.Web.GetClientIp());
             }
 #else
             Helper.HttpCoreSimulate(() =>
@@ -38,7 +38,7 @@ namespace CLMS.Framework.Tests.Utilities
                 return context;
             });
 
-            Assert.AreEqual("127.0.0.1", Web.GetClientIp());
+            Assert.AreEqual("127.0.0.1", Framework.Utilities.Web.GetClientIp());
 #endif
         }
 
@@ -49,7 +49,7 @@ namespace CLMS.Framework.Tests.Utilities
 #if NETFRAMEWORK
             using (new HttpSimulator("/", Directory.GetCurrentDirectory()).SimulateRequest(new Uri(url)))
             {
-                Assert.AreEqual(url, Web.GetRequestUri().ToString());
+                Assert.AreEqual(url, Framework.Utilities.Web.GetRequestUri().ToString());
             }
 #else
             Helper.HttpCoreSimulate(() =>
@@ -63,7 +63,7 @@ namespace CLMS.Framework.Tests.Utilities
                 return context;
             });
 
-            Assert.AreEqual(url, Web.GetRequestUri().ToString());
+            Assert.AreEqual(url, Framework.Utilities.Web.GetRequestUri().ToString());
 #endif
         }
 
@@ -73,7 +73,7 @@ namespace CLMS.Framework.Tests.Utilities
 #if NETFRAMEWORK
             using (new HttpSimulator("/", Directory.GetCurrentDirectory()).SimulateRequest())
             {
-//                Assert.AreEqual(false, Web.IsUserInRole("Admin"));
+//                Assert.AreEqual(false, Framework.Utilities.Web.IsUserInRole("Admin"));
             }
 #else
             Helper.HttpCoreSimulate(() =>
@@ -83,7 +83,7 @@ namespace CLMS.Framework.Tests.Utilities
                 context.User.AddIdentity(new ClaimsIdentity());
                 return context;
             });
-            Assert.AreEqual(false, Web.IsUserInRole("Admin"));
+            Assert.AreEqual(false, Framework.Utilities.Web.IsUserInRole("Admin"));
 #endif
         }
 
@@ -93,7 +93,7 @@ namespace CLMS.Framework.Tests.Utilities
 #if NETFRAMEWORK
             using (new HttpSimulator("/", Directory.GetCurrentDirectory()).SimulateRequest())
             {
-//                Assert.AreEqual(false, Web.IsUserInRole("Admin"));
+//                Assert.AreEqual(false, Framework.Utilities.Web.IsUserInRole("Admin"));
             }
 #else
             Helper.HttpCoreSimulate(() =>
@@ -103,7 +103,7 @@ namespace CLMS.Framework.Tests.Utilities
                 context.User.AddIdentity(new ClaimsIdentity());
                 return context;
             });
-            Assert.AreEqual(false, Web.IsUser("Admin"));
+            Assert.AreEqual(false, Framework.Utilities.Web.IsUser("Admin"));
 #endif
         }
 
@@ -114,13 +114,13 @@ namespace CLMS.Framework.Tests.Utilities
             using (new HttpSimulator("/", Directory.GetCurrentDirectory())
                 .SimulateRequest())
             {
-                Assert.AreEqual(false, Web.IsInControllerAction("Test"));
+                Assert.AreEqual(false, Framework.Utilities.Web.IsInControllerAction("Test"));
             }
             
             using (new HttpSimulator("/", Directory.GetCurrentDirectory())
                 .SimulateRequest(new Uri("http://clms.test.com?_currentControllerAction=Test")))
             {
-                Assert.AreEqual(true, Web.IsInControllerAction("Test"));
+                Assert.AreEqual(true, Framework.Utilities.Web.IsInControllerAction("Test"));
             }
 #else
             Helper.HttpCoreSimulate(() =>
@@ -132,7 +132,7 @@ namespace CLMS.Framework.Tests.Utilities
                 return context;
             });
 
-            Assert.AreEqual(true, Web.IsInControllerAction("Test"));
+            Assert.AreEqual(true, Framework.Utilities.Web.IsInControllerAction("Test"));
 #endif
         }
 
@@ -143,7 +143,7 @@ namespace CLMS.Framework.Tests.Utilities
             using (new HttpSimulator("/", Directory.GetCurrentDirectory())
                 .SimulateRequest(new Uri("http://clms.test.com?_currentControllerAction=Test")))
             {
-                Assert.AreEqual("?_currentControllerAction=Test", Web.GetQuery());
+                Assert.AreEqual("?_currentControllerAction=Test", Framework.Utilities.Web.GetQuery());
             }
 #else
             Helper.HttpCoreSimulate(() =>
@@ -155,7 +155,7 @@ namespace CLMS.Framework.Tests.Utilities
                 return context;
             });
 
-            Assert.AreEqual("?_currentControllerAction=Test", Web.GetQuery());
+            Assert.AreEqual("?_currentControllerAction=Test", Framework.Utilities.Web.GetQuery());
 #endif
         }
 
@@ -166,13 +166,13 @@ namespace CLMS.Framework.Tests.Utilities
             using (new HttpSimulator("/", Directory.GetCurrentDirectory())
                 .SimulateRequest(new Uri("http://clms.test.com?returnUrl=www.google.com")))
             {
-                Assert.AreEqual("www.google.com", Web.GetFormArgument("returnUrl"));
+                Assert.AreEqual("www.google.com", Framework.Utilities.Web.GetFormArgument("returnUrl"));
             }            
             
             using (new HttpSimulator("/", Directory.GetCurrentDirectory())
                 .SimulateRequest(new Uri("http://clms.test.com")))
             {
-                Assert.AreEqual("", Web.GetFormArgument("returnUrl"));
+                Assert.AreEqual("", Framework.Utilities.Web.GetFormArgument("returnUrl"));
             }            
 #else
             Helper.HttpCoreSimulate(() =>
@@ -183,8 +183,8 @@ namespace CLMS.Framework.Tests.Utilities
 
                 return context;
             });
-            Assert.AreEqual("Test", Web.GetFormArgument("_currentControllerAction"));
-            Assert.AreEqual("", Web.GetFormArgument("returnUrl"));
+            Assert.AreEqual("Test", Framework.Utilities.Web.GetFormArgument("_currentControllerAction"));
+            Assert.AreEqual("", Framework.Utilities.Web.GetFormArgument("returnUrl"));
 #endif
         }
 
@@ -200,7 +200,7 @@ namespace CLMS.Framework.Tests.Utilities
             using (new HttpSimulator("/", Directory.GetCurrentDirectory())
                 .SimulateRequest(new Uri("http://clms.test.com"), options, headers))
             {
-                Assert.AreEqual("text/plain", Web.GetRequestHeader("Accept"));
+                Assert.AreEqual("text/plain", Framework.Utilities.Web.GetRequestHeader("Accept"));
             }
 #else
             Helper.HttpCoreSimulate(() =>
@@ -211,7 +211,7 @@ namespace CLMS.Framework.Tests.Utilities
 
                 return context;
             });
-            Assert.AreEqual("text/plain", Web.GetRequestHeader("Accept"));
+            Assert.AreEqual("text/plain", Framework.Utilities.Web.GetRequestHeader("Accept"));
 #endif
         }
 
@@ -222,7 +222,7 @@ namespace CLMS.Framework.Tests.Utilities
             using (new HttpSimulator("/", Directory.GetCurrentDirectory())
                 .SimulateRequest(new Uri("http://clms.test.com?returnUrl=www.google.com")))
             {
-                Assert.AreEqual("www.google.com", Web.GetReturnUrl());
+                Assert.AreEqual("www.google.com", Framework.Utilities.Web.GetReturnUrl());
             }
 #else
             Helper.HttpCoreSimulate(() =>
@@ -234,7 +234,7 @@ namespace CLMS.Framework.Tests.Utilities
                 return context;
             });
 
-            Assert.AreEqual("www.google.com", Web.GetReturnUrl());
+            Assert.AreEqual("www.google.com", Framework.Utilities.Web.GetReturnUrl());
 
             Helper.HttpCoreSimulate(() =>
             {
@@ -245,20 +245,20 @@ namespace CLMS.Framework.Tests.Utilities
                 return context;
             });
 
-            Assert.AreEqual("www.google.com", Web.GetReturnUrl());
+            Assert.AreEqual("www.google.com", Framework.Utilities.Web.GetReturnUrl());
 #endif
         }
 
         [TestMethod]
         public void SerializationSanitizationEntriesTest()
         {
-            Assert.AreEqual(">>MVC_1<<", Web.SerializationSanitizationEntries["="]);
+            Assert.AreEqual(">>MVC_1<<", Framework.Utilities.Web.SerializationSanitizationEntries["="]);
         }
 
         [TestMethod]
         public void CurrentServerRoleTest()
         {
-            Assert.AreEqual(Web.ServerRole.Combined, Web.CurrentServerRole);
+            Assert.AreEqual(Framework.Utilities.Web.ServerRole.Combined, Framework.Utilities.Web.CurrentServerRole);
         }
 
         [TestMethod]
@@ -269,8 +269,8 @@ namespace CLMS.Framework.Tests.Utilities
             using (new HttpSimulator("/", Directory.GetCurrentDirectory())
                 .SimulateRequest(new Uri("http://clms.test.com?returnUrl=www.google.com")))
             {                
-                Assert.IsTrue(regex.IsMatch(Web.MapPath("App_Data")));
-                Assert.IsTrue(regex.IsMatch(Web.MapPath("~/App_Data/CodeMap.js")));
+                Assert.IsTrue(regex.IsMatch(Framework.Utilities.Web.MapPath("App_Data")));
+                Assert.IsTrue(regex.IsMatch(Framework.Utilities.Web.MapPath("~/App_Data/CodeMap.js")));
             }
 #else
             Helper.HttpCoreSimulate(() =>
@@ -281,7 +281,7 @@ namespace CLMS.Framework.Tests.Utilities
 
                 return context;
             });
-            Assert.IsTrue(regex.IsMatch(Web.MapPath("App_Data")));
+            Assert.IsTrue(regex.IsMatch(Framework.Utilities.Web.MapPath("App_Data")));
 #endif
         }
 
@@ -292,21 +292,21 @@ namespace CLMS.Framework.Tests.Utilities
             using (new HttpSimulator("/", Directory.GetCurrentDirectory())
                 .SimulateRequest(new Uri("http://clms.test.com?returnUrl=www.google.com")))
             {
-                Debug.WriteLine(Web.Session.GetStorage());
+                Debug.WriteLine(Framework.Utilities.Web.Session.GetStorage());
 
-                Assert.ThrowsException<AppDev.Cache.CacheException>(() => Web.Session.Get("Name"));
+                Assert.ThrowsException<AppDev.Cache.CacheException>(() => Framework.Utilities.Web.Session.Get("Name"));
                 
-                Web.Session.Set("Name", "George");
+                Framework.Utilities.Web.Session.Set("Name", "George");
                 
-                Assert.AreEqual("George", Web.Session.Get("Name"));
+                Assert.AreEqual("George", Framework.Utilities.Web.Session.Get("Name"));
                 
-                Web.Session.Add("Phone", "808080");
+                Framework.Utilities.Web.Session.Add("Phone", "808080");
                 
-                Assert.AreEqual("808080", Web.Session.Get("Phone"));
+                Assert.AreEqual("808080", Framework.Utilities.Web.Session.Get("Phone"));
                 
-                Web.Session.Remove("Phone");
+                Framework.Utilities.Web.Session.Remove("Phone");
                 
-                Assert.ThrowsException<AppDev.Cache.CacheException>(() => Web.Session.Get("Phone"));
+                Assert.ThrowsException<AppDev.Cache.CacheException>(() => Framework.Utilities.Web.Session.Get("Phone"));
             } 
 #else
             Helper.HttpCoreSimulate(() =>
@@ -322,21 +322,21 @@ namespace CLMS.Framework.Tests.Utilities
                 return context;
             });
 
-            //Debug.WriteLine(Web.Session.GetStorage());
+            //Debug.WriteLine(Framework.Utilities.Web.Session.GetStorage());
 
-            //Assert.ThrowsException<AppDev.Cache.CacheException>(() => Web.Session.Get("Name"));
+            //Assert.ThrowsException<AppDev.Cache.CacheException>(() => Framework.Utilities.Web.Session.Get("Name"));
 
-            //Web.Session.Set("Name", "George");
+            //Framework.Utilities.Web.Session.Set("Name", "George");
 
-            //Assert.AreEqual("George", Web.Session.Get("Name"));
+            //Assert.AreEqual("George", Framework.Utilities.Web.Session.Get("Name"));
 
-            //Web.Session.Add("Phone", "808080");
+            //Framework.Utilities.Web.Session.Add("Phone", "808080");
 
-            //Assert.AreEqual("808080", Web.Session.Get("Phone"));
+            //Assert.AreEqual("808080", Framework.Utilities.Web.Session.Get("Phone"));
 
-            //Web.Session.Remove("Phone");
+            //Framework.Utilities.Web.Session.Remove("Phone");
 
-            //Assert.ThrowsException<AppDev.Cache.CacheException>(() => Web.Session.Get("Phone"));
+            //Assert.ThrowsException<AppDev.Cache.CacheException>(() => Framework.Utilities.Web.Session.Get("Phone"));
 #endif
         }
     }
