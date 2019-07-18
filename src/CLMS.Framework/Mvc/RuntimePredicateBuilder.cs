@@ -394,8 +394,8 @@ namespace CLMS.Framework.Mvc
         {
             var type = typeof(T);
 
-            var code = $@"public static List<AppCode.DynamicOrderBy<{TypeName(type)}>> BuildOrderByList() {{
-                            var list = new List<AppCode.DynamicOrderBy<{TypeName(type)}>>();";
+            var code = $@"public static List<CLMS.Framework.Mvc.DynamicOrderBy<{TypeName(type)}>> BuildOrderByList() {{
+                            var list = new List<CLMS.Framework.Mvc.DynamicOrderBy<{TypeName(type)}>>();";
 
             foreach (var order in orderBy)
             {
@@ -433,7 +433,7 @@ namespace CLMS.Framework.Mvc
                 {
                     expressionToUse = $"o.{order.Column.Name}";
                 }
-                code += $"list.Add(new AppCode.DynamicOrderBy<{TypeName(type)}>(\"{order.Column.Name}\", o => {expressionToUse}, {ascending}));";
+                code += $"list.Add(new CLMS.Framework.Mvc.DynamicOrderBy<{TypeName(type)}>(\"{order.Column.Name}\", o => {expressionToUse}, {ascending}));";
             }
 
             code += "return list; }";
