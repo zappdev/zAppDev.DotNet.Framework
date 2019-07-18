@@ -445,8 +445,8 @@ namespace CLMS.Framework.Mvc
         {
             var type = typeof(T);
 
-            var code = $@"public static List<AppCode.DynamicGroupBy<{TypeName(type)}>> BuildGroupByList() {{
-                            var list = new List<AppCode.DynamicGroupBy<{TypeName(type)}>>();";
+            var code = $@"public static List<CLMS.Framework.Mvc.DynamicGroupBy<{TypeName(type)}>> BuildGroupByList() {{
+                            var list = new List<CLMS.Framework.Mvc.DynamicGroupBy<{TypeName(type)}>>();";
 
             foreach (var group in groupBy)
             {
@@ -467,7 +467,7 @@ namespace CLMS.Framework.Mvc
                     safecasePathToProp += $" != null ? {pathToProp} : null";
                 }
 
-                code += $"list.Add(new AppCode.DynamicGroupBy<{TypeName(type)}>(\"{group.Column.Name}\", o => {safecasePathToProp}, {expanded}));";
+                code += $"list.Add(new CLMS.Framework.Mvc.DynamicGroupBy<{TypeName(type)}>(\"{group.Column.Name}\", o => {safecasePathToProp}, {expanded}));";
             }
 
             code += "return list; }";
@@ -480,7 +480,7 @@ namespace CLMS.Framework.Mvc
             var type = typeof(T);
 
             var code =
-                $"public static List<AppCode.AggregatorInfo<{TypeName(type)}>> BuildAggregatorPredicates(List<AppCode.AggregatorInfo<{TypeName(type)}>> aggregators)  {{";
+                $"public static List<CLMS.Framework.Mvc.AggregatorInfo<{TypeName(type)}>> BuildAggregatorPredicates(List<CLMS.Framework.Mvc.AggregatorInfo<{TypeName(type)}>> aggregators)  {{";
 
             for (var i = 0; i < aggregators.Count(); i++)
             {
@@ -499,8 +499,8 @@ namespace CLMS.Framework.Mvc
             aggregators = aggregators ?? new List<AggregatorInfo<T>>();
             var type = typeof(T);
 
-            var code = $@"public static AppCode.DynamicClosedGroupsInfo<{TypeName(type)}> BuildClosedGroupsInfo() {{
-                            var closedGroupsInfo = new AppCode.DynamicClosedGroupsInfo<{TypeName(type)}>();
+            var code = $@"public static CLMS.Framework.Mvc.DynamicClosedGroupsInfo<{TypeName(type)}> BuildClosedGroupsInfo() {{
+                            var closedGroupsInfo = new CLMS.Framework.Mvc.DynamicClosedGroupsInfo<{TypeName(type)}>();
                             var groups = new List<CLMS.Framework.LinqRuntimeTypeBuilder.FieldDefinition<{TypeName(type)}>>();";
 
 
