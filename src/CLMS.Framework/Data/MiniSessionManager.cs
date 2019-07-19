@@ -10,6 +10,7 @@ using NHibernate.Cfg;
 using CLMS.Framework.Data.DAL;
 
 #if NETFRAMEWORK
+using CLMS.Framework.Owin;
 using Microsoft.AspNet.Identity.Owin;
 #endif
 
@@ -128,7 +129,7 @@ namespace CLMS.Framework.Data
         public static MiniSessionManager InstanceSafe => 
             HttpContext.Current?.Items["owin.Environment"] == null
             ? _manager
-            : HttpContext.Current?.GetOwinContext()?.Get<MiniSessionManager>();
+            : OwinHelper.GetOwinContext(HttpContext.Current)?.Get<MiniSessionManager>();
 
         #endif
 
@@ -144,7 +145,7 @@ namespace CLMS.Framework.Data
                 #if NETFRAMEWORK
                 if (HttpContext.Current?.Items["owin.Environment"] != null)
                 {
-                    var manager = HttpContext.Current?.GetOwinContext()?.Get<MiniSessionManager>();
+                    var manager = OwinHelper.GetOwinContext(HttpContext.Current)?.Get<MiniSessionManager>();
                     if (manager == null)
                     {
                         throw new ApplicationException("Could not find MiniSessionManager in OWIN context!");

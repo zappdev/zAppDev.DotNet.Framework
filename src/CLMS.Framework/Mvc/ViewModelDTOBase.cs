@@ -6,6 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 #if NETFRAMEWORK
 using System.Web;
+using CLMS.Framework.Owin;
 using CLMS.AppDev.Cache;
 using Microsoft.AspNet.Identity.Owin;
 #else
@@ -47,19 +48,19 @@ namespace CLMS.Framework.Mvc
         {
             get
             {
-                return HttpContext.Current?.GetOwinContext()?.Get<DTOHelper>();
+                return OwinHelper.GetOwinContext(HttpContext.Current)?.Get<DTOHelper>();
             }
 
             set
             {
-                var helper = HttpContext.Current?.GetOwinContext()?.Get<DTOHelper>();
+                var helper = OwinHelper.GetOwinContext(HttpContext.Current)?.Get<DTOHelper>();
 
                 if (helper != null)
                 {
                     throw new InvalidOperationException("Do not set the DTO Helper when another one exists in the OWIN context!");
                 }
 
-                HttpContext.Current?.GetOwinContext()?.Set(value);
+                OwinHelper.GetOwinContext(HttpContext.Current)?.Set(value);
             }
         }
 

@@ -6,6 +6,7 @@ using System.Text;
 #if NETFRAMEWORK
 using System.Web;
 using System.Web.Mvc;
+using CLMS.Framework.Owin;
 using Microsoft.AspNet.Identity.Owin;
 #else
 using CLMS.Framework.Utilities;
@@ -74,12 +75,12 @@ namespace CLMS.Framework.Mvc
                 try
                 {
 #if NETFRAMEWORK
-                    var pendingUpload = HttpContext.Current?.GetOwinContext()?.Get<PendingUploads>();
+                    var pendingUpload = OwinHelper.GetOwinContext(HttpContext.Current)?.Get<PendingUploads>();
                     if (pendingUpload != null) return pendingUpload;
 
                     pendingUpload = new PendingUploads();
                     _pendingUploadsInstance = pendingUpload;
-                    HttpContext.Current?.GetOwinContext()?.Set(pendingUpload);
+                    OwinHelper.GetOwinContext(HttpContext.Current)?.Set(pendingUpload);
                     return pendingUpload;
 #else
                     throw new NotImplementedException();
@@ -107,12 +108,12 @@ namespace CLMS.Framework.Mvc
                 try
                 {
 #if NETFRAMEWORK
-                    var pendingDowload = HttpContext.Current?.GetOwinContext()?.Get<PendingDownloads>();
+                    var pendingDowload = OwinHelper.GetOwinContext(HttpContext.Current)?.Get<PendingDownloads>();
                     if (pendingDowload != null) return pendingDowload;
 
                     pendingDowload = new PendingDownloads();
                     _pendingDownloadsInstance = pendingDowload;
-                    HttpContext.Current?.GetOwinContext()?.Set(pendingDowload);
+                    OwinHelper.GetOwinContext(HttpContext.Current)?.Set(pendingDowload);
                     return pendingDowload;
 #else
                     throw new NotImplementedException();
