@@ -445,11 +445,11 @@ namespace CLMS.Framework.Auditing.Model
 
         #endregion
 
-        public static bool ExemptEntity(string entity)
+        public static bool SkipEntity(string entity)
         {
 
 #if NETFRAMEWORK
-            using (new Profiling.Profiler(nameof(AuditEntityConfiguration), Profiling.AppDevSymbolType.ClassOperation, nameof(AuditEntityConfiguration.ExemptEntity)))
+            using (new Profiling.Profiler(nameof(AuditEntityConfiguration), Profiling.AppDevSymbolType.ClassOperation, nameof(AuditEntityConfiguration.SkipEntity)))
             {
                 List<string> list = new List<string>();
                 list.Add("IDomainModelClass");
@@ -461,9 +461,11 @@ namespace CLMS.Framework.Auditing.Model
                 return false;
             }
 #else
-            List<string> list = new List<string>();
-            list.Add("IDomainModelClass");
-            list.Add("BusinessException");
+            List<string> list = new List<string>
+            {
+                "IDomainModelClass",
+                "BusinessException"
+            };
             if (list.Contains(entity))
             {
                 return true;
@@ -546,7 +548,7 @@ namespace CLMS.Framework.Auditing.Model
 
                 foreach (var currentClassType in _auditableTypes)
                 {
-                    if (ExemptEntity(Common.GetTypeName(currentClassType, false)))
+                    if (SkipEntity(Common.GetTypeName(currentClassType, false)))
                     {
                         continue;
                     }
@@ -565,21 +567,21 @@ namespace CLMS.Framework.Auditing.Model
 
             foreach (var currentClassType in _auditableTypes)
             {
-                if (ExemptEntity(Common.GetTypeName(currentClassType, false)))
+                if (SkipEntity(Common.GetTypeName(currentClassType, false)))
                 {
                     continue;
                 }
 
-                newEntity = new AuditEntityConfiguration();
-                newEntity.FullName = Common.GetTypeName(currentClassType, true);
-                newEntity.ShortName = Common.GetTypeName(currentClassType, false);
-                newEntity.Properties = AuditPropertyConfiguration.GetAuditEntityProperties(currentClassType).ToList();
+                newEntity = new AuditEntityConfiguration
+                {
+                    FullName = Common.GetTypeName(currentClassType, true),
+                    ShortName = Common.GetTypeName(currentClassType, false),
+                    Properties = AuditPropertyConfiguration.GetAuditEntityProperties(currentClassType).ToList()
+                };
                 entities?.Add(newEntity);
             }
             return entities;
 #endif
-
-
         }
 
     }

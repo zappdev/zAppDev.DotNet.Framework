@@ -19,8 +19,6 @@ namespace CLMS.Framework.Auditing.Model
     [DataContract]
     public class AuditPropertyConfiguration : IDomainModelClass
     {
-        #region AuditPropertyConfiguration's Fields
-
         protected Guid _transientId= Guid.NewGuid();
         public virtual Guid TransientId
         {
@@ -33,138 +31,64 @@ namespace CLMS.Framework.Auditing.Model
                 _transientId = value;
             }
         }
-        [DataMember(Name="Id")]
-        protected int? id = 0;
-        [DataMember(Name="Name")]
-        protected string name;
-        [DataMember(Name="DataType")]
-        protected string dataType;
-        [DataMember(Name="IsAuditable")]
-        protected bool isAuditable;
-        [DataMember(Name="IsComplex")]
-        protected bool isComplex;
-        [DataMember(Name="IsCollection")]
-        protected bool isCollection;
-        [DataMember(Name="VersionTimestamp")]
-        protected byte[] versionTimestamp;
 
-        #endregion
-        #region AuditPropertyConfiguration's Properties
-/// <summary>
-/// The Id property
-///
-/// </summary>
-///
+        /// <summary>
+        /// The Id property
+        ///
+        /// </summary>
+        ///
         [Key]
-        public virtual int? Id
-        {
-            get
-            {
-                return id;
-            }
-            set
-            {
-                id = value;
-            }
-        }
-/// <summary>
-/// The Name property
-///
-/// </summary>
-///
-        public virtual string Name
-        {
-            get
-            {
-                return name;
-            }
-            set
-            {
-                name = value;
-            }
-        }
-/// <summary>
-/// The DataType property
-///
-/// </summary>
-///
-        public virtual string DataType
-        {
-            get
-            {
-                return dataType;
-            }
-            set
-            {
-                dataType = value;
-            }
-        }
-/// <summary>
-/// The IsAuditable property
-///
-/// </summary>
-///
-        public virtual bool IsAuditable
-        {
-            get
-            {
-                return isAuditable;
-            }
-            set
-            {
-                isAuditable = value;
-            }
-        }
-/// <summary>
-/// The IsComplex property
-///
-/// </summary>
-///
-        public virtual bool IsComplex
-        {
-            get
-            {
-                return isComplex;
-            }
-            set
-            {
-                isComplex = value;
-            }
-        }
-/// <summary>
-/// The IsCollection property
-///
-/// </summary>
-///
-        public virtual bool IsCollection
-        {
-            get
-            {
-                return isCollection;
-            }
-            set
-            {
-                isCollection = value;
-            }
-        }
-/// <summary>
-/// The VersionTimestamp property
-///Provides concurrency control for the class
-/// </summary>
-///
-        public virtual byte[] VersionTimestamp
-        {
-            get
-            {
-                return versionTimestamp;
-            }
-            set
-            {
-                versionTimestamp = value;
-            }
-        }
-        #endregion
-        #region AuditPropertyConfiguration's Participant Properties
+        [DataMember(Name = "Id")]
+        public virtual int? Id { get; set; }
+
+        /// <summary>   
+        /// The Name property
+        ///
+        /// </summary>
+        ///
+        [DataMember(Name = "Name")]
+        public virtual string Name { get; set; }
+
+        /// <summary>
+        /// The DataType property
+        ///
+        /// </summary>
+        ///
+        [DataMember(Name = "DataType")]
+        public virtual string DataType { get; set; }
+
+        /// <summary>
+        /// The IsAuditable property
+        ///
+        /// </summary>
+        ///
+        [DataMember(Name = "IsAuditable")]
+        public virtual bool IsAuditable { get; set; }
+
+        /// <summary>
+        /// The IsComplex property
+        ///
+        /// </summary>
+        ///
+        [DataMember(Name = "IsComplex")]
+        public virtual bool IsComplex { get; set; }
+
+        /// <summary>
+        /// The IsCollection property
+        ///
+        /// </summary>
+        ///
+        [DataMember(Name = "IsCollection")]
+        public virtual bool IsCollection { get; set; }
+
+        /// <summary>
+        /// The VersionTimestamp property
+        ///Provides concurrency control for the class
+        /// </summary>
+        ///
+        [DataMember(Name = "VersionTimestamp")]
+        public virtual byte[] VersionTimestamp { get; set; }
+
         [DataMember(Name="Entity")]
         protected AuditEntityConfiguration entity;
         public virtual AuditEntityConfiguration Entity
@@ -176,7 +100,6 @@ namespace CLMS.Framework.Auditing.Model
             set
             {
                 if(Equals(entity, value)) return;
-                var __oldValue = entity;
                 entity?.InternalRemoveProperties(this);
                 entity = value;
                 if (value != null)
@@ -185,16 +108,16 @@ namespace CLMS.Framework.Auditing.Model
                 }
             }
         }
-        #endregion
-        #region Constructors
-/// <summary>
-/// Public constructors of the AuditPropertyConfiguration class
-/// </summary>
-/// <returns>New AuditPropertyConfiguration object</returns>
-/// <remarks></remarks>
-        public AuditPropertyConfiguration() {}
-        #endregion
-        #region Methods
+
+        /// <summary>
+        /// Public constructors of the AuditPropertyConfiguration class
+        /// </summary>
+        /// <returns>New AuditPropertyConfiguration object</returns>
+        /// <remarks></remarks>
+        public AuditPropertyConfiguration()
+        {
+
+        }
 
         public virtual List<string> _Validate(bool throwException = true)
         {
@@ -228,26 +151,21 @@ namespace CLMS.Framework.Auditing.Model
             hashCode = hashCode * -1521134295 + (Id?.GetHashCode() ?? 0);
             hashCode = hashCode * -1521134295 + (Name?.GetHashCode() ?? 0);
             hashCode = hashCode * -1521134295 + (DataType?.GetHashCode() ?? 0);
-            hashCode = hashCode * -1521134295 + (IsAuditable.GetHashCode() );
-            hashCode = hashCode * -1521134295 + (IsComplex.GetHashCode() );
-            hashCode = hashCode * -1521134295 + (IsCollection.GetHashCode() );
+            hashCode = hashCode * -1521134295 + IsAuditable.GetHashCode() ;
+            hashCode = hashCode * -1521134295 + IsComplex.GetHashCode() ;
+            hashCode = hashCode * -1521134295 + IsCollection.GetHashCode() ;
             return hashCode;
         }
 
-
-
-
-
-
-/// <summary>
-/// Copies the current object to a new instance
-/// </summary>
-/// <param name="deep">Copy members that refer to objects external to this class (not dependent)</param>
-/// <param name="copiedObjects">Objects that should be reused</param>
-/// <param name="asNew">Copy the current object as a new one, ready to be persisted, along all its members.</param>
-/// <param name="reuseNestedObjects">If asNew is true, this flag if set, forces the reuse of all external objects.</param>
-/// <param name="copy">Optional - An existing [AuditPropertyConfiguration] instance to use as the destination.</param>
-/// <returns>A copy of the object</returns>
+        /// <summary>
+        /// Copies the current object to a new instance
+        /// </summary>
+        /// <param name="deep">Copy members that refer to objects external to this class (not dependent)</param>
+        /// <param name="copiedObjects">Objects that should be reused</param>
+        /// <param name="asNew">Copy the current object as a new one, ready to be persisted, along all its members.</param>
+        /// <param name="reuseNestedObjects">If asNew is true, this flag if set, forces the reuse of all external objects.</param>
+        /// <param name="copy">Optional - An existing [AuditPropertyConfiguration] instance to use as the destination.</param>
+        /// <returns>A copy of the object</returns>
         public virtual AuditPropertyConfiguration Copy(bool deep=false, Hashtable copiedObjects=null, bool asNew=false, bool reuseNestedObjects = false, AuditPropertyConfiguration copy = null)
         {
             if(copiedObjects == null)
@@ -259,35 +177,35 @@ namespace CLMS.Framework.Auditing.Model
             copy = copy ?? new AuditPropertyConfiguration();
             if (!asNew)
             {
-                copy.TransientId = this.TransientId;
-                copy.Id = this.Id;
+                copy.TransientId = TransientId;
+                copy.Id = Id;
             }
-            copy.Name = this.Name;
-            copy.DataType = this.DataType;
-            copy.IsAuditable = this.IsAuditable;
-            copy.IsComplex = this.IsComplex;
-            copy.IsCollection = this.IsCollection;
+            copy.Name = Name;
+            copy.DataType = DataType;
+            copy.IsAuditable = IsAuditable;
+            copy.IsComplex = IsComplex;
+            copy.IsCollection = IsCollection;
             if (!copiedObjects.Contains(this))
             {
                 copiedObjects.Add(this, copy);
             }
-            if(deep && this.entity != null)
+            if(deep && entity != null)
             {
-                if (!copiedObjects.Contains(this.entity))
+                if (!copiedObjects.Contains(entity))
                 {
                     if (asNew && reuseNestedObjects)
-                        copy.Entity = this.Entity;
+                        copy.Entity = Entity;
                     else if (asNew)
-                        copy.Entity = this.Entity.Copy(deep, copiedObjects, true);
+                        copy.Entity = Entity.Copy(deep, copiedObjects, true);
                     else
-                        copy.entity = this.entity.Copy(deep, copiedObjects, false);
+                        copy.entity = entity.Copy(deep, copiedObjects, false);
                 }
                 else
                 {
                     if (asNew)
-                        copy.Entity = (AuditEntityConfiguration)copiedObjects[this.Entity];
+                        copy.Entity = (AuditEntityConfiguration)copiedObjects[Entity];
                     else
-                        copy.entity = (AuditEntityConfiguration)copiedObjects[this.Entity];
+                        copy.entity = (AuditEntityConfiguration)copiedObjects[Entity];
                 }
             }
             return copy;
@@ -300,21 +218,21 @@ namespace CLMS.Framework.Auditing.Model
             {
                 return true;
             }
-            if (compareTo == null || !this.GetType().Equals(compareTo.GetTypeUnproxied()))
+            if (compareTo == null || !GetType().Equals(compareTo.GetTypeUnproxied()))
             {
                 return false;
             }
-            if (this.HasSameNonDefaultIdAs(compareTo))
+            if (HasSameNonDefaultIdAs(compareTo))
             {
                 return true;
             }
             // Since the Ids aren't the same, both of them must be transient to
             // compare domain signatures; because if one is transient and the
             // other is a persisted entity, then they cannot be the same object.
-            return this.IsTransient() && compareTo.IsTransient() && (base.Equals(compareTo) || this.TransientId.Equals(compareTo.TransientId));
+            return IsTransient() && compareTo.IsTransient() && (base.Equals(compareTo) || TransientId.Equals(compareTo.TransientId));
         }
 
-// Maintain equality operator semantics for entities.
+        // Maintain equality operator semantics for entities.
         public static bool operator ==(AuditPropertyConfiguration x, AuditPropertyConfiguration y)
         {
             // By default, == and Equals compares references. In order to
@@ -324,7 +242,7 @@ namespace CLMS.Framework.Auditing.Model
             return Equals(x, y);
         }
 
-// Maintain inequality operator semantics for entities.
+        // Maintain inequality operator semantics for entities.
         public static bool operator !=(AuditPropertyConfiguration x, AuditPropertyConfiguration y)
         {
             return !(x == y);
@@ -335,32 +253,32 @@ namespace CLMS.Framework.Auditing.Model
         {
             if (__propertyKeyCache == null)
             {
-                __propertyKeyCache = this.GetType().GetProperty("Id");
+                __propertyKeyCache = GetType().GetProperty("Id");
             }
             return __propertyKeyCache;
         }
 
 
-/// <summary>
-///     To help ensure hashcode uniqueness, a carefully selected random number multiplier
-///     is used within the calculation.  Goodrich and Tamassia's Data Structures and
-///     Algorithms in Java asserts that 31, 33, 37, 39 and 41 will produce the fewest number
-///     of collissions.  See http://computinglife.wordpress.com/2008/11/20/why-do-hash-functions-use-prime-numbers/
-///     for more information.
-/// </summary>
+        /// <summary>
+        ///     To help ensure hashcode uniqueness, a carefully selected random number multiplier
+        ///     is used within the calculation.  Goodrich and Tamassia's Data Structures and
+        ///     Algorithms in Java asserts that 31, 33, 37, 39 and 41 will produce the fewest number
+        ///     of collissions.  See http://computinglife.wordpress.com/2008/11/20/why-do-hash-functions-use-prime-numbers/
+        ///     for more information.
+        /// </summary>
         private const int HashMultiplier = 31;
         private int? cachedHashcode;
 
         public override int GetHashCode()
         {
-            if (this.cachedHashcode.HasValue)
+            if (cachedHashcode.HasValue)
             {
-                return this.cachedHashcode.Value;
+                return cachedHashcode.Value;
             }
-            if (this.IsTransient())
+            if (IsTransient())
             {
                 //this.cachedHashcode = base.GetHashCode();
-                return this.TransientId.GetHashCode(); //don't cache because this won't stay transient forever
+                return TransientId.GetHashCode(); //don't cache because this won't stay transient forever
             }
             else
             {
@@ -369,52 +287,50 @@ namespace CLMS.Framework.Auditing.Model
                     // It's possible for two objects to return the same hash code based on
                     // identically valued properties, even if they're of two different types,
                     // so we include the object's type in the hash calculation
-                    var hashCode = this.GetType().GetHashCode();
-                    this.cachedHashcode = (hashCode * HashMultiplier) ^ this.Id.GetHashCode();
+                    var hashCode = GetType().GetHashCode();
+                    cachedHashcode = (hashCode * HashMultiplier) ^ Id.GetHashCode();
                 }
             }
-            return this.cachedHashcode.Value;
+            return cachedHashcode.Value;
         }
 
-/// <summary>
-///     Transient objects are not associated with an item already in storage.  For instance,
-///     a Customer is transient if its Id is 0.  It's virtual to allow NHibernate-backed
-///     objects to be lazily loaded.
-/// </summary>
+        /// <summary>
+        ///     Transient objects are not associated with an item already in storage.  For instance,
+        ///     a Customer is transient if its Id is 0.  It's virtual to allow NHibernate-backed
+        ///     objects to be lazily loaded.
+        /// </summary>
         public virtual bool IsTransient()
         {
-            return this.Id == default(int) || this.Id.Equals(default(int));
+            return Id == default(int) || Id.Equals(default(int));
         }
 
-/// <summary>
-///     When NHibernate proxies objects, it masks the type of the actual entity object.
-///     This wrapper burrows into the proxied object to get its actual type.
-///
-///     Although this assumes NHibernate is being used, it doesn't require any NHibernate
-///     related dependencies and has no bad side effects if NHibernate isn't being used.
-///
-///     Related discussion is at http://groups.google.com/group/sharp-architecture/browse_thread/thread/ddd05f9baede023a ...thanks Jay Oliver!
-/// </summary>
+        /// <summary>
+        ///     When NHibernate proxies objects, it masks the type of the actual entity object.
+        ///     This wrapper burrows into the proxied object to get its actual type.
+        ///
+        ///     Although this assumes NHibernate is being used, it doesn't require any NHibernate
+        ///     related dependencies and has no bad side effects if NHibernate isn't being used.
+        ///
+        ///     Related discussion is at http://groups.google.com/group/sharp-architecture/browse_thread/thread/ddd05f9baede023a ...thanks Jay Oliver!
+        /// </summary>
         protected virtual Type GetTypeUnproxied()
         {
-            return this.GetType();
+            return GetType();
         }
 
-/// <summary>
-///     Returns true if self and the provided entity have the same Id values
-///     and the Ids are not of the default Id value
-/// </summary>
+        /// <summary>
+        ///     Returns true if self and the provided entity have the same Id values
+        ///     and the Ids are not of the default Id value
+        /// </summary>
         protected bool HasSameNonDefaultIdAs(AuditPropertyConfiguration compareTo)
         {
-            return !this.IsTransient() && !compareTo.IsTransient() && this.Id.Equals(compareTo.Id);
+            return !IsTransient() && !compareTo.IsTransient() && Id.Equals(compareTo.Id);
         }
-
-        #endregion
 
         public virtual void UpdateAuditPropertyConfiguration(AuditPropertyConfiguration tmp)
         {            
 #if NETFRAMEWORK
-            using (new Profiling.Profiler(nameof(AuditEntityConfiguration), Profiling.AppDevSymbolType.ClassOperation, nameof(AuditEntityConfiguration.ExemptEntity)))
+            using (new Profiling.Profiler(nameof(AuditEntityConfiguration), Profiling.AppDevSymbolType.ClassOperation, nameof(AuditEntityConfiguration.SkipEntity)))
             {
                 IsAuditable = (tmp?.IsAuditable ?? false);
                 IsCollection = (tmp?.IsCollection ?? false);
@@ -422,10 +338,10 @@ namespace CLMS.Framework.Auditing.Model
                 DataType = (tmp?.DataType ?? "");
             }
 #else
-            IsAuditable = (tmp?.IsAuditable ?? false);
-            IsCollection = (tmp?.IsCollection ?? false);
-            IsComplex = (tmp?.IsComplex ?? false);
-            DataType = (tmp?.DataType ?? "");
+            IsAuditable = tmp?.IsAuditable ?? false;
+            IsCollection = tmp?.IsCollection ?? false;
+            IsComplex = tmp?.IsComplex ?? false;
+            DataType = tmp?.DataType ?? "";
 #endif
         }
 
@@ -442,7 +358,7 @@ namespace CLMS.Framework.Auditing.Model
                 AuditEntityConfiguration existingEntity = new AuditEntityConfiguration();
                 foreach (var currentProperty in MambaRuntimeType.FromPropertiesList(runtimeEntityProperty.GetProperties()) ?? Enumerable.Empty<MambaRuntimeType>())
                 {
-                    if ((ExemptProperty(currentProperty.Name)))
+                    if ((SkipProperty(currentProperty.Name)))
                     {
                         continue;
                     }
@@ -487,14 +403,14 @@ namespace CLMS.Framework.Auditing.Model
             AuditEntityConfiguration existingEntity = new AuditEntityConfiguration();
             foreach (var currentProperty in MambaRuntimeType.FromPropertiesList(runtimeEntityProperty.GetProperties()) ?? Enumerable.Empty<MambaRuntimeType>())
             {
-                if ((ExemptProperty(currentProperty.Name)))
+                if (SkipProperty(currentProperty.Name))
                 {
                     continue;
                 }
                 newproperty = new AuditPropertyConfiguration();
                 existingEntity = existingEntities?.FirstOrDefault((a) => a.FullName == Common.GetTypeName(runtimeEntityProperty, true));
                 newproperty.Name = currentProperty.Name;
-                newproperty.IsComplex = ((Common.IsPropertyPrimitiveOrSimple(currentProperty)) == false);
+                newproperty.IsComplex = Common.IsPropertyPrimitiveOrSimple(currentProperty) == false;
                 if ((currentProperty.PropertyType.GenericTypeArguments.Length > 0) && (currentProperty.PropertyType.GenericTypeArguments.ToList().FirstOrDefault() != null))
                 {
                     newproperty.DataType = Common.GetTypeName(currentProperty.PropertyType.GenericTypeArguments.ToList().FirstOrDefault(), true);
@@ -513,7 +429,7 @@ namespace CLMS.Framework.Auditing.Model
                 }
                 if (existingEntity != null && existingEntity?.Properties?.FirstOrDefault((x) => x.Name == currentProperty.Name) != null)
                 {
-                    newproperty.IsAuditable = (existingEntity?.Properties?.FirstOrDefault((x) => x.Name == currentProperty.Name)?.IsAuditable ?? false);
+                    newproperty.IsAuditable = existingEntity?.Properties?.FirstOrDefault((x) => x.Name == currentProperty.Name)?.IsAuditable ?? false;
                 }
                 else
                 {
@@ -525,9 +441,11 @@ namespace CLMS.Framework.Auditing.Model
 #endif
         }
 
-        public static bool ExemptProperty(string property)
+        public static bool SkipProperty(string property)
         {
-            return property == "TransientId" || property == "DbTimestamp" || property == "VersionTimestamp";
+            return property == "TransientId" 
+                || property == "DbTimestamp" 
+                || property == "VersionTimestamp";
         }
 
     }
