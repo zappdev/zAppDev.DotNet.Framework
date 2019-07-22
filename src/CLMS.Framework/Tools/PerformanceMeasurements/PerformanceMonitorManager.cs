@@ -1,3 +1,5 @@
+#if NETFRAMEWORK
+
 using CLMS.Framework.Data;
 using CLMS.Framework.Data.DAL;
 using CLMS.Framework.Tools.PerformanceMeasurements.Configuration;
@@ -132,3 +134,4 @@ namespace CLMS.Framework.Tools.PerformanceMeasurements
         }
     }
 }
+#endif
