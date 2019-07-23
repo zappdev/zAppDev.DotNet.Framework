@@ -19,8 +19,6 @@ namespace CLMS.Framework.Auditing.Model
     [DataContract]
     public class AuditEntityConfiguration : IDomainModelClass
     {
-        #region AuditEntityConfiguration's Fields
-
         protected Guid _transientId= Guid.NewGuid();
         public virtual Guid TransientId
         {
@@ -33,10 +31,7 @@ namespace CLMS.Framework.Auditing.Model
                 _transientId = value;
             }
         }
-        [DataMember(Name="Id")]
-        protected int? id = 0;
-        [DataMember(Name="FullName")]
-        protected string fullName;
+
         [DataMember(Name="ShortName")]
         protected string shortName;
         [DataMember(Name="VersionTimestamp")]
@@ -45,46 +40,31 @@ namespace CLMS.Framework.Auditing.Model
 #pragma warning disable 0649
         private bool disableInternalAdditions;
 #pragma warning restore 0649
-        #endregion
+
         #region AuditEntityConfiguration's Properties
-/// <summary>
-/// The Id property
-///
-/// </summary>
-///
+
+        /// <summary>
+        /// The Id property
+        ///
+        /// </summary>
+        ///
         [Key]
-        public virtual int? Id
-        {
-            get
-            {
-                return id;
-            }
-            set
-            {
-                id = value;
-            }
-        }
-/// <summary>
-/// The FullName property
-///
-/// </summary>
-///
-        public virtual string FullName
-        {
-            get
-            {
-                return fullName;
-            }
-            set
-            {
-                fullName = value;
-            }
-        }
-/// <summary>
-/// The ShortName property
-///
-/// </summary>
-///
+        [DataMember(Name = "Id")]
+        public virtual int? Id { get; set; }
+
+        /// <summary>
+        /// The FullName property
+        ///
+        /// </summary>
+        ///
+        [DataMember(Name="FullName")]
+        public virtual string FullName { get; set; }
+
+        /// <summary>
+        /// The ShortName property
+        ///
+        /// </summary>
+        ///
         public virtual string ShortName
         {
             get
@@ -506,7 +486,7 @@ namespace CLMS.Framework.Auditing.Model
                 repo.Save(this);
             }
 #else
-            AuditPropertyConfiguration tmpProperty = new AuditPropertyConfiguration();
+            var tmpProperty = new AuditPropertyConfiguration();
             foreach (var current in this?.Properties ?? Enumerable.Empty<AuditPropertyConfiguration>())
             {
                 var _var0 = current?.Name;
@@ -553,17 +533,19 @@ namespace CLMS.Framework.Auditing.Model
                         continue;
                     }
 
-                    newEntity = new AuditEntityConfiguration();
-                    newEntity.FullName = Common.GetTypeName(currentClassType, true);
-                    newEntity.ShortName = Common.GetTypeName(currentClassType, false);
-                    newEntity.Properties = AuditPropertyConfiguration.GetAuditEntityProperties(currentClassType).ToList();
+                    newEntity = new AuditEntityConfiguration
+                    {
+                        FullName = Common.GetTypeName(currentClassType, true),
+                        ShortName = Common.GetTypeName(currentClassType, false),
+                        Properties = AuditPropertyConfiguration.GetAuditEntityProperties(currentClassType).ToList()
+                    };
                     entities?.Add(newEntity);
                 }
                 return entities;
             }
 #else
-            List<AuditEntityConfiguration> entities = new List<AuditEntityConfiguration>();
-            AuditEntityConfiguration newEntity = new AuditEntityConfiguration();
+            var entities = new List<AuditEntityConfiguration>();
+            var newEntity = new AuditEntityConfiguration();
 
             foreach (var currentClassType in _auditableTypes)
             {
