@@ -32,16 +32,9 @@ namespace CLMS.Framework.Auditing.Model
             }
         }
 
-        [DataMember(Name="ShortName")]
-        protected string shortName;
-        [DataMember(Name="VersionTimestamp")]
-        protected byte[] versionTimestamp;
-
 #pragma warning disable 0649
         private bool disableInternalAdditions;
 #pragma warning restore 0649
-
-        #region AuditEntityConfiguration's Properties
 
         /// <summary>
         /// The Id property
@@ -65,35 +58,17 @@ namespace CLMS.Framework.Auditing.Model
         ///
         /// </summary>
         ///
-        public virtual string ShortName
-        {
-            get
-            {
-                return shortName;
-            }
-            set
-            {
-                shortName = value;
-            }
-        }
-/// <summary>
-/// The VersionTimestamp property
-///Provides concurrency control for the class
-/// </summary>
-///
-        public virtual byte[] VersionTimestamp
-        {
-            get
-            {
-                return versionTimestamp;
-            }
-            set
-            {
-                versionTimestamp = value;
-            }
-        }
-        #endregion
-        #region AuditEntityConfiguration's Participant Properties
+        [DataMember(Name = "ShortName")]
+        public virtual string ShortName { get; set; }
+
+        /// <summary>
+        /// The VersionTimestamp property
+        ///Provides concurrency control for the class
+        /// </summary>
+        ///
+        [DataMember(Name = "VersionTimestamp")]
+        public virtual byte[] VersionTimestamp { get; set; }
+        
         [DataMember(Name="Properties")]
         protected IList<AuditPropertyConfiguration> properties = new List<AuditPropertyConfiguration>();
         public virtual List<AuditPropertyConfiguration> Properties
@@ -159,7 +134,7 @@ namespace CLMS.Framework.Auditing.Model
         {
             if (__item == null) return;
             if (__item.Entity != this)
-                __item.Entity = this;
+            __item.Entity = this;
         }
 
         public virtual void AddAtIndexProperties(int index, AuditPropertyConfiguration __item)
@@ -170,7 +145,7 @@ namespace CLMS.Framework.Auditing.Model
             try
             {
                 if (__item.Entity != this)
-                    __item.Entity = this;
+                __item.Entity = this;
             }
             finally
             {
@@ -210,16 +185,13 @@ namespace CLMS.Framework.Auditing.Model
                 }
             }
         }
-        #endregion
-        #region Constructors
-/// <summary>
-/// Public constructors of the AuditEntityConfiguration class
-/// </summary>
-/// <returns>New AuditEntityConfiguration object</returns>
-/// <remarks></remarks>
+        
+        /// <summary>
+        /// Public constructors of the AuditEntityConfiguration class
+        /// </summary>
+        /// <returns>New AuditEntityConfiguration object</returns>
+        /// <remarks></remarks>
         public AuditEntityConfiguration() {}
-        #endregion
-        #region Methods
 
         public virtual List<string> _Validate(bool throwException = true)
         {
@@ -257,15 +229,15 @@ namespace CLMS.Framework.Auditing.Model
 
 
 
-/// <summary>
-/// Copies the current object to a new instance
-/// </summary>
-/// <param name="deep">Copy members that refer to objects external to this class (not dependent)</param>
-/// <param name="copiedObjects">Objects that should be reused</param>
-/// <param name="asNew">Copy the current object as a new one, ready to be persisted, along all its members.</param>
-/// <param name="reuseNestedObjects">If asNew is true, this flag if set, forces the reuse of all external objects.</param>
-/// <param name="copy">Optional - An existing [AuditEntityConfiguration] instance to use as the destination.</param>
-/// <returns>A copy of the object</returns>
+        /// <summary>
+        /// Copies the current object to a new instance
+        /// </summary>
+        /// <param name="deep">Copy members that refer to objects external to this class (not dependent)</param>
+        /// <param name="copiedObjects">Objects that should be reused</param>
+        /// <param name="asNew">Copy the current object as a new one, ready to be persisted, along all its members.</param>
+        /// <param name="reuseNestedObjects">If asNew is true, this flag if set, forces the reuse of all external objects.</param>
+        /// <param name="copy">Optional - An existing [AuditEntityConfiguration] instance to use as the destination.</param>
+        /// <returns>A copy of the object</returns>
         public virtual AuditEntityConfiguration Copy(bool deep=false, Hashtable copiedObjects=null, bool asNew=false, bool reuseNestedObjects = false, AuditEntityConfiguration copy = null)
         {
             if(copiedObjects == null)
@@ -328,7 +300,7 @@ namespace CLMS.Framework.Auditing.Model
             return this.IsTransient() && compareTo.IsTransient() && (base.Equals(compareTo) || this.TransientId.Equals(compareTo.TransientId));
         }
 
-// Maintain equality operator semantics for entities.
+        // Maintain equality operator semantics for entities.
         public static bool operator ==(AuditEntityConfiguration x, AuditEntityConfiguration y)
         {
             // By default, == and Equals compares references. In order to
@@ -338,7 +310,7 @@ namespace CLMS.Framework.Auditing.Model
             return Equals(x, y);
         }
 
-// Maintain inequality operator semantics for entities.
+        // Maintain inequality operator semantics for entities.
         public static bool operator !=(AuditEntityConfiguration x, AuditEntityConfiguration y)
         {
             return !(x == y);
@@ -355,13 +327,13 @@ namespace CLMS.Framework.Auditing.Model
         }
 
 
-/// <summary>
-///     To help ensure hashcode uniqueness, a carefully selected random number multiplier
-///     is used within the calculation.  Goodrich and Tamassia's Data Structures and
-///     Algorithms in Java asserts that 31, 33, 37, 39 and 41 will produce the fewest number
-///     of collissions.  See http://computinglife.wordpress.com/2008/11/20/why-do-hash-functions-use-prime-numbers/
-///     for more information.
-/// </summary>
+        /// <summary>
+        ///     To help ensure hashcode uniqueness, a carefully selected random number multiplier
+        ///     is used within the calculation.  Goodrich and Tamassia's Data Structures and
+        ///     Algorithms in Java asserts that 31, 33, 37, 39 and 41 will produce the fewest number
+        ///     of collissions.  See http://computinglife.wordpress.com/2008/11/20/why-do-hash-functions-use-prime-numbers/
+        ///     for more information.
+        /// </summary>
         private const int HashMultiplier = 31;
         private int? cachedHashcode;
 
@@ -390,40 +362,38 @@ namespace CLMS.Framework.Auditing.Model
             return this.cachedHashcode.Value;
         }
 
-/// <summary>
-///     Transient objects are not associated with an item already in storage.  For instance,
-///     a Customer is transient if its Id is 0.  It's virtual to allow NHibernate-backed
-///     objects to be lazily loaded.
-/// </summary>
+        /// <summary>
+        ///     Transient objects are not associated with an item already in storage.  For instance,
+        ///     a Customer is transient if its Id is 0.  It's virtual to allow NHibernate-backed
+        ///     objects to be lazily loaded.
+        /// </summary>
         public virtual bool IsTransient()
         {
             return this.Id == default(int) || this.Id.Equals(default(int));
         }
 
-/// <summary>
-///     When NHibernate proxies objects, it masks the type of the actual entity object.
-///     This wrapper burrows into the proxied object to get its actual type.
-///
-///     Although this assumes NHibernate is being used, it doesn't require any NHibernate
-///     related dependencies and has no bad side effects if NHibernate isn't being used.
-///
-///     Related discussion is at http://groups.google.com/group/sharp-architecture/browse_thread/thread/ddd05f9baede023a ...thanks Jay Oliver!
-/// </summary>
+        /// <summary>
+        ///     When NHibernate proxies objects, it masks the type of the actual entity object.
+        ///     This wrapper burrows into the proxied object to get its actual type.
+        ///
+        ///     Although this assumes NHibernate is being used, it doesn't require any NHibernate
+        ///     related dependencies and has no bad side effects if NHibernate isn't being used.
+        ///
+        ///     Related discussion is at http://groups.google.com/group/sharp-architecture/browse_thread/thread/ddd05f9baede023a ...thanks Jay Oliver!
+        /// </summary>
         protected virtual Type GetTypeUnproxied()
         {
             return this.GetType();
         }
 
-/// <summary>
-///     Returns true if self and the provided entity have the same Id values
-///     and the Ids are not of the default Id value
-/// </summary>
+        /// <summary>
+        ///     Returns true if self and the provided entity have the same Id values
+        ///     and the Ids are not of the default Id value
+        /// </summary>
         protected bool HasSameNonDefaultIdAs(AuditEntityConfiguration compareTo)
         {
             return !this.IsTransient() && !compareTo.IsTransient() && this.Id.Equals(compareTo.Id);
         }
-
-        #endregion
 
         public static bool SkipEntity(string entity)
         {

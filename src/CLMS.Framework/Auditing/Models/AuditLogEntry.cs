@@ -22,8 +22,7 @@ namespace CLMS.Framework.Auditing.Model
     [DataContract]
     public class AuditLogEntry : IDomainModelClass
     {
-        #region AuditLogEntry's Fields
-
+       
         protected Guid _transientId= Guid.NewGuid();
         public virtual Guid TransientId
         {
@@ -36,235 +35,111 @@ namespace CLMS.Framework.Auditing.Model
                 _transientId = value;
             }
         }
-        [DataMember(Name="Id")]
-        protected int? id = 0;
-        [DataMember(Name="UserName")]
-        protected string userName;
-        [DataMember(Name="IPAddress")]
-        protected string iPAddress;
-        [DataMember(Name="EntityFullName")]
-        protected string entityFullName;
-        [DataMember(Name="EntityShortName")]
-        protected string entityShortName;
-        [DataMember(Name="EntityId")]
-        protected string entityId;
-        [DataMember(Name="Timestamp")]
-        protected DateTime? timestamp;
-        [DataMember(Name="EntryTypeId")]
-        protected int? entryTypeId;
-        [DataMember(Name="ActionTypeId")]
-        protected int? actionTypeId;
-        [DataMember(Name="OldValue")]
-        protected string oldValue;
-        [DataMember(Name="NewValue")]
-        protected string newValue;
-        [DataMember(Name="PropertyName")]
-        protected string propertyName;
-        #endregion
-        #region AuditLogEntry's Properties
-/// <summary>
-/// The Id property
-///
-/// </summary>
-///
+        
+        /// <summary>
+        /// The Id property
+        ///
+        /// </summary>
+        ///
         [Key]
-        public virtual int? Id
-        {
-            get
-            {
-                return id;
-            }
-            set
-            {
-                id = value;
-            }
-        }
-/// <summary>
-/// The UserName property
-///
-/// </summary>
-///
-        public virtual string UserName
-        {
-            get
-            {
-                return userName;
-            }
-            set
-            {
-                userName = value;
-            }
-        }
-/// <summary>
-/// The IPAddress property
-///
-/// </summary>
-///
-        public virtual string IPAddress
-        {
-            get
-            {
-                return iPAddress;
-            }
-            set
-            {
-                iPAddress = value;
-            }
-        }
-/// <summary>
-/// The EntityFullName property
-///
-/// </summary>
-///
-        public virtual string EntityFullName
-        {
-            get
-            {
-                return entityFullName;
-            }
-            set
-            {
-                entityFullName = value;
-            }
-        }
-/// <summary>
-/// The EntityShortName property
-///
-/// </summary>
-///
-        public virtual string EntityShortName
-        {
-            get
-            {
-                return entityShortName;
-            }
-            set
-            {
-                entityShortName = value;
-            }
-        }
-/// <summary>
-/// The EntityId property
-///
-/// </summary>
-///
-        public virtual string EntityId
-        {
-            get
-            {
-                return entityId;
-            }
-            set
-            {
-                entityId = value;
-            }
-        }
-/// <summary>
-/// The Timestamp property
-///
-/// </summary>
-///
-        public virtual DateTime? Timestamp
-        {
-            get
-            {
-                return timestamp;
-            }
-            set
-            {
-                timestamp = value;
-            }
-        }
-/// <summary>
-/// The EntryTypeId property
-///
-/// </summary>
-///
-        public virtual int? EntryTypeId
-        {
-            get
-            {
-                return entryTypeId;
-            }
-            set
-            {
-                entryTypeId = value;
-            }
-        }
-/// <summary>
-/// The ActionTypeId property
-///
-/// </summary>
-///
-        public virtual int? ActionTypeId
-        {
-            get
-            {
-                return actionTypeId;
-            }
-            set
-            {
-                actionTypeId = value;
-            }
-        }
-/// <summary>
-/// The OldValue property
-///
-/// </summary>
-///
-        public virtual string OldValue
-        {
-            get
-            {
-                return oldValue;
-            }
-            set
-            {
-                oldValue = value;
-            }
-        }
-/// <summary>
-/// The NewValue property
-///
-/// </summary>
-///
-        public virtual string NewValue
-        {
-            get
-            {
-                return newValue;
-            }
-            set
-            {
-                newValue = value;
-            }
-        }
-/// <summary>
-/// The PropertyName property
-///
-/// </summary>
-///
-        public virtual string PropertyName
-        {
-            get
-            {
-                return propertyName;
-            }
-            set
-            {
-                propertyName = value;
-            }
-        }
-        #endregion
-        #region Constructors
-/// <summary>
-/// Public constructors of the AuditLogEntry class
-/// </summary>
-/// <returns>New AuditLogEntry object</returns>
-/// <remarks></remarks>
+        [DataMember(Name = "Id")]
+        public virtual int? Id { get; set; }
+
+        /// <summary>
+        /// The UserName property
+        ///
+        /// </summary>
+        ///
+        [DataMember(Name = "UserName")]
+        public virtual string UserName { get; set; }
+
+        /// <summary>
+        /// The IPAddress property
+        ///
+        /// </summary>
+        ///
+        [DataMember(Name = "IPAddress")]
+        public virtual string IPAddress { get; set; }
+
+        /// <summary>
+        /// The EntityFullName property
+        ///
+        /// </summary>
+        ///
+        [DataMember(Name = "EntityFullName")]
+        public virtual string EntityFullName { get; set; }
+
+        /// <summary>
+        /// The EntityShortName property
+        ///
+        /// </summary>
+        ///
+        [DataMember(Name = "EntityShortName")]
+        public virtual string EntityShortName { get; set; }
+
+        /// <summary>
+        /// The EntityId property
+        ///
+        /// </summary>
+        ///
+        [DataMember(Name = "EntityId")]
+        public virtual string EntityId { get; set; }
+
+        /// <summary>
+        /// The Timestamp property
+        ///
+        /// </summary>
+        ///
+        [DataMember(Name = "Timestamp")]
+        public virtual DateTime? Timestamp { get; set; }
+
+        /// <summary>
+        /// The EntryTypeId property
+        ///
+        /// </summary>
+        ///
+        [DataMember(Name = "EntryTypeId")]
+        public virtual int? EntryTypeId { get; set; }
+
+        /// <summary>
+        /// The ActionTypeId property
+        ///
+        /// </summary>
+        ///
+        [DataMember(Name = "ActionTypeId")]
+        public virtual int? ActionTypeId { get; set; }
+
+        /// <summary>
+        /// The OldValue property
+        ///
+        /// </summary>
+        ///
+        [DataMember(Name = "OldValue")]
+        public virtual string OldValue { get; set; }
+
+        /// <summary>
+        /// The NewValue property
+        ///
+        /// </summary>
+        ///
+        [DataMember(Name = "NewValue")]
+        public virtual string NewValue { get; set; }
+
+        /// <summary>
+        /// The PropertyName property
+        ///
+        /// </summary>
+        ///
+        [DataMember(Name = "PropertyName")]
+        public virtual string PropertyName { get; set; }
+        
+     
+    /// <summary>
+    /// Public constructors of the AuditLogEntry class
+    /// </summary>
+    /// <returns>New AuditLogEntry object</returns>
+    /// <remarks></remarks>
         public AuditLogEntry() {}
-        #endregion
-        #region Methods
 
         public virtual List<string> _Validate(bool throwException = true)
         {
@@ -330,20 +205,15 @@ namespace CLMS.Framework.Auditing.Model
             return hashCode;
         }
 
-
-
-
-
-
-/// <summary>
-/// Copies the current object to a new instance
-/// </summary>
-/// <param name="deep">Copy members that refer to objects external to this class (not dependent)</param>
-/// <param name="copiedObjects">Objects that should be reused</param>
-/// <param name="asNew">Copy the current object as a new one, ready to be persisted, along all its members.</param>
-/// <param name="reuseNestedObjects">If asNew is true, this flag if set, forces the reuse of all external objects.</param>
-/// <param name="copy">Optional - An existing [AuditLogEntry] instance to use as the destination.</param>
-/// <returns>A copy of the object</returns>
+    /// <summary>
+    /// Copies the current object to a new instance
+    /// </summary>
+    /// <param name="deep">Copy members that refer to objects external to this class (not dependent)</param>
+    /// <param name="copiedObjects">Objects that should be reused</param>
+    /// <param name="asNew">Copy the current object as a new one, ready to be persisted, along all its members.</param>
+    /// <param name="reuseNestedObjects">If asNew is true, this flag if set, forces the reuse of all external objects.</param>
+    /// <param name="copy">Optional - An existing [AuditLogEntry] instance to use as the destination.</param>
+    /// <returns>A copy of the object</returns>
         public virtual AuditLogEntry Copy(bool deep=false, Hashtable copiedObjects=null, bool asNew=false, bool reuseNestedObjects = false, AuditLogEntry copy = null)
         {
             if(copiedObjects == null)
@@ -397,7 +267,7 @@ namespace CLMS.Framework.Auditing.Model
             return this.IsTransient() && compareTo.IsTransient() && (base.Equals(compareTo) || this.TransientId.Equals(compareTo.TransientId));
         }
 
-// Maintain equality operator semantics for entities.
+        // Maintain equality operator semantics for entities.
         public static bool operator ==(AuditLogEntry x, AuditLogEntry y)
         {
             // By default, == and Equals compares references. In order to
@@ -407,7 +277,7 @@ namespace CLMS.Framework.Auditing.Model
             return Equals(x, y);
         }
 
-// Maintain inequality operator semantics for entities.
+        // Maintain inequality operator semantics for entities.
         public static bool operator !=(AuditLogEntry x, AuditLogEntry y)
         {
             return !(x == y);
@@ -424,13 +294,13 @@ namespace CLMS.Framework.Auditing.Model
         }
 
 
-/// <summary>
-///     To help ensure hashcode uniqueness, a carefully selected random number multiplier
-///     is used within the calculation.  Goodrich and Tamassia's Data Structures and
-///     Algorithms in Java asserts that 31, 33, 37, 39 and 41 will produce the fewest number
-///     of collissions.  See http://computinglife.wordpress.com/2008/11/20/why-do-hash-functions-use-prime-numbers/
-///     for more information.
-/// </summary>
+        /// <summary>
+        ///     To help ensure hashcode uniqueness, a carefully selected random number multiplier
+        ///     is used within the calculation.  Goodrich and Tamassia's Data Structures and
+        ///     Algorithms in Java asserts that 31, 33, 37, 39 and 41 will produce the fewest number
+        ///     of collissions.  See http://computinglife.wordpress.com/2008/11/20/why-do-hash-functions-use-prime-numbers/
+        ///     for more information.
+        /// </summary>
         private const int HashMultiplier = 31;
         private int? cachedHashcode;
 
@@ -459,41 +329,37 @@ namespace CLMS.Framework.Auditing.Model
             return this.cachedHashcode.Value;
         }
 
-/// <summary>
-///     Transient objects are not associated with an item already in storage.  For instance,
-///     a Customer is transient if its Id is 0.  It's virtual to allow NHibernate-backed
-///     objects to be lazily loaded.
-/// </summary>
+        /// <summary>
+        ///     Transient objects are not associated with an item already in storage.  For instance,
+        ///     a Customer is transient if its Id is 0.  It's virtual to allow NHibernate-backed
+        ///     objects to be lazily loaded.
+        /// </summary>
         public virtual bool IsTransient()
         {
             return this.Id == default(int) || this.Id.Equals(default(int));
         }
 
-/// <summary>
-///     When NHibernate proxies objects, it masks the type of the actual entity object.
-///     This wrapper burrows into the proxied object to get its actual type.
-///
-///     Although this assumes NHibernate is being used, it doesn't require any NHibernate
-///     related dependencies and has no bad side effects if NHibernate isn't being used.
-///
-///     Related discussion is at http://groups.google.com/group/sharp-architecture/browse_thread/thread/ddd05f9baede023a ...thanks Jay Oliver!
-/// </summary>
+        /// <summary>
+        ///     When NHibernate proxies objects, it masks the type of the actual entity object.
+        ///     This wrapper burrows into the proxied object to get its actual type.
+        ///
+        ///     Although this assumes NHibernate is being used, it doesn't require any NHibernate
+        ///     related dependencies and has no bad side effects if NHibernate isn't being used.
+        ///
+        ///     Related discussion is at http://groups.google.com/group/sharp-architecture/browse_thread/thread/ddd05f9baede023a ...thanks Jay Oliver!
+        /// </summary>
         protected virtual System.Type GetTypeUnproxied()
         {
             return this.GetType();
         }
 
-/// <summary>
-///     Returns true if self and the provided entity have the same Id values
-///     and the Ids are not of the default Id value
-/// </summary>
+        /// <summary>
+        ///     Returns true if self and the provided entity have the same Id values
+        ///     and the Ids are not of the default Id value
+        /// </summary>
         protected bool HasSameNonDefaultIdAs(AuditLogEntry compareTo)
         {
             return !this.IsTransient() && !compareTo.IsTransient() && this.Id.Equals(compareTo.Id);
         }
-
-        #endregion
-
-
     }
 }
