@@ -650,6 +650,38 @@ namespace CLMS.Framework.Utilities
                     : null;
         }
 
+        public static int GetIntConfigurationKey(string key)
+        {
+            var value = GetConfigurationKey(key);
+            if (value == null)
+            {
+                return 0;
+            }
+
+            if (int.TryParse(value, out int val))
+            {
+                return val;
+            }
+
+            return default;
+        }
+
+        public static bool GetBoolConfigurationKey(string key)
+        {
+            var value = GetConfigurationKey(key);
+            if (value == null)
+            {
+                return false;
+            }
+
+            if (bool.TryParse(value, out bool val))
+            {
+                return val;
+            }
+
+            return false;
+        }
+
         public static bool IsTypePrimitiveOrSimple(Type type)
         {
             type = GetTypeAsNonNullable(type);

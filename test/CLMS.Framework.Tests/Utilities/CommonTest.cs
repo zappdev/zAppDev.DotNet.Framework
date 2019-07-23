@@ -99,6 +99,14 @@ namespace CLMS.Framework.Tests.Utilities
         }
 
         [TestMethod]
+        public void ConfigValueTest()
+        {
+            Assert.AreEqual("true", Common.GetConfigurationKey("SeedSecurityTables"));
+            Assert.AreEqual(true, Common.GetBoolConfigurationKey("SeedSecurityTables"));
+            Assert.AreEqual(30, Common.GetIntConfigurationKey("SQLQueryTimeoutInSeconds"));
+        }
+
+        [TestMethod]
         public void GetExcelFormatTest()
         {
             var columnNames = new List<string> { "Col" };
