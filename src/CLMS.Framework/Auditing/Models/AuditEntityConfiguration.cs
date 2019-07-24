@@ -453,6 +453,11 @@ namespace CLMS.Framework.Auditing.Model
             _auditableTypes = auditableTypes;
         }
 
+        internal static Type GetTypeFromClassName(string name)
+        {            
+            return _auditableTypes.FirstOrDefault(c => c.FullName == name);
+        }
+
         private static List<Type> _auditableTypes = new List<Type>();
 
         public static List<AuditEntityConfiguration> GetAllEntityConfigurations()

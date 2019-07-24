@@ -279,12 +279,12 @@ namespace CLMS.Framework.Auditing
             var auditableProperty = auditableEntity.Properties[key];
             var classMetadata = @event.Session.SessionFactory.GetClassMetadata(auditableProperty.Datatype);
             var identifierPropertyName = classMetadata.IdentifierPropertyName;
-            var collectionPersister = @event.Session.SessionFactory.GetCollectionMetadata(role) as ICollectionPersister;
-            if (collectionPersister == null)
+            if (!(@event.Session.SessionFactory.GetCollectionMetadata(role) is ICollectionPersister collectionPersister))
             {
                 throw new Exception("CollectionPersister is null. Not sure why.");
             }
-            var type = Type.GetType(auditableProperty.Datatype + ", cfTests.BO");
+
+            var type = GetTypeFromClassName(auditableProperty.Datatype);
             if (!(type != null))
                 return;
             if (collectionPersister.IsInverse)
@@ -357,14 +357,14 @@ namespace CLMS.Framework.Auditing
             }
         }
 
-        private static string GetStringValueFromStateArray(IList<object> stateArray, int position, AuditableProperty property, IEventSource session)
+        private string GetStringValueFromStateArray(IList<object> stateArray, int position, AuditableProperty property, IEventSource session)
         {
             var value = stateArray?[position];
             if (value == null)
                 return NoValueString;
             if (!property.IsComplex)
                 return value.ToString() == string.Empty ? NoValueString : value.ToString();
-            var type = Type.GetType(property.Datatype + ", cfTests.BO");
+            var type = GetTypeFromClassName(property.Datatype);
             if (type == null)
                 return value.ToString() == string.Empty ? NoValueString : value.ToString();
             var identifierPropertyName = session.SessionFactory.GetClassMetadata(property.Datatype).IdentifierPropertyName;
@@ -374,6 +374,8 @@ namespace CLMS.Framework.Auditing
             return keyValue == null || keyValue.ToString() == string.Empty ? NoValueString : keyValue.ToString();
         }
 
+        private Type GetTypeFromClassName(string name) 
+            => AuditEntityConfiguration.GetTypeFromClassName(name);
     }
 
     public class AuditableEntity
