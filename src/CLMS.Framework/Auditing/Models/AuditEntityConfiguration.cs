@@ -46,7 +46,7 @@ namespace CLMS.Framework.Auditing.Model
         ///
         [Key]
         [DataMember(Name = "Id")]
-        public virtual int? Id { get; set; }
+        public virtual int? Id { get; set; } = 0;
 
         /// <summary>
         /// The FullName property
@@ -462,7 +462,6 @@ namespace CLMS.Framework.Auditing.Model
            {
 #endif
             var entities = new List<AuditEntityConfiguration>();
-            var newEntity = new AuditEntityConfiguration();
 
             foreach (var currentClassType in _auditableTypes)
             {
@@ -471,6 +470,7 @@ namespace CLMS.Framework.Auditing.Model
                     continue;
                 }
 
+                var newEntity = new AuditEntityConfiguration();
                 newEntity = new AuditEntityConfiguration
                 {
                     FullName = Common.GetTypeName(currentClassType, true),

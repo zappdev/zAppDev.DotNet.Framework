@@ -43,7 +43,7 @@ namespace CLMS.Framework.Auditing.Model
         ///
         [Key]
         [DataMember(Name = "Id")]
-        public virtual int? Id { get; set; }
+        public virtual int? Id { get; set; } = 0;
 
         /// <summary>
         /// The Code property
