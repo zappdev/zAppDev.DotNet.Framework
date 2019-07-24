@@ -44,50 +44,83 @@ namespace CLMS.Framework.Auditing
 
         public static INHAuditTrailManager GetInstance()
         {
-#if NETFRAMEWORK
-            return System.Web.Http.GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(INHAuditTrailManager)) as INHAuditTrailManager;
-#else
-            return CLMS.Framework.Utilities.ServiceLocator.Current.GetInstance<INHAuditTrailManager>();
-#endif
+            return ServiceLocator.Current.GetInstance<INHAuditTrailManager>();
         }
 
-        public void InitializeConfiguration()
-        {
-            _auditableEntities = new Dictionary<string, AuditableEntity>();
+        public void ClearAuditTrailCache()
+        {            
             MiniSessionManager.ExecuteInUoW(manager =>
             {
-                var repo = ServiceLocator.Current.GetInstance<IRepositoryBuilder>().CreateCreateRepository();
+                var repo = ServiceLocator.Current.GetInstance<IRepositoryBuilder>().CreateCreateRepository(manager);
+
+                _auditableEntities = new Dictionary<string, AuditableEntity>();
                 repo.GetAll<AuditEntityConfiguration>()
-                .ForEach(entity =>
-                {
-                    var auditableEntity = new AuditableEntity {Name = entity.FullName};
-                    entity.Properties
-                    .Where(property => property.IsAuditable)
-                    .ToList()
-                    .ForEach(property => auditableEntity.Properties.Add(property.Name,
-                             new AuditableProperty
+                    .ForEach(entity =>
                     {
-                        Name = property.Name,
-                        Datatype = property.DataType,
-                        IsComplex = property.IsComplex,
-                        IsCollection = property.IsCollection
-                    }));
-                    if (!auditableEntity.Properties.Any()) return;
-                    _log.Debug($@"Monitoring object: [{entity.ShortName}]. Monitored Properties:
-                                                        * {string.Join("\r\n* ", auditableEntity.Properties.Keys)}");
-                    _auditableEntities.Add(entity.FullName, auditableEntity);
+                        var auditableEntity = new AuditableEntity {Name = entity.FullName};
+                        entity.Properties
+                            .Where(property => property.IsAuditable)
+                            .ToList()
+                            .ForEach(property => auditableEntity.Properties.Add(property.Name, new AuditableProperty
+                            {
+                                Name = property.Name,
+                                Datatype = property.DataType,
+                                IsComplex = property.IsComplex,
+                                IsCollection = property.IsCollection
+                            }));
+                        if (!auditableEntity.Properties.Any()) return;
+                        _log.Debug($@"Monitoring object: [{entity.ShortName}]. Monitored Properties:
+                                                                * {string.Join("\r\n* ", auditableEntity.Properties.Keys)}");
+                        _auditableEntities.Add(entity.FullName, auditableEntity);
+                    });
+
+                _auditLogEntryTypes = new Dictionary<string, AuditLogEntryType>();
+                repo.GetAll<AuditLogEntryType>()
+                    .ForEach(type => _auditLogEntryTypes.Add(type.Code, type));
+
+                _auditLogPropertyActionTypes = new Dictionary<string, AuditLogPropertyActionType>();
+                repo.GetAll<AuditLogPropertyActionType>()
+                    .ForEach(type => _auditLogPropertyActionTypes.Add(type.Code, type));
+            });
+        }
+
+        private void InitializeConfiguration()
+        {
+            MiniSessionManager.ExecuteInUoW(manager =>
+            {
+                var repo = ServiceLocator.Current.GetInstance<IRepositoryBuilder>().CreateAuditingRepository(manager);
+
+                var oldEntityConfigurations = repo.GetAll<AuditEntityConfiguration>();
+
+                List<AuditEntityConfiguration> newEntityConfigurations = AuditEntityConfiguration.GetAllEntityConfigurations();
+                newEntityConfigurations.ForEach(newEntityConfiguration =>
+                {
+                    var item = oldEntityConfigurations.FirstOrDefault(c => c.FullName == newEntityConfiguration.FullName);
+                    if (item == null)
+                    {
+                        repo.Save(newEntityConfiguration);
+                    }
+                    else
+                    {
+                        item.UpdateAuditEntityConfiguration(newEntityConfiguration, repo);
+                    }
                 });
+
+                oldEntityConfigurations.ForEach(oldEntityConfiguration =>
+                {
+                    var item = newEntityConfigurations.FirstOrDefault(c => c.FullName == oldEntityConfiguration.FullName);
+                    if (item == null) repo.DeleteAuditEntityConfiguration(oldEntityConfiguration);
+                });
+
                 var auditLogEntryTypes = repo.GetAll<AuditLogEntryType>();
                 if (!auditLogEntryTypes.Any())
                 {
-                    // Create default values
                     repo.Save(new AuditLogEntryType { Code = "CREATE", Name = "Create" });
                     repo.Save(new AuditLogEntryType { Code = "UPDATE", Name = "Update" });
                     repo.Save(new AuditLogEntryType { Code = "DELETE", Name = "Delete" });
                     auditLogEntryTypes = repo.GetAll<AuditLogEntryType>();
                 }
-                _auditLogEntryTypes = new Dictionary<string, AuditLogEntryType>();
-                auditLogEntryTypes.ForEach(type => _auditLogEntryTypes.Add(type.Code, type));
+
                 var auditLogPropertyActionTypes = repo.GetAll<AuditLogPropertyActionType>();
                 var addAction = auditLogPropertyActionTypes.FirstOrDefault(a => a.Code == "ADD");
                 if (addAction == null)
@@ -104,10 +137,9 @@ namespace CLMS.Framework.Auditing
                 {
                     repo.Save(new AuditLogPropertyActionType { Code = "ASSIGN", Name = "Assign Entity" });
                 }
-                auditLogPropertyActionTypes = repo.GetAll<AuditLogPropertyActionType>();
-                _auditLogPropertyActionTypes = new Dictionary<string, AuditLogPropertyActionType>();
-                auditLogPropertyActionTypes.ForEach(type => _auditLogPropertyActionTypes.Add(type.Code, type));
             });
+
+            ClearAuditTrailCache();
         }
 
         private void PostDatabaseOperationEvent(IPostDatabaseOperationEventArgs @event, object[] newState, object[] oldState, string type)

@@ -8,7 +8,7 @@ namespace CLMS.Framework.Auditing
     {
         bool IsTemporarilyDisabled { get; set; }
 
-    	void InitializeConfiguration();
+        void ClearAuditTrailCache();
         void OnPostUpdateLogEvent(PostUpdateEvent postUpdateEvent);
         void OnPostInsertLogEvent(PostInsertEvent postInsertEvent);
         void OnPostDeleteLogEvent(PostDeleteEvent postDeleteEvent);

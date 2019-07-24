@@ -17,21 +17,8 @@ namespace CLMS.Framework.Auditing.Model
     /// </summary>
     [Serializable]
     [DataContract]
-    public class AuditPropertyConfiguration : IDomainModelClass
+    public class AuditPropertyConfiguration : DomainModel
     {
-        protected Guid _transientId= Guid.NewGuid();
-        public virtual Guid TransientId
-        {
-            get
-            {
-                return _transientId;
-            }
-            set
-            {
-                _transientId = value;
-            }
-        }
-
         /// <summary>
         /// The Id property
         ///
@@ -119,7 +106,7 @@ namespace CLMS.Framework.Auditing.Model
 
         }
 
-        public virtual List<string> _Validate(bool throwException = true)
+        public new virtual List<string> _Validate(bool throwException = true)
         {
             var __errors = new List<string>();
             if (Id == null)
@@ -266,9 +253,6 @@ namespace CLMS.Framework.Auditing.Model
         ///     of collissions.  See http://computinglife.wordpress.com/2008/11/20/why-do-hash-functions-use-prime-numbers/
         ///     for more information.
         /// </summary>
-        private const int HashMultiplier = 31;
-        private int? cachedHashcode;
-
         public override int GetHashCode()
         {
             if (cachedHashcode.HasValue)
@@ -303,21 +287,7 @@ namespace CLMS.Framework.Auditing.Model
         {
             return Id == default(int) || Id.Equals(default(int));
         }
-
-        /// <summary>
-        ///     When NHibernate proxies objects, it masks the type of the actual entity object.
-        ///     This wrapper burrows into the proxied object to get its actual type.
-        ///
-        ///     Although this assumes NHibernate is being used, it doesn't require any NHibernate
-        ///     related dependencies and has no bad side effects if NHibernate isn't being used.
-        ///
-        ///     Related discussion is at http://groups.google.com/group/sharp-architecture/browse_thread/thread/ddd05f9baede023a ...thanks Jay Oliver!
-        /// </summary>
-        protected virtual Type GetTypeUnproxied()
-        {
-            return GetType();
-        }
-
+        
         /// <summary>
         ///     Returns true if self and the provided entity have the same Id values
         ///     and the Ids are not of the default Id value
@@ -328,20 +298,17 @@ namespace CLMS.Framework.Auditing.Model
         }
 
         public virtual void UpdateAuditPropertyConfiguration(AuditPropertyConfiguration tmp)
-        {            
+        {
 #if NETFRAMEWORK
             using (new Profiling.Profiler(nameof(AuditEntityConfiguration), Profiling.AppDevSymbolType.ClassOperation, nameof(AuditEntityConfiguration.SkipEntity)))
             {
-                IsAuditable = (tmp?.IsAuditable ?? false);
-                IsCollection = (tmp?.IsCollection ?? false);
-                IsComplex = (tmp?.IsComplex ?? false);
-                DataType = (tmp?.DataType ?? "");
-            }
-#else
+#endif
             IsAuditable = tmp?.IsAuditable ?? false;
             IsCollection = tmp?.IsCollection ?? false;
             IsComplex = tmp?.IsComplex ?? false;
             DataType = tmp?.DataType ?? "";
+#if NETFRAMEWORK
+        }
 #endif
         }
 
@@ -350,6 +317,7 @@ namespace CLMS.Framework.Auditing.Model
 #if NETFRAMEWORK
             using (new Profiling.Profiler(nameof(AuditPropertyConfiguration), Profiling.AppDevSymbolType.ClassOperation, "GetAuditEntityProperties"))
             {
+#endif
                 var repo = ServiceLocator.Current.GetInstance<IRepositoryBuilder>().CreateRetrieveRepository();
 
                 List<AuditPropertyConfiguration> properties = new List<AuditPropertyConfiguration>();
@@ -393,51 +361,8 @@ namespace CLMS.Framework.Auditing.Model
                     properties?.Add(newproperty);
                 }
                 return properties;
+#if NETFRAMEWORK
             }
-#else
-            var repo = ServiceLocator.Current.GetInstance<IRepositoryBuilder>().CreateRetrieveRepository();
-
-            List<AuditPropertyConfiguration> properties = new List<AuditPropertyConfiguration>();
-            AuditPropertyConfiguration newproperty = new AuditPropertyConfiguration();
-            List<AuditEntityConfiguration> existingEntities = repo.GetAll<AuditEntityConfiguration>();
-            AuditEntityConfiguration existingEntity = new AuditEntityConfiguration();
-            foreach (var currentProperty in MambaRuntimeType.FromPropertiesList(runtimeEntityProperty.GetProperties()) ?? Enumerable.Empty<MambaRuntimeType>())
-            {
-                if (SkipProperty(currentProperty.Name))
-                {
-                    continue;
-                }
-                newproperty = new AuditPropertyConfiguration();
-                existingEntity = existingEntities?.FirstOrDefault((a) => a.FullName == Common.GetTypeName(runtimeEntityProperty, true));
-                newproperty.Name = currentProperty.Name;
-                newproperty.IsComplex = Common.IsPropertyPrimitiveOrSimple(currentProperty) == false;
-                if ((currentProperty.PropertyType.GenericTypeArguments.Length > 0) && (currentProperty.PropertyType.GenericTypeArguments.ToList().FirstOrDefault() != null))
-                {
-                    newproperty.DataType = Common.GetTypeName(currentProperty.PropertyType.GenericTypeArguments.ToList().FirstOrDefault(), true);
-                }
-                else
-                {
-                    newproperty.DataType = Common.GetTypeName(currentProperty.PropertyType, true);
-                }
-                if (newproperty?.DataType == "System.String")
-                {
-                    newproperty.IsCollection = false;
-                }
-                else
-                {
-                    newproperty.IsCollection = Common.IsPropertyCollection(currentProperty);
-                }
-                if (existingEntity != null && existingEntity?.Properties?.FirstOrDefault((x) => x.Name == currentProperty.Name) != null)
-                {
-                    newproperty.IsAuditable = existingEntity?.Properties?.FirstOrDefault((x) => x.Name == currentProperty.Name)?.IsAuditable ?? false;
-                }
-                else
-                {
-                    newproperty.IsAuditable = false;
-                }
-                properties?.Add(newproperty);
-            }
-            return properties;
 #endif
         }
 
@@ -447,6 +372,5 @@ namespace CLMS.Framework.Auditing.Model
                 || property == "DbTimestamp" 
                 || property == "VersionTimestamp";
         }
-
     }
 }

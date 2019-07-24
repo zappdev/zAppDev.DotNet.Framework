@@ -1,16 +1,11 @@
 using System;
 using System.Runtime.Serialization;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Collections;
 using System.ComponentModel.DataAnnotations;
-using System.Linq.Expressions;
-using CLMS.Framework.Linq;
 using CLMS.Framework.Data.Domain;
-using CLMS.Framework.Workflow;
-using CLMS.Framework.Identity.Model;
 
 namespace CLMS.Framework.Auditing.Model
 {
@@ -20,25 +15,11 @@ namespace CLMS.Framework.Auditing.Model
     /// </summary>
     [Serializable]
     [DataContract]
-    public class AuditLogPropertyActionType : IDomainModelClass
-    {
-        protected Guid _transientId= Guid.NewGuid();
-        public virtual Guid TransientId
-        {
-            get
-            {
-                return _transientId;
-            }
-            set
-            {
-                _transientId = value;
-            }
-        }
-        
+    public class AuditLogPropertyActionType : DomainModel
+    {        
         [DataMember(Name="VersionTimestamp")]
         protected byte[] versionTimestamp;
-
-
+        
         /// <summary>
         /// The Id property
         ///
@@ -80,7 +61,7 @@ namespace CLMS.Framework.Auditing.Model
         /// <remarks></remarks>
         public AuditLogPropertyActionType() {}
         
-        public virtual List<string> _Validate(bool throwException = true)
+        public new virtual List<string> _Validate(bool throwException = true)
         {
             var __errors = new List<string>();
             if (Id == null)
@@ -131,11 +112,11 @@ namespace CLMS.Framework.Auditing.Model
             copy = copy ?? new AuditLogPropertyActionType();
             if (!asNew)
             {
-                copy.TransientId = this.TransientId;
-                copy.Id = this.Id;
+                copy.TransientId = TransientId;
+                copy.Id = Id;
             }
-            copy.Code = this.Code;
-            copy.Name = this.Name;
+            copy.Code = Code;
+            copy.Name = Name;
             if (!copiedObjects.Contains(this))
             {
                 copiedObjects.Add(this, copy);
@@ -150,18 +131,18 @@ namespace CLMS.Framework.Auditing.Model
             {
                 return true;
             }
-            if (compareTo == null || !this.GetType().Equals(compareTo.GetTypeUnproxied()))
+            if (compareTo == null || !GetType().Equals(compareTo.GetTypeUnproxied()))
             {
                 return false;
             }
-            if (this.HasSameNonDefaultIdAs(compareTo))
+            if (HasSameNonDefaultIdAs(compareTo))
             {
                 return true;
             }
             // Since the Ids aren't the same, both of them must be transient to
             // compare domain signatures; because if one is transient and the
             // other is a persisted entity, then they cannot be the same object.
-            return this.IsTransient() && compareTo.IsTransient() && (base.Equals(compareTo) || this.TransientId.Equals(compareTo.TransientId));
+            return IsTransient() && compareTo.IsTransient() && (base.Equals(compareTo) || TransientId.Equals(compareTo.TransientId));
         }
 
         // Maintain equality operator semantics for entities.
@@ -185,7 +166,7 @@ namespace CLMS.Framework.Auditing.Model
         {
             if (__propertyKeyCache == null)
             {
-                __propertyKeyCache = this.GetType().GetProperty("Id");
+                __propertyKeyCache = GetType().GetProperty("Id");
             }
             return __propertyKeyCache;
         }
@@ -198,19 +179,16 @@ namespace CLMS.Framework.Auditing.Model
         ///     of collissions.  See http://computinglife.wordpress.com/2008/11/20/why-do-hash-functions-use-prime-numbers/
         ///     for more information.
         /// </summary>
-        private const int HashMultiplier = 31;
-        private int? cachedHashcode;
-
         public override int GetHashCode()
         {
-            if (this.cachedHashcode.HasValue)
+            if (cachedHashcode.HasValue)
             {
-                return this.cachedHashcode.Value;
+                return cachedHashcode.Value;
             }
-            if (this.IsTransient())
+            if (IsTransient())
             {
                 //this.cachedHashcode = base.GetHashCode();
-                return this.TransientId.GetHashCode(); //don't cache because this won't stay transient forever
+                return TransientId.GetHashCode(); //don't cache because this won't stay transient forever
             }
             else
             {
@@ -219,11 +197,11 @@ namespace CLMS.Framework.Auditing.Model
                     // It's possible for two objects to return the same hash code based on
                     // identically valued properties, even if they're of two different types,
                     // so we include the object's type in the hash calculation
-                    var hashCode = this.GetType().GetHashCode();
-                    this.cachedHashcode = (hashCode * HashMultiplier) ^ this.Id.GetHashCode();
+                    var hashCode = GetType().GetHashCode();
+                    cachedHashcode = (hashCode * HashMultiplier) ^ Id.GetHashCode();
                 }
             }
-            return this.cachedHashcode.Value;
+            return cachedHashcode.Value;
         }
 
         /// <summary>
@@ -233,21 +211,7 @@ namespace CLMS.Framework.Auditing.Model
         /// </summary>
         public virtual bool IsTransient()
         {
-            return this.Id == default(int) || this.Id.Equals(default(int));
-        }
-
-        /// <summary>
-        ///     When NHibernate proxies objects, it masks the type of the actual entity object.
-        ///     This wrapper burrows into the proxied object to get its actual type.
-        ///
-        ///     Although this assumes NHibernate is being used, it doesn't require any NHibernate
-        ///     related dependencies and has no bad side effects if NHibernate isn't being used.
-        ///
-        ///     Related discussion is at http://groups.google.com/group/sharp-architecture/browse_thread/thread/ddd05f9baede023a ...thanks Jay Oliver!
-        /// </summary>
-        protected virtual System.Type GetTypeUnproxied()
-        {
-            return this.GetType();
+            return Id == default(int) || Id.Equals(default(int));
         }
 
         /// <summary>
@@ -256,7 +220,7 @@ namespace CLMS.Framework.Auditing.Model
         /// </summary>
         protected bool HasSameNonDefaultIdAs(AuditLogPropertyActionType compareTo)
         {
-            return !this.IsTransient() && !compareTo.IsTransient() && this.Id.Equals(compareTo.Id);
+            return !IsTransient() && !compareTo.IsTransient() && Id.Equals(compareTo.Id);
         }
     }
 }
