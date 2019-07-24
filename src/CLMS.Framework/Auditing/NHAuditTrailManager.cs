@@ -4,7 +4,6 @@ using NHibernate.Event;
 using NHibernate.Persister.Collection;
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using CLMS.Framework.Data;
 using CLMS.Framework.Auditing.Model;
@@ -23,15 +22,31 @@ namespace CLMS.Framework.Auditing
         private Func<AuditContext> _getAuditContext;
         private bool _isEnabled;
 
-        public bool IsTemporarilyDisabled
-        {
-            get;
-            set;
-        } = false;
+        public bool IsTemporarilyDisabled { get; set; } = false;
 
         public NHAuditTrailManager()
         {
 
+        }
+
+        public void ExecuteWithoutAuditTrail(Func<object, object> action)
+        {
+            try
+            {
+                IsTemporarilyDisabled = true;
+
+                MiniSessionManager.ExecuteInUoW(manager =>
+                {
+                    var result = action?.Invoke(this);
+                });
+
+                IsTemporarilyDisabled = false;
+            }
+            catch (Exception)
+            {
+                IsTemporarilyDisabled = false;
+                throw;
+            }
         }
 
         public void Enable(List<Type> auditableTypes, Func<AuditContext> getAuditContext)

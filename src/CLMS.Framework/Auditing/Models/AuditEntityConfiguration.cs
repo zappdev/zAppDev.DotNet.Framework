@@ -17,8 +17,24 @@ namespace CLMS.Framework.Auditing.Model
     /// </summary>
     [Serializable]
     [DataContract]
-    public class AuditEntityConfiguration : DomainModel
+    public class AuditEntityConfiguration : IDomainModelClass
     {
+        protected const int HashMultiplier = 31;
+        protected int? cachedHashcode;
+
+        protected Guid _transientId = Guid.NewGuid();
+        public virtual Guid TransientId
+        {
+            get
+            {
+                return _transientId;
+            }
+            set
+            {
+                _transientId = value;
+            }
+        }
+
 #pragma warning disable 0649
         private bool disableInternalAdditions;
 #pragma warning restore 0649
@@ -180,7 +196,7 @@ namespace CLMS.Framework.Auditing.Model
         /// <remarks></remarks>
         public AuditEntityConfiguration() { }
 
-        public new virtual List<string> _Validate(bool throwException = true)
+        public virtual List<string> _Validate(bool throwException = true)
         {
             var __errors = new List<string>();
             if (Id == null)
@@ -308,6 +324,19 @@ namespace CLMS.Framework.Auditing.Model
             return __propertyKeyCache;
         }
 
+        /// <summary>
+        ///     When NHibernate proxies objects, it masks the type of the actual entity object.
+        ///     This wrapper burrows into the proxied object to get its actual type.
+        ///
+        ///     Although this assumes NHibernate is being used, it doesn't require any NHibernate
+        ///     related dependencies and has no bad side effects if NHibernate isn't being used.
+        ///
+        ///     Related discussion is at http://groups.google.com/group/sharp-architecture/browse_thread/thread/ddd05f9baede023a ...thanks Jay Oliver!
+        /// </summary>
+        protected virtual Type GetTypeUnproxied()
+        {
+            return GetType();
+        }
 
         /// <summary>
         ///     To help ensure hashcode uniqueness, a carefully selected random number multiplier
