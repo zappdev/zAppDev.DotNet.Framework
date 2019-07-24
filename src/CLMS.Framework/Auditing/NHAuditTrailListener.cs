@@ -6,11 +6,7 @@ namespace CLMS.Framework.Auditing
 {
     public class NHAuditTrailListener : IPostUpdateEventListener, IPostInsertEventListener, IPostDeleteEventListener, IPreCollectionUpdateEventListener
     {
-#if NETFRAMEWORK
-        protected INHAuditTrailManager AuditTrailManager => System.Web.Http.GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(INHAuditTrailManager)) as INHAuditTrailManager;
-#else
-        protected INHAuditTrailManager AuditTrailManager => CLMS.Framework.Utilities.ServiceLocator.Current.GetInstance<INHAuditTrailManager>();
-#endif
+        protected INHAuditTrailManager AuditTrailManager => Utilities.ServiceLocator.Current.GetInstance<INHAuditTrailManager>();
 
         public Task OnPostUpdateAsync(PostUpdateEvent @event, CancellationToken cancellationToken)
         {
