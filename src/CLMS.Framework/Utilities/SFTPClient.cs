@@ -88,7 +88,7 @@ namespace CLMS.Framework.Utilities
 
         public bool DownloadFiles(List<string> remoteFilePaths, string localFolderPath)
         {
-            var errorOccured =false;
+            var errorOccured = false;
 
             //Create a client
             using (var sftp = new SftpClient(Host, Port, Username, Password))

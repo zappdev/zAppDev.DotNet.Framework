@@ -75,7 +75,7 @@ namespace CLMS.Framework.Utilities
     public class Common
     {
         public static string NormalizeLineEncoding(string originalString) => Regex.Replace(originalString, @"\r\n|\n\r|\n|\r", "\r\n");
-        
+
         public static string GetExcelFormat(List<string> columnNames, List<List<object>> values, string[] formatStrings = null,
            string sheetName = "Sheet1", bool showBorders = true, string headerBackgroundColor = "rgb(238, 233, 233)",
            string rowBackgroundColor = "rgb(238, 238, 224)", string alternateRowBackgroundColor = "rgb(255, 255, 255)")
@@ -1214,16 +1214,16 @@ namespace CLMS.Framework.Utilities
             }
             return result;
         }
-        
-        public static string Capitalize(string s)  
-        {  
-// Check for empty string.  
-            if (string.IsNullOrEmpty(s))  
-            {  
-                return string.Empty;  
-            }  
-// Return char and concat substring.  
-            return char.ToUpper(s[0]) + s.Substring(1);  
+
+        public static string Capitalize(string s)
+        {
+            // Check for empty string.  
+            if (string.IsNullOrEmpty(s))
+            {
+                return string.Empty;
+            }
+            // Return char and concat substring.  
+            return char.ToUpper(s[0]) + s.Substring(1);
         }
     }
 }

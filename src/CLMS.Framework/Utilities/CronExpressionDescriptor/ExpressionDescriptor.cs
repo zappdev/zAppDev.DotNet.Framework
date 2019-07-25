@@ -269,8 +269,7 @@ namespace CLMS.Framework.Utilities.CronExpressionDescriptor
                (s => GetString("SecondsX0ThroughX1PastTheMinute")),
                (s =>
                {
-                   int i = 0;
-                   if (int.TryParse(s, out i))
+                   if (int.TryParse(s, out int i))
                    {
                        return s == "0"
                         ? string.Empty
