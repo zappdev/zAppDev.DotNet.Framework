@@ -28,7 +28,7 @@ namespace CLMS.Framework.Identity
         public static bool AdminCanResetPassword = true;
 
         public static ConcurrentDictionary<string, string> ActiveSessions = new ConcurrentDictionary<string, string>();
-        
+
         // Used for XSRF when linking external logins
         public const string XsrfKey = "XsrfId";
 
@@ -47,8 +47,7 @@ namespace CLMS.Framework.Identity
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(username)) return false;
             if (!AllowMultipleSessionsPerUser && UserHasSession(username))
             {
-                OnDuplicateSessionDetected(username, throwException: false);
-				return false;
+                OnDuplicateSessionDetected(username);                
             }
             var signInManager = GetSignInManager();
             var result = signInManager.PasswordSignIn(username, password, isPersistent, true);
@@ -56,11 +55,7 @@ namespace CLMS.Framework.Identity
         }
 
         private static void SignIn(ExternalLoginInfo loginInfo, bool isPersistent)
-        {
-            if (!AllowMultipleSessionsPerUser && UserHasSession(loginInfo.DefaultUserName))
-            {
-                OnDuplicateSessionDetected(loginInfo.DefaultUserName, throwException: true);
-            }
+        {            
             var signInManager = GetSignInManager();
             var result = signInManager.ExternalSignIn(loginInfo, isPersistent);
             var loggedIn = HandleLoginResult(result, loginInfo);
@@ -69,6 +64,7 @@ namespace CLMS.Framework.Identity
                 throw new ApplicationException($"Could not login with external login: {loginInfo.DefaultUserName}, provider: {loginInfo.Login.LoginProvider}");
             }
         }
+
         public static void AddUserSession(string username)
         {
             var sessionId = HttpContext.Current?.Session?.SessionID;
@@ -76,12 +72,14 @@ namespace CLMS.Framework.Identity
             if (ActiveSessions.ContainsKey(sessionId)) return;
 			ActiveSessions.TryAdd(sessionId, username);
         }
+
         public static void RemoveUserSession(string sessionId)
         {
 			if (string.IsNullOrWhiteSpace(sessionId)) return;
             sessionId = sessionId.Replace("SessionStateStoreProvider#", "");
             ActiveSessions.TryRemove(sessionId, out _);
         }
+       
         public static bool UserHasSession(string username)
         {
             var connectedUsernames = ActiveSessions.Values;
@@ -92,17 +90,17 @@ namespace CLMS.Framework.Identity
             var activeSessions = ActiveSessions.Where(s => s.Value == username);                                    
             return activeSessions.Where(x => x.Key != sessionId).Any();
         }
-        private static void OnDuplicateSessionDetected(string username, bool throwException)
-        {                        
-			var msg = $"More than one active sessions detected for user: [{username}], session id [{HttpContext.Current?.Session?.SessionID}]";
-			if (throwException) 
-			{
-				throw new AuthenticationException(msg);
-			}
-            else 
-			{
-				LogManager.GetLogger(typeof(IdentityHelper)).Error(msg);                        
-            }
+
+        public static void OnDuplicateSessionDetected(string username)
+        {
+            using (var manager = new MiniSessionManager())
+            {
+                var repo = ServiceLocator.Current
+                     .GetInstance<Data.DAL.IRepositoryBuilder>()
+                     .CreateCreateRepository(manager);
+                var user = repo.GetById<ApplicationUser>(username);
+                SignOutUserFromAllSessions(user);
+            }			
         }
 
         public static void SignOut()
@@ -324,6 +322,7 @@ namespace CLMS.Framework.Identity
         {
             var manager = GetUserManager();
             var user = GetIdentityUser(username, email, name, userClass);
+          
             foreach (var claim in claims)
             {
                 user.User.AddClaims(new ApplicationUserClaim
@@ -442,7 +441,8 @@ namespace CLMS.Framework.Identity
             log.DebugFormat("Identity {0}, has not been processed.", incomingPrincipal.Identity.Name);
             // Find local user associated with the windows login
             var manager = GetUserManager();
-            var user = manager.FindByName(incomingPrincipal.Identity.Name);
+            var username = incomingPrincipal.Identity.Name;
+            var user = manager.FindByName(username);
             if (user == null)
             {
                 log.DebugFormat("Identity {0}, does not have local login. Creating...", incomingPrincipal.Identity.Name);
@@ -470,7 +470,7 @@ namespace CLMS.Framework.Identity
             }
             else
             {
-                log.Debug($"User {incomingPrincipal.Identity.Name} already has local login.");
+                log.Debug($"User {incomingPrincipal.Identity.Name} already has local login.");        
             }
             PrintUser(user, log);
             var clientKey = HttpContext.Current.Request.Browser.Type;
@@ -605,12 +605,14 @@ namespace CLMS.Framework.Identity
             }
         }
 
-		public static void SignOutUserFromAllSessions(ApplicationUser user)
+		public static void SignOutUserFromAllSessions(ApplicationUser user, string sessionToKeep = null)
         {
             if (user == null) return;
             var activeSessionIds = ActiveSessions.Where(s => s.Value == user.UserName).Select(x => x.Key);
             foreach (var id in activeSessionIds)
             {
+                if (id == sessionToKeep) continue;
+
                 RemoveUserSession(id);
             }
             ServiceLocator.Current.GetInstance<IApplicationHub>()?.ForceUserPageReloadEvent(user.UserName);
