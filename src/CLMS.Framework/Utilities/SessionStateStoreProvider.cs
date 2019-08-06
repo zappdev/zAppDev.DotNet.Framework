@@ -94,7 +94,7 @@ namespace CLMS.Framework.Utilities
     }
 
 
-    class SessionStateStoreProvider : SessionStateStoreProviderBase
+    public class SessionStateStoreProvider : SessionStateStoreProviderBase
     {   
         private readonly Func<HttpContext, HttpStaticObjectsCollection> _staticObjectsGetter;
         private string _name = "SessionStateStoreProvider";

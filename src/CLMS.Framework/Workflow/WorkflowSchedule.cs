@@ -508,9 +508,9 @@ namespace CLMS.Framework.Workflow
             return Utilities.Common.GetNextExecutionTime(CronExpression ?? "", (StartDateTime ?? SqlDateTime.MinValue.Value));
         }
 
-        public virtual IWorkflowExecutionResult Execute()
+        public virtual WorkflowExecutionResult Execute()
         {
-            return new ScheduleManager().ExecuteSchedule(this);
+            return new ScheduleManager().ExecuteSchedule(this) as WorkflowExecutionResult;
         }
 
     }
