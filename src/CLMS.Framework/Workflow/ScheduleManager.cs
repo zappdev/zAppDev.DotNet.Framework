@@ -4,6 +4,7 @@ using System.Linq;
 using log4net;
 using CLMS.Framework.Data;
 using CLMS.Framework.Data.DAL;
+using CLMS.Framework.Utilities;
 
 namespace CLMS.Framework.Workflow
 {
@@ -16,7 +17,7 @@ namespace CLMS.Framework.Workflow
         public ScheduleManager(IRepositoryBuilder builder = null)
         {
             _log = LogManager.GetLogger(typeof(ScheduleManager));
-            Builder = builder;
+            Builder = builder ?? ServiceLocator.Current.GetInstance<IRepositoryBuilder>();
         }
 
         public void ProcessSchedules()
