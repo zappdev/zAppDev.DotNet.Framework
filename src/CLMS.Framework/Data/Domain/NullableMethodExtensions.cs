@@ -42,47 +42,47 @@ namespace CLMS.Framework.Data.Domain
 
         #region Fail-safe methods
 
-        public static object GetValueOrDefault(this object me, object defaultValue)
+        public static object GetValueOrDefault(this object me, object defaultValue=null)
         {
             return me;
         }
 
-        public static int GetValueOrDefault(this int me, object defaultValue)
+        public static int GetValueOrDefault(this int me, object defaultValue = null)
         {
             return me;
         }
 
-        public static long GetValueOrDefault(this long me, object defaultValue)
+        public static long GetValueOrDefault(this long me, object defaultValue = null)
         {
             return me;
         }
 
-        public static bool GetValueOrDefault(this bool me, object defaultValue)
+        public static bool GetValueOrDefault(this bool me, object defaultValue = null)
         {
             return me;
         }
 
-        public static double GetValueOrDefault(this double me, object defaultValue)
+        public static double GetValueOrDefault(this double me, object defaultValue = null)
         {
             return me;
         }
 
-        public static decimal GetValueOrDefault(this decimal me, object defaultValue)
+        public static decimal GetValueOrDefault(this decimal me, object defaultValue = null)
         {
             return me;
         }
 
-        public static float GetValueOrDefault(this float me, object defaultValue)
+        public static float GetValueOrDefault(this float me, object defaultValue = null)
         {
             return me;
         }
 
-        public static char GetValueOrDefault(this char me, object defaultValue)
+        public static char GetValueOrDefault(this char me, object defaultValue = null)
         {
             return me;
         }
 
-        public static byte GetValueOrDefault(this byte me, object defaultValue)
+        public static byte GetValueOrDefault(this byte me, object defaultValue = null)
         {
             return me;
         }
