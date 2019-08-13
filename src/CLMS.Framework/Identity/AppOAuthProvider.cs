@@ -31,7 +31,7 @@ namespace CLMS.Framework.Identity
 
             // Fill claims
             var userInfo = IdentityHelper.GetUserManager().FindByName(usernameVal);
-            var claims = IdentityHelper.GetUserActivePermissions(usernameVal).Select(p => new Claim(Model.ClaimTypes.Permission, p)).ToList();
+            var claims = userInfo.User.Permissions.Select(p => new Claim(Model.ClaimTypes.Permission, p.Name)).ToList();
             claims.Add(new Claim(ClaimTypes.Name, userInfo.UserName));
             if (!string.IsNullOrWhiteSpace(userInfo.User.Email))
             {
