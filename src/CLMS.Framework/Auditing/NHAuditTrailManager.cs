@@ -34,11 +34,17 @@ namespace CLMS.Framework.Auditing
             try
             {
                 IsTemporarilyDisabled = true;
-
+#if NETFRAMEWORK
+                MiniSessionManager.ExecuteInUoW(manager =>
+                {
+                    var result = action?.Invoke(this);
+                }, MiniSessionManager.InstanceSafe);
+#else   
                 MiniSessionManager.ExecuteInUoW(manager =>
                 {
                     var result = action?.Invoke(this);
                 });
+#endif
 
                 IsTemporarilyDisabled = false;
             }
