@@ -123,6 +123,7 @@ namespace CLMS.Framework.Mvc
                 var result = Json(new
                 {
                     Type = "Redirect",
+                    ClientCommands = viewDTO.ClientCommands,
                     Url = ClientCommands.CLOSE_FORM.ToString()
                 }, JsonRequestBehavior.AllowGet);
                 result.MaxJsonLength = int.MaxValue;
