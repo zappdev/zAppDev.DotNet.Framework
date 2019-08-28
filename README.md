@@ -1,5 +1,5 @@
-# CLMS Framework 
+# zAppDev DotNet Framework
 
 ### License
 
-The **CLMS.Framework** is dual licensed as AGPL/Commercial software.
+The **zAppDev.DotNet.Framework** is dual licensed as AGPL/Commercial software.
