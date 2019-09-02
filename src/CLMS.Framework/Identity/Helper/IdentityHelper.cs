@@ -343,7 +343,7 @@ namespace CLMS.Framework.Identity
             var _savedUser = manager.FindByName(user.User.UserName);
             if (_savedUser == null)
             {
-                var msg = $"Application User {user.User.UserName} was not created";
+                var msg = $"NOT_CREATED [{user.User.UserName}]";
 				HttpContext.Current?.Response?.AddHeader(nameof(AuthenticationException), msg);
 				return new string[] { msg };
             }
