@@ -106,7 +106,7 @@ namespace zAppDev.DotNet.Framework.Mvc
         }
     }
 
-    public class DTOHelper
+    public class DTOHelper: IDTOHelper
     {
         private static string _nonPersistedDataset = "NonPersistedDataSetQueryables";
    

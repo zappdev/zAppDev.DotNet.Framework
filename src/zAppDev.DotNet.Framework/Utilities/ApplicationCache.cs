@@ -1,6 +1,8 @@
 ﻿#if NETFRAMEWORK
 using Autofac;
 using Autofac.Integration.WebApi;
+#endif
+
 using CacheManager.Core;
 using System.Web.Http;
 using System;
@@ -24,8 +26,12 @@ namespace zAppDev.DotNet.Framework.Utilities
         {
             get
             {
+#if NETFRAMEWORK
                 var resolver = GlobalConfiguration.Configuration.DependencyResolver as AutofacWebApiDependencyResolver;
                 return resolver.Container.ResolveNamed<ICacheManager<object>>("AppCache");
+#else
+                return ServiceLocator.Current.GetInstance<ICacheManager<object>>();
+#endif
             }
         }
 
@@ -93,4 +99,3 @@ namespace zAppDev.DotNet.Framework.Utilities
         }
     }
 }
-#endif

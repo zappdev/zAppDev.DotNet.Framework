@@ -5,37 +5,33 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Routing;
 using System.Collections.Generic;
 
-namespace zAppDev.DotNet.Framework.Mvc.UI
+namespace zAppDev.DotNet.Framework.Mvc.UI.Helper
 {
-
-    namespace Helper
+    public class Routes
     {
-        public class Routes
+        public static Dictionary<string, string> GetRouteData()
         {
-            public static Dictionary<string, string> GetRouteData()
-            {
-                var result = new Dictionary<string, string>();
+            var result = new Dictionary<string, string>();
 
-                var routedData = Web.GetContext().GetRouteData();
-                if (routedData != null)
+            var routedData = Web.GetContext().GetRouteData();
+            if (routedData != null)
+            {
+                foreach (var key in routedData.Values.Keys)
                 {
-                    foreach (var key in routedData.Values.Keys)
-                    {
-                        var value = routedData.Values[key];
-                        result.Add(key, value?.ToString());
-                    }
+                    var value = routedData.Values[key];
+                    result.Add(key, value?.ToString());
                 }
-
-                return result;
             }
+
+            return result;
         }
+    }
 
-        public static class RulesHelper
+    public static class RulesHelper
+    {
+        public static HtmlString Attribute(string name, string value)
         {
-            public static HtmlString Attribute(string name, string value)
-            {
-                return new HtmlString($"{name}=\"{value}\"");
-            }
+            return new HtmlString($"{name}=\"{value}\"");
         }
     }
 }

@@ -6,14 +6,17 @@ using System.Linq;
 using System.Linq.Expressions;
 #if NETFRAMEWORK
 using System.Runtime.Caching;
+#else
+using Microsoft.Extensions.Caching.Memory;
 #endif
 using System.Runtime.Serialization;
 
 namespace zAppDev.DotNet.Framework.Mvc
 {
-    #if NETFRAMEWORK
     public class DatasourceRetriever
     {
+#if NETFRAMEWORK
+
         private static MemoryCache Cache = MemoryCache.Default;
         
         private static void AddToCache(DatasourceRequest request, object filtered)
@@ -24,9 +27,27 @@ namespace zAppDev.DotNet.Framework.Mvc
             var cacheItem = new CacheItem(request.GetHashCode().ToString(), filtered);
             Cache.Add(cacheItem, policy);
         }
+#else
 
+        private static IMemoryCache Cache = null;
+
+        private static void AddToCache(DatasourceRequest request, object filtered)
+        {
+            var cacheEntryOptions = new MemoryCacheEntryOptions()
+                .SetSlidingExpiration(TimeSpan.FromSeconds(30));
+            Cache.Set(request.GetHashCode().ToString(), filtered, cacheEntryOptions);
+        }
+
+#endif
         private static object GetFromCache(DatasourceRequest request)
         {
+#if NETFRAMEWORK
+#else
+            if (Cache == null)
+            {
+                Cache = Framework.Utilities.ServiceLocator.Current.GetInstance<IMemoryCache>();
+            }
+#endif
             return Cache.Get(request.GetHashCode().ToString());
         }
 
@@ -119,7 +140,7 @@ namespace zAppDev.DotNet.Framework.Mvc
             }            
         }
     }
-#endif
+
     public class DatasourceRequest
 	{
 		public DatasourceRequest(int startRow = 0, int pageSize = 9999, List<FilterInfo> filters = null, List<OrderByInfo> orderBy = null, List<object> excludeKeys = null, int[] indexes = null, List<GroupByInfo> grouping = null)
