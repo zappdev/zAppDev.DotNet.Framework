@@ -1,4 +1,7 @@
-﻿/*
+﻿// Copyright (c) 2017 CLMS. All rights reserved.
+// Licensed under the AGPL-3.0 license. See LICENSE file in the project root for full license information.
+
+/*
 Tolis: This code is contains bad junior-level code (that magically works). 
 We need to refactor it ASAP.
 */

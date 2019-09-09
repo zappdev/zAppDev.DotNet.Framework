@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+Copyright (c) 2017 CLMS. All rights reserved.
+Licensed under the AGPL-3.0 license. See LICENSE file in the project root for full license information.
+-->
 <hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" default-lazy="true" auto-import="false" assembly="zAppDev.DotNet.Framework" namespace="zAppDev.DotNet.Framework.Auditing.Model">
     <class name="AuditLogEntry" table="`AuditLogEntries`" schema="`audit`">
         <cache usage="read-write" region="audit" />
