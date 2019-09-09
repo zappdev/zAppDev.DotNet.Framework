@@ -23,14 +23,14 @@ namespace zAppDev.DotNet.Framework.Tests.Utilities
         {
             var settings = Email.FetchSmtpSettings();
 
-            Assert.AreEqual("unit@zAppDev.DotNet.Framework.com", settings.Smtp.From);
+            Assert.AreEqual("unit@clms.framework.com", settings.Smtp.From);
 
 #if NETFRAMEWORK
             using (new HttpSimulator("/", Directory.GetCurrentDirectory()).SimulateRequest())
             {
                 settings = Email.FetchSmtpSettings();
 
-                Assert.AreEqual("unit@zAppDev.DotNet.Framework.com", settings.Smtp.From);
+                Assert.AreEqual("unit@clms.framework.com", settings.Smtp.From);
             }
 #endif
         }
@@ -71,8 +71,7 @@ namespace zAppDev.DotNet.Framework.Tests.Utilities
         [TestMethod]
         public void ImapTest()
         {
-            var emailHandler = new Email("host", 990, "nonsense", "nonsense", true, true);
-            emailHandler = new Email();
+            var emailHandler = new Email();
 
             Assert.AreEqual(true, emailHandler.TestConnection());
 

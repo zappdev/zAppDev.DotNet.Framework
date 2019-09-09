@@ -76,7 +76,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="CLMS.Framework.Tests.csproj.DotSettings" />
     <None Remove="coverage.cobertura.xml" />
+    <None Remove="coverage.json" />
   </ItemGroup>
 
   <ItemGroup>
