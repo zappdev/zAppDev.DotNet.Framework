@@ -524,7 +524,7 @@ namespace zAppDev.DotNet.Framework.Utilities
                     return client.Authed;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return false;
             }

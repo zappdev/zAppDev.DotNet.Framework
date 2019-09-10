@@ -21,17 +21,17 @@ namespace zAppDev.DotNet.Framework.Tests.Utilities
         [TestMethod]
         public void FetchSmtpSettingsTest()
         {
-            var settings = Email.FetchSmtpSettings();
-
-            Assert.AreEqual("unit@clms.framework.com", settings.Smtp.From);
-
 #if NETFRAMEWORK
             using (new HttpSimulator("/", Directory.GetCurrentDirectory()).SimulateRequest())
             {
-                settings = Email.FetchSmtpSettings();
+                var settings = Email.FetchSmtpSettings();
 
                 Assert.AreEqual("unit@clms.framework.com", settings.Smtp.From);
             }
+#else
+            var settings = Email.FetchSmtpSettings();
+
+            Assert.AreEqual("unit@clms.framework.com", settings.Smtp.From);
 #endif
         }
 
