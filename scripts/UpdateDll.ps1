@@ -10,8 +10,8 @@ if ($null -ne $res)
     Write-Host "Update net462"
     Copy-Item -Force -Confirm:$false "$srcBasePath\net462\zAppDev.DotNet.Framework.dll" "$dstBasePath"
 
-    Write-Host "Update netstandard2.0"
-    Copy-Item -Force -Confirm:$false "$srcBasePath\netstandard2.0\zAppDev.DotNet.Framework.dll" "$dstBasePath\Standard"
+    Write-Host "Update netcoreapp2.1"
+    Copy-Item -Force -Confirm:$false "$srcBasePath\netcoreapp2.1\zAppDev.DotNet.Framework.dll" "$dstBasePath\Standard"
 }
 
 Set-Location ..\..\scripts
