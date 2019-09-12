@@ -311,7 +311,27 @@ namespace zAppDev.DotNet.Framework.LinqRuntimeTypeBuilder
 
         private static Assembly BuildAssembly(string codeToCompile)
         {
-#if NETSTANDARD           
+#if NETFRAMEWORK
+            var provider = new CSharpCodeProvider();
+            var compilerParameters = new CompilerParameters
+            {
+                GenerateExecutable = false,
+                GenerateInMemory = true
+            };
+            compilerParameters.ReferencedAssemblies.Add("System.Core.Dll");
+
+            var results = provider.CompileAssemblyFromSource(compilerParameters, codeToCompile);
+            if (!results.Errors.HasErrors) return results.CompiledAssembly;
+
+            var errors = new StringBuilder("Compiler Errors :\r\n");
+            foreach (CompilerError error in results.Errors)
+            {
+                errors.AppendFormat("Line {0},{1}\t: {2}\n",
+                    error.Line, error.Column, error.ErrorText);
+            }
+
+            throw new ApplicationException(errors.ToString());
+#else
             var syntaxTree = CSharpSyntaxTree.ParseText(codeToCompile);
 
             var assemblyName = Path.GetRandomFileName();
@@ -354,26 +374,6 @@ namespace zAppDev.DotNet.Framework.LinqRuntimeTypeBuilder
                 ms.Seek(0, SeekOrigin.Begin);
                 return AssemblyLoadContext.Default.LoadFromStream(ms);
             }
-#else
-            var provider = new CSharpCodeProvider();
-            var compilerParameters = new CompilerParameters
-            {
-                GenerateExecutable = false,
-                GenerateInMemory = true
-            };
-            compilerParameters.ReferencedAssemblies.Add("System.Core.Dll");
-
-            var results = provider.CompileAssemblyFromSource(compilerParameters, codeToCompile);
-            if (!results.Errors.HasErrors) return results.CompiledAssembly;
-
-            var errors = new StringBuilder("Compiler Errors :\r\n");
-            foreach (CompilerError error in results.Errors)
-            {
-                errors.AppendFormat("Line {0},{1}\t: {2}\n",
-                    error.Line, error.Column, error.ErrorText);
-            }
-
-            throw new ApplicationException(errors.ToString());
 #endif
         }
 
