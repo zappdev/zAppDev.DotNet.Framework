@@ -366,22 +366,36 @@ namespace CLMS.Framework.Auditing
         private string GetStringValueFromStateArray(IList<object> stateArray, int position, AuditableProperty property, IEventSource session)
         {
             var value = stateArray?[position];
-            if (value == null)
-                return NoValueString;
-            if (!property.IsComplex)
-                return value.ToString() == string.Empty ? NoValueString : value.ToString();
+            if (value == null) return NoValueString;
+
+            if (!property.IsComplex) return ValueToString(property.Datatype, value);
             var type = GetTypeFromClassName(property.Datatype);
-            if (type == null)
-                return value.ToString() == string.Empty ? NoValueString : value.ToString();
+            if (type == null) return ValueToString(property.Datatype, value);
+
             var identifierPropertyName = session.SessionFactory.GetClassMetadata(property.Datatype).IdentifierPropertyName;
             var propertyInfo = type.GetProperty(identifierPropertyName);
+
             if (propertyInfo == null) return string.Empty;
-            var keyValue = propertyInfo.GetValue(value);
-            return keyValue == null || keyValue.ToString() == string.Empty ? NoValueString : keyValue.ToString();
+
+            return ValueToString(Common.GetTypeName(propertyInfo.PropertyType, true), propertyInfo.GetValue(value));        
+        }
+
+        private string ValueToString(string dataType, object value)
+        {
+            if (value == null) return NoValueString;
+
+            if (Equals(dataType, DateTimeType))
+                return ((DateTime)value).ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fff'Z'");
+
+            var serializedValue = value.ToString();
+
+            return string.IsNullOrEmpty(serializedValue) ? NoValueString : serializedValue;
         }
 
         private Type GetTypeFromClassName(string name) 
             => AuditEntityConfiguration.GetTypeFromClassName(name);
+
+        private readonly string DateTimeType = Common.GetTypeName(typeof(DateTime), true);
     }
 
     public class AuditableEntity
