@@ -1,4 +1,4 @@
-$srcBasePath = "D:\Work\CLMS\CLMS.Framework\src\CLMS.Framework\bin\Release"
+$srcBasePath = "D:\Work\CLMS\zAppDev.DotNet.Framework\src\CLMS.Framework\bin\Release"
 $dstBasePath = "D:\Work\zAppDev.CodingFacility.CSharp.MVP\CLMS.CodingFacility.CS.Resources\Libraries"
 
 Set-Location ..\src\CLMS.Framework
