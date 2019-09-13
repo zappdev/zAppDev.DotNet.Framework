@@ -22,5 +22,9 @@
         <property name="OldValue" column="`OldValue`" type="String" not-null="false" length="4000" />
         <property name="NewValue" column="`NewValue`" type="String" not-null="false" length="4000" />
         <property name="PropertyName" column="`PropertyName`" type="String" not-null="false" length="4000" />
+
+        <property name="ExtraField1" column="`ExtraField1`" type="String" not-null="false" length="4000" />
+        <property name="ExtraField2" column="`ExtraField2`" type="String" not-null="false" length="4000" />
+        <property name="ExtraField3" column="`ExtraField3`" type="String" not-null="false" length="4000" />
     </class>
 </hibernate-mapping>

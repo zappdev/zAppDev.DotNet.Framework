@@ -131,6 +131,30 @@ namespace CLMS.Framework.Auditing.Model
         public virtual string PropertyName { get; set; }
 
         /// <summary>
+        /// The ExtraField1 property
+        ///
+        /// </summary>
+        ///
+        [DataMember(Name = "ExtraField1")]
+        public virtual string ExtraField1 { get; set; }
+
+        /// <summary>
+        /// The ExtraField2 property
+        ///
+        /// </summary>
+        ///
+        [DataMember(Name = "ExtraField2")]
+        public virtual string ExtraField2 { get; set; }
+
+        /// <summary>
+        /// The ExtraField3 property
+        ///
+        /// </summary>
+        ///
+        [DataMember(Name = "ExtraField3")]
+        public virtual string ExtraField3 { get; set; }
+
+        /// <summary>
         /// Public constructors of the AuditLogEntry class
         /// </summary>
         /// <returns>New AuditLogEntry object</returns>
