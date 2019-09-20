@@ -1,15 +1,10 @@
-﻿// Copyright (c) 2017 CLMS. All rights reserved.
+// Copyright (c) 2017 CLMS. All rights reserved.
 // Licensed under the AGPL-3.0 license. See LICENSE file in the project root for full license information.
-#if NETFRAMEWORK
-using Autofac;
-using Autofac.Integration.WebApi;
-#endif
-
 using CacheManager.Core;
-using System.Web.Http;
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+
 
 namespace zAppDev.DotNet.Framework.Utilities
 {
@@ -28,12 +23,7 @@ namespace zAppDev.DotNet.Framework.Utilities
         {
             get
             {
-#if NETFRAMEWORK
-                var resolver = GlobalConfiguration.Configuration.DependencyResolver as AutofacWebApiDependencyResolver;
-                return resolver.Container.ResolveNamed<ICacheManager<object>>("AppCache");
-#else
-                return ServiceLocator.Current.GetInstance<ICacheManager<object>>();
-#endif
+                return ServiceLocator.Current.GetInstance<ICacheManager<object>>("AppCache");
             }
         }
 
@@ -96,7 +86,7 @@ namespace zAppDev.DotNet.Framework.Utilities
 
         public static void Set<TV>(string key, TV value)
         {
-            var serialized = Newtonsoft.Json.JsonConvert.SerializeObject(value, DefaultDeserializationSettingsWithCycles);
+            var serialized = JsonConvert.SerializeObject(value, DefaultDeserializationSettingsWithCycles);
             Instance.Put(key, serialized);
         }
     }
