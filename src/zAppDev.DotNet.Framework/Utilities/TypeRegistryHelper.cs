@@ -15,11 +15,20 @@ namespace zAppDev.DotNet.Framework.Utilities
         {
             if (_domainTypes == null)
             {
-                _domainTypes = typeof(TypeRegistryHelper).Assembly
-                    .GetTypes()
-                    .Where(t => 
-                        t.GetInterfaces().Contains(typeof(Data.Domain.IDomainModelClass)))
-                    .ToList();
+                try
+                {
+                    _domainTypes = typeof(TypeRegistryHelper).Assembly
+                        .GetTypes()
+                        .Where(t =>
+                            t.GetInterfaces().Contains(typeof(Data.Domain.IDomainModelClass)))
+                        .ToList();
+                }
+                catch (System.Reflection.ReflectionTypeLoadException e)
+                {
+                    log4net.LogManager.GetLogger(typeof(TypeRegistryHelper))
+                        .Error("Failed to load Domain Model classes from Assembly. LoaderExceptions:" + string.Join("\r\n\t", e.LoaderExceptions.Select(le => le.Message)));
+                    throw;
+                }
             }
 
             return _domainTypes;
