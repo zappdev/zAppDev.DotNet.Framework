@@ -7,8 +7,8 @@ $res = dotnet build -c Release
 
 if ($null -ne $res)
 {
-    Write-Host "Update net462"
-    Copy-Item -Force -Confirm:$false "$srcBasePath\net462\zAppDev.DotNet.Framework.dll" "$dstBasePath"
+    Write-Host "Update net472"
+    Copy-Item -Force -Confirm:$false "$srcBasePath\net472\zAppDev.DotNet.Framework.dll" "$dstBasePath"
 
     Write-Host "Update netcoreapp2.2"
     Copy-Item -Force -Confirm:$false "$srcBasePath\netcoreapp2.2\zAppDev.DotNet.Framework.dll" "$dstBasePath\Standard"

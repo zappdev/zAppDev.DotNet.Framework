@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net462;net472;netcoreapp2.2</TargetFrameworks>
+    <TargetFrameworks>net472;netcoreapp2.2</TargetFrameworks>
     <PackageId>zAppDev.DotNet.Framework</PackageId>
     <Product>zAppDev.DotNet.Framework</Product>
     <AssemblyName>zAppDev.DotNet.Framework</AssemblyName>
