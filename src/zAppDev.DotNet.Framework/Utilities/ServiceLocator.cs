@@ -2,11 +2,12 @@
 // Licensed under the AGPL-3.0 license. See LICENSE file in the project root for full license information.
 using System;
 using Microsoft.Extensions.DependencyInjection;
-using Autofac.Extensions.DependencyInjection;
 using Autofac;
 
 #if NETFRAMEWORK
 using CommonServiceLocator;
+#else
+using Autofac.Extensions.DependencyInjection;
 #endif
 
 namespace zAppDev.DotNet.Framework.Utilities
@@ -39,6 +40,8 @@ namespace zAppDev.DotNet.Framework.Utilities
             _serviceProvider = serviceProvider;
         }
 
+#if NETFRAMEWORK
+#else
         public object GetInstance(Type serviceType, string name = null)
         {
             if (string.IsNullOrEmpty(name))
@@ -73,5 +76,6 @@ namespace zAppDev.DotNet.Framework.Utilities
                 return default;
             }
         }
+#endif
     }
 }
