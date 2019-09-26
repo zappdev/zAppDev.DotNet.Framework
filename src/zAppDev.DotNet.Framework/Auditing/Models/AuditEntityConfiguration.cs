@@ -9,7 +9,6 @@ using System.Collections;
 using System.ComponentModel.DataAnnotations;
 using zAppDev.DotNet.Framework.Data.Domain;
 using zAppDev.DotNet.Framework.Utilities;
-using zAppDev.DotNet.Framework.Utilities;
 using zAppDev.DotNet.Framework.Data.DAL;
 
 namespace zAppDev.DotNet.Framework.Auditing.Model

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net472;netcoreapp2.2</TargetFrameworks>
+    <TargetFrameworks>net472;netcoreapp2.2;netstandard2.0</TargetFrameworks>
     <PackageId>zAppDev.DotNet.Framework</PackageId>
     <Product>zAppDev.DotNet.Framework</Product>
     <AssemblyName>zAppDev.DotNet.Framework</AssemblyName>
@@ -149,7 +149,17 @@
     <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.1.1" />
+  </ItemGroup>
+
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.2'">
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.1.5" />
+    <PackageReference Include="Microsoft.PowerShell.Commands.Diagnostics" Version="6.1.5" />
+    <PackageReference Include="Microsoft.WSMan.Management" Version="6.1.5" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.2' or '$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="Autofac" Version="4.9.1" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="5.0.0-rc2" />
     <PackageReference Include="Autofac.Extras.CommonServiceLocator" Version="5.0.0" />
@@ -176,7 +186,6 @@
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.2.0" />
-    <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.1.1" />
     <PackageReference Include="RSG.Promise.Core" Version="3.0.0" />
     <PackageReference Include="PdfSharp.MigraDoc.Standard" Version="1.51.*" />
     <PackageReference Include="PDFSharp.Standard" Version="1.51.*" />
@@ -185,10 +194,6 @@
     <PackageReference Include="System.CodeDom" Version="4.5.0" />
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />    
     <PackageReference Include="System.Data.SqlClient" Version="4.6.0" />
-    <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.1.5" /> 
-    <PackageReference Include="Microsoft.PowerShell.Commands.Diagnostics" Version="6.1.5" />
-    <PackageReference Include="Microsoft.WSMan.Management" Version="6.1.5" />
-
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
     <PackageReference Include="VerbalExpressions-netstandard16" Version="0.2.0" />
