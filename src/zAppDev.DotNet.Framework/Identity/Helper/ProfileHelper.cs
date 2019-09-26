@@ -62,12 +62,12 @@ namespace zAppDev.DotNet.Framework.Identity
             }
         }
 
-        public static object GetCurrentProfileTheme()
+        public static object GetCurrentProfileTheme(string defaultThemeName = "DarkTheme")
         {
             var currentUser = IdentityHelper.GetCurrentApplicationUser();
             var profileTheme = (currentUser == null || currentUser.Profile == null || currentUser.Profile.Theme == null)
-                               ? "DarkTheme"
-                               : currentUser.Profile.Theme;
+                               ? defaultThemeName
+                               : currentUser.Profile.Theme;  
             var availableThemes = GetAllAvailableThemes();
             return profileTheme != null && availableThemes.Any(t => t.Name == profileTheme)
                    ? profileTheme
