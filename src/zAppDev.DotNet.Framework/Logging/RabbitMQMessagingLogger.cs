@@ -19,9 +19,9 @@ namespace zAppDev.DotNet.Framework.Logging
 {
     public class RabbitMQMessagingLogger : IAPILogger, IDisposable
     {
+#if NETFRAMEWORK
         private IConnection _connection;
         private IModel _channel;
-#if NETFRAMEWORK
         private readonly string _exchange;
         private bool _initialized;
         private ConnectionFactory _connectionFactory;
@@ -203,11 +203,21 @@ namespace zAppDev.DotNet.Framework.Logging
             }
         }
 
-#endif
         public void Dispose()
         {
             _connection?.Dispose();
             _channel?.Dispose();
         }
+#else
+        public void LogExposedAPIAccess(string controller, string action, Guid requestId, TimeSpan processingTime, bool cacheHit)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Dispose()
+        {
+        }
+#endif
+
     }
 }

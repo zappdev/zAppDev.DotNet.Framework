@@ -4,6 +4,8 @@ using System;
 using System.Net;
 #if NETFRAMEWORK
 using System.Web.Http.Controllers;
+#else
+using Microsoft.AspNetCore.Http;
 #endif
 using zAppDev.DotNet.Framework.Services;
 using System.Net.Http;
@@ -23,6 +25,8 @@ namespace zAppDev.DotNet.Framework.Logging
             HttpResponseMessage response, TimeSpan processingTime, bool throwOnError, bool cacheHit);
 
         void Log(string apiType, string apiTitle, LogMessage message, bool throwOnError);
+#else
+        void LogExposedAPIAccess(string controller, string action, Guid requestId, TimeSpan processingTime, bool cacheHit);
 #endif
     }
 }
