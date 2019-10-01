@@ -8,6 +8,7 @@ using CacheManager.Core;
 using WebApi.OutputCache.Core.Cache;
 using System.Web.Http;
 using CacheManager.Core.Internal;
+using zAppDev.DotNet.Framework.Mvc;
 
 namespace zAppDev.DotNet.Framework.Services
 {
