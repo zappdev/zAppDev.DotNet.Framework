@@ -10,6 +10,7 @@ namespace zAppDev.DotNet.Framework.Mvc
         string UserName { get; set; }
 
         string GetHashedKey();
+        string GetHashedKey(string apiName, string operationName, string originalKey, string userName);
         ICacheKeyHasher SplitToObject(string hashedKey, string deliminator = "|", bool throwOnException = false);
     }
 }

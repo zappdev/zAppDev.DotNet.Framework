@@ -91,8 +91,7 @@ namespace zAppDev.DotNet.Framework.Services
 
             return _cacheKeyHasher.GetHashedKey();
         }
-
-
+        
         private static string GetJsonpCallback(HttpRequestMessage request)
         {
             if (request.Method != HttpMethod.Get) return string.Empty;

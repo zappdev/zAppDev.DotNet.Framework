@@ -159,9 +159,7 @@ namespace zAppDev.DotNet.Framework.Mvc
             log4net.LogManager.GetLogger(this.GetType()).Info("end: OnActionExecutedAsync");
 
         }// end OnActionExecutedAsync()
-
-
-
+        
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
             log4net.LogManager.GetLogger(this.GetType()).Info("start: OnActionExecuting");

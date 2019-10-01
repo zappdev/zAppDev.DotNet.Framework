@@ -3,6 +3,7 @@
 using System;
 using System.Security.Cryptography;
 using System.Text;
+using zAppDev.DotNet.Framework.Mvc;
 
 namespace zAppDev.DotNet.Framework.Services
 {
@@ -29,6 +30,16 @@ namespace zAppDev.DotNet.Framework.Services
             }
 
             return $"{ApiName}{_deliminator}{UserName}{_deliminator}{Operation}{_deliminator}{hash}";
+        }
+
+        public string GetHashedKey(string apiName, string operationName, string originalKey, string userName)
+        {
+            ApiName = apiName;
+            UserName = userName;
+            Operation = operationName;
+            OriginalKey = originalKey;
+
+            return GetHashedKey();
         }
 
         public ICacheKeyHasher SplitToObject(string hashedKey, string deliminator = "|", bool throwOnException = false)
@@ -63,6 +74,6 @@ namespace zAppDev.DotNet.Framework.Services
 
             return sBuilder.ToString();
         }
-    }
 
+    }
 }
