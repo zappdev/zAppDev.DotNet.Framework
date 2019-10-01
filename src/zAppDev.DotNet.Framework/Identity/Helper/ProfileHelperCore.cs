@@ -70,18 +70,24 @@ namespace zAppDev.DotNet.Framework.Identity
             }
         }
 
-        public static object GetCurrentProfileTheme()
+        public static object GetCurrentProfileTheme(string defaultThemeName = null)
         {
+            if (string.IsNullOrWhiteSpace(defaultThemeName))
+            {
+                defaultThemeName = ServiceLocator.Current.GetInstance<IConfiguration>()["configuration:appSettings:add:DefaultTheme:value"] ?? "";
+            }
+
             var currentUser = IdentityHelper.GetCurrentApplicationUser();
             var profileTheme = (currentUser == null || currentUser.Profile == null || currentUser.Profile.Theme == null)
-                   ? "{DEFAULT_THEME}"
+                   ? defaultThemeName
                    : currentUser.Profile.Theme;
 
             var availableThemes = GetAllAvailableThemes();
+            if (availableThemes?.Count == 0) return defaultThemeName;
 
             return profileTheme != null && availableThemes.Any(t => t.Name == profileTheme)
                 ? profileTheme
-                : availableThemes.FirstOrDefault()?.Name;
+                : availableThemes.FirstOrDefault()?.Name ?? defaultThemeName;
         }
 
         public static object GetProfileSettingValue(string key, object defaultValue = null)
