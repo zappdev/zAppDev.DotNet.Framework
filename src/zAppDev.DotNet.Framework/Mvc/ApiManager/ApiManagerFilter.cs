@@ -18,11 +18,6 @@ namespace zAppDev.DotNet.Framework.Mvc.API
             context.HttpContext.SetApiRequestConfig(LogEnabled, AllowPartialResponse, controller, action);
             base.OnActionExecuting(context);
         }
-
-        public override void OnActionExecuted(ActionExecutedContext context)
-        {
-             var id = context.HttpContext.Items["exposed-service-requestId"];
-        }
     }
 }
 #endif

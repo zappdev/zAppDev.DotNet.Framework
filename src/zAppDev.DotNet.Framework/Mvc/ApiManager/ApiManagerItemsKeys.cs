@@ -7,5 +7,7 @@
         public static string RequestIsLogged = "requestIsLogged";
 
         public static string ExposedServiceRequestId = "exposed-service-requestId";
+
+        public static string HitCache = "hit-cache";
     }
 }
