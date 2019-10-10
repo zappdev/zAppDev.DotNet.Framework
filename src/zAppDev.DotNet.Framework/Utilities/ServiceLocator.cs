@@ -36,9 +36,11 @@ namespace zAppDev.DotNet.Framework.Utilities
 #endif
 
         public static void SetLocatorProvider(IServiceProvider serviceProvider)
-        {         
+        {   
             _serviceProvider = serviceProvider;
         }
+
+        public static bool ServiceProviderIsLoaded() => _serviceProvider != null;
 
 #if NETFRAMEWORK
 #else
