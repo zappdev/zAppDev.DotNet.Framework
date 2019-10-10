@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using zAppDev.DotNet.Framework.Data;
 using zAppDev.DotNet.Framework.Logging;
 using zAppDev.DotNet.Framework.Mvc.API;
+using zAppDev.DotNet.Framework.Utilities;
 
 namespace zAppDev.DotNet.Framework.Middleware
 {
@@ -16,19 +16,24 @@ namespace zAppDev.DotNet.Framework.Middleware
     {
         private readonly RequestDelegate _next;
 
-        private readonly IMiniSessionService _miniSessionService;
-
         private readonly IAPILogger _logger;
 
-        public ApiManagerMiddleware(RequestDelegate next, IMiniSessionService miniSessionService, IAPILogger logger)
+        private readonly IServiceProvider _serviceProvider;
+
+        public ApiManagerMiddleware(
+            RequestDelegate next,
+            IAPILogger logger,
+            IServiceProvider serviceProvider)
         {
             _next = next;
             _logger = logger;
-            _miniSessionService = miniSessionService;
+            _serviceProvider = serviceProvider;
         } 
 
         public async Task Invoke(HttpContext context)
         {
+            ServiceLocator.SetLocatorProvider(_serviceProvider);
+
             context.Items[ApiManagerItemsKeys.LogTimer] = Stopwatch.StartNew();
             context.Items[ApiManagerItemsKeys.RequestIsLogged] = false;
 
@@ -37,9 +42,7 @@ namespace zAppDev.DotNet.Framework.Middleware
             context.TraceIdentifier = id.ToString();
             try
             {
-                _miniSessionService.OpenSessionWithTransaction();
                 await _next(context);
-                _miniSessionService.CommitChanges();
                 if (context.IsAllowPartialResponseEnabled()) CreateByVariableTypeDtoResponse(context);
             }
             catch (Exception ex)
