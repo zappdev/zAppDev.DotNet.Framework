@@ -48,16 +48,23 @@ namespace zAppDev.DotNet.Framework.Identity
 
         private ApplicationUser PersistApplicationUser(ApplicationUser user)
         {
-            using (var manager = new MiniSessionService(_sessionManager.SessionFactory))
-            {
-                manager.OpenSessionWithTransaction();
-                ServiceLocator.Current
-                    .GetInstance<Data.DAL.IRepositoryBuilder>()
-                    .CreateCreateRepository(manager)
-                    .Save(user);
-                manager.CommitChanges();
-                return user;
-            }
+            //using (var manager = new MiniSessionService(_sessionManager.SessionFactory))
+            //{
+            //    manager.OpenSessionWithTransaction();
+            //    ServiceLocator.Current
+            //        .GetInstance<Data.DAL.IRepositoryBuilder>()
+            //        .CreateCreateRepository(manager)
+            //        .Save(user);
+            //    manager.CommitChanges();
+            //    return user;
+            //}
+
+            var manager = ServiceLocator.Current.GetInstance<IMiniSessionService>();
+            ServiceLocator.Current
+                .GetInstance<Data.DAL.IRepositoryBuilder>()
+                .CreateCreateRepository(manager)
+                .Save(user);
+            return user;
         }
 
         private ApplicationUser RetrieveApplicationUser(string username, Expression<Func<ApplicationUser, bool>> filter = null)
