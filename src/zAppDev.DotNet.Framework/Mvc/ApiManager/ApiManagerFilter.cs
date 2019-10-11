@@ -33,6 +33,7 @@ namespace zAppDev.DotNet.Framework.Mvc.API
         {
             base.OnActionExecuted(context);
             var manager = ServiceLocator.Current.GetInstance<IMiniSessionService>();
+
             manager.CommitChanges(context.Exception);
         }
     }
