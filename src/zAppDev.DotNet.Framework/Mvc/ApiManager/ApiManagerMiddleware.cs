@@ -40,15 +40,11 @@ namespace zAppDev.DotNet.Framework.Middleware
             var id = Guid.NewGuid();
             context.Items[ApiManagerItemsKeys.ExposedServiceRequestId] = id;
             context.TraceIdentifier = id.ToString();
-            try
-            {
-                await _next(context);
-                if (context.IsAllowPartialResponseEnabled()) CreateByVariableTypeDtoResponse(context);
-            }
-            catch (Exception ex)
-            {
-                HandleException(context, ex);
-            }
+
+            await _next(context);
+            if (context.IsAllowPartialResponseEnabled())
+                CreateByVariableTypeDtoResponse(context);
+
             var timer = (Stopwatch)context.Items[ApiManagerItemsKeys.LogTimer];
             timer.Stop();
             var _elapsed = timer.Elapsed;
@@ -70,11 +66,6 @@ namespace zAppDev.DotNet.Framework.Middleware
         private void CreateByVariableTypeDtoResponse(HttpContext context)
         {
 
-        }
-
-        private void HandleException(HttpContext context, Exception ex)
-        {
-            
         }
     }
 }
