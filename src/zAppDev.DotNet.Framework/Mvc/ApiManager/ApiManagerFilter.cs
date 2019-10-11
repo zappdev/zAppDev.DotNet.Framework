@@ -1,10 +1,6 @@
 ﻿#if NETFRAMEWORK
 #else
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Extensions.Logging;
-using System;
 using zAppDev.DotNet.Framework.Data;
 using zAppDev.DotNet.Framework.Utilities;
 

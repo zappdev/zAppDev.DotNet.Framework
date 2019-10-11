@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using WebApiContrib.Core.Results;
 using zAppDev.DotNet.Framework.Mvc.API;
 using zAppDev.DotNet.Framework.Utilities;
 
@@ -14,7 +15,6 @@ namespace zAppDev.DotNet.Framework.Mvc
     {
         public static async Task HandleException(HttpContext context)
         {
-            context.Response.StatusCode = 500;
             var exceptionHandlerPathFeature =
                 context.Features.Get<IExceptionHandlerPathFeature>();
 
@@ -27,12 +27,12 @@ namespace zAppDev.DotNet.Framework.Mvc
                 {
                     var msgObject = new ExceptionHandler()
                         .HandleException(exceptionHandlerPathFeature.Error);
-                    await context.WriteModelAsync(msgObject);
+                    await context.BadRequest(msgObject);
                 }
                 catch (Exception e)
                 {
                     logger.LogError(e, "Could not produce friendly message for exception!");
-                    await context.WriteModelAsync(exceptionHandlerPathFeature.Error);
+                    await context.BadRequest(exceptionHandlerPathFeature.Error);
                 }
             }
         }

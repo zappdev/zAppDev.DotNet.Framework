@@ -8,11 +8,12 @@
     <RootNamespace>zAppDev.DotNet.Framework</RootNamespace>
     <AssemblyName>zAppDev.DotNet.Framework</AssemblyName>
     <AssemblyTitle>zAppDev.DotNet.Framework</AssemblyTitle>
-    <AssemblyVersion>7.0.0.0</AssemblyVersion>
-    <FileVersion>7.0.0.0</FileVersion>
-    <Version>7.0.0.0</Version>
+    <AssemblyVersion>7.0.5.0</AssemblyVersion>
+    <FileVersion>7.0.5.0</FileVersion>
+    <Version>7.0.5.0</Version>
     <Copyright>© Copyright CLMS</Copyright>
     <LangVersion>7.1</LangVersion>
+    <PackageIcon>icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/zappdev/zAppDev.DotNet.Framework.git</RepositoryUrl>
     <PackageProjectUrl>https://github.com/zappdev/zAppDev.DotNet.Framework</PackageProjectUrl>
     <IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</IsWindows>
@@ -20,6 +21,7 @@
     <IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">true</IsLinux>
     <PackageTags>mvc</PackageTags>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageIconUrl>https://raw.githubusercontent.com/zappdev/zAppDev.DotNet.Framework/develop/assets/icon.png</PackageIconUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.2'">
@@ -66,6 +68,10 @@
     <None Remove="Workflow\WorkflowContextBase.hbm.xml" />
     <None Remove="Workflow\WorkflowSchedule.hbm.xml" />
     <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\..\assets\icon.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
@@ -186,6 +192,7 @@
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.2.0" />
+    <PackageReference Include="WebApiContrib.Core" Version="2.2.1" />
     <PackageReference Include="RSG.Promise.Core" Version="3.0.0" />
     <PackageReference Include="PdfSharp.MigraDoc.Standard" Version="1.51.*" />
     <PackageReference Include="PDFSharp.Standard" Version="1.51.*" />

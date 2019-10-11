@@ -57,7 +57,7 @@ namespace zAppDev.DotNet.Framework.Middleware
 
                     var bytes = ms.ToArray();
 
-                    if (context.Items.ContainsKey(ApiManagerItemsKeys.HitCache) && ((bool)context.Items[ApiManagerItemsKeys.HitCache]) == false)
+                    if (MustCached(context))
                     {
                         SetEtag(context, context.TraceIdentifier);
                         AddResponseToCache(context, bytes);
@@ -75,6 +75,11 @@ namespace zAppDev.DotNet.Framework.Middleware
                 }
             }
         }
+
+        private bool MustCached(HttpContext context) =>
+            context.Response.StatusCode == 500 &&
+            context.Items.ContainsKey(ApiManagerItemsKeys.HitCache) && 
+            ((bool)context.Items[ApiManagerItemsKeys.HitCache]) == false;
 
         private void AddResponseToCache(HttpContext context, byte[] bytes)
         {
