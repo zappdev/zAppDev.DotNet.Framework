@@ -34,18 +34,18 @@ namespace zAppDev.DotNet.Framework.Middleware
         {
             ServiceLocator.SetLocatorProvider(_serviceProvider);
 
-            context.Items[ApiManagerItemsKeys.LogTimer] = Stopwatch.StartNew();
-            context.Items[ApiManagerItemsKeys.RequestIsLogged] = false;
+            context.Items[HttpContextItemKeys.LogTimer] = Stopwatch.StartNew();
+            context.Items[HttpContextItemKeys.RequestIsLogged] = false;
 
             var id = Guid.NewGuid();
-            context.Items[ApiManagerItemsKeys.ExposedServiceRequestId] = id;
+            context.Items[HttpContextItemKeys.ExposedServiceRequestId] = id;
             context.TraceIdentifier = id.ToString();
 
             await _next(context);
             if (context.IsAllowPartialResponseEnabled())
                 CreateByVariableTypeDtoResponse(context);
 
-            var timer = (Stopwatch)context.Items[ApiManagerItemsKeys.LogTimer];
+            var timer = (Stopwatch)context.Items[HttpContextItemKeys.LogTimer];
             timer.Stop();
             var _elapsed = timer.Elapsed;
             if (!context.IsLogEnabled()) return;
@@ -56,10 +56,10 @@ namespace zAppDev.DotNet.Framework.Middleware
             //    filterContext.Exception == null,
             //    filterContext.Exception?.Message);
 
-            if (!(bool)context.Items[ApiManagerItemsKeys.RequestIsLogged])
+            if (!(bool)context.Items[HttpContextItemKeys.RequestIsLogged])
             {
                 _logger?.LogExposedAPIAccess(context.GetController(), context.GetAction(), id, _elapsed, false);
-                context.Items[ApiManagerItemsKeys.RequestIsLogged] = true;
+                context.Items[HttpContextItemKeys.RequestIsLogged] = true;
             }
         }
 

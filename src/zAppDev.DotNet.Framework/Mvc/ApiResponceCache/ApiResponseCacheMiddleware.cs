@@ -78,8 +78,8 @@ namespace zAppDev.DotNet.Framework.Middleware
 
         private bool MustCached(HttpContext context) =>
             context.Response.StatusCode == 500 &&
-            context.Items.ContainsKey(ApiManagerItemsKeys.HitCache) && 
-            ((bool)context.Items[ApiManagerItemsKeys.HitCache]) == false;
+            context.Items.ContainsKey(HttpContextItemKeys.HitCache) && 
+            ((bool)context.Items[HttpContextItemKeys.HitCache]) == false;
 
         private void AddResponseToCache(HttpContext context, byte[] bytes)
         {

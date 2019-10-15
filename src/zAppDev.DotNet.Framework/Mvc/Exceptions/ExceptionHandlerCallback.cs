@@ -1,4 +1,7 @@
-﻿#if NETFRAMEWORK
+﻿// Copyright (c) 2017 CLMS. All rights reserved.
+// Licensed under the AGPL-3.0 license. See LICENSE file in the project root for full license information.
+
+#if NETFRAMEWORK
 #else
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
@@ -18,7 +21,7 @@ namespace zAppDev.DotNet.Framework.Mvc
             var exceptionHandlerPathFeature =
                 context.Features.Get<IExceptionHandlerPathFeature>();
 
-            if (context.Items.ContainsKey(ApiManagerItemsKeys.ExposedServiceRequestId))
+            if (context.Items.ContainsKey(HttpContextItemKeys.ExposedServiceRequestId))
             {
                 var logger = ServiceLocator.Current.GetInstance<ILogger<ExceptionHandler>>();
 

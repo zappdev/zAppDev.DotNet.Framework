@@ -86,11 +86,11 @@ namespace zAppDev.DotNet.Framework.Mvc.API
                     ContentType = value.Headers["Content-Type"]
                 };
 
-                httpContext.Items[ApiManagerItemsKeys.HitCache] = true;
+                httpContext.Items[HttpContextItemKeys.HitCache] = true;
             }
             else
             {
-                httpContext.Items[ApiManagerItemsKeys.HitCache] = false;
+                httpContext.Items[HttpContextItemKeys.HitCache] = false;
             }
         }
     }
