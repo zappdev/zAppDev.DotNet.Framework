@@ -15,6 +15,12 @@ namespace zAppDev.DotNet.Framework.Identity
         {
             if (incomingPrincipal != null && incomingPrincipal.Identity.IsAuthenticated)
             {
+                //Do not authenticate the Application Pool user, usually used by SignalR and other internal, non-user thingies
+                if(System.Security.Principal.WindowsIdentity.GetCurrent()?.Name == incomingPrincipal.Identity.Name)
+                {
+                    return incomingPrincipal;
+                }
+
                 var localUserForWindowsIdentity = IdentityHelper.CreateLocalUserForWindowsIdentity(incomingPrincipal);
                 if(localUserForWindowsIdentity == null)
                 {
