@@ -72,25 +72,17 @@ namespace zAppDev.DotNet.Framework.Mvc.Exceptions
             {
                 return staleObjectStateException;
             }
-
-            var culture_id = GetCultureId(context);
        
             //Otherwise, enrich it
             var defaultMessage = @"Somebody already committed modifications to the data you are about to commit. <br/>You have been working with <i>stale data</i>.<br/>Please, refresh your page in order to restart with fresh data.";
             var defaultTitle = "Stale Data";
-            var message = _localesService.GetResourceValue("GlobalResources", "RES_SITE_StaleObjectStateExceptionMessage", culture_id).ToString();
-            var title = _localesService.GetResourceValue("GlobalResources", "RES_SITE_StaleObjectStateExceptionTitle", culture_id).ToString();
+            var message = _localesService.GetResourceValue("GlobalResources", "RES_SITE_StaleObjectStateExceptionMessage").ToString();
+            var title = _localesService.GetResourceValue("GlobalResources", "RES_SITE_StaleObjectStateExceptionTitle").ToString();
             if (string.IsNullOrWhiteSpace(message)) message = defaultMessage;
             if (string.IsNullOrWhiteSpace(title)) title = defaultTitle;
             staleObjectStateException.Data.Add("ZAPPDEV_MESSAGE", message);
             staleObjectStateException.Data.Add("ZAPPDEV_TITLE", title);
             return staleObjectStateException;
-        }
-
-        private string GetCultureId(ExceptionContext context)
-        {
-            if (context.HttpContext.Items.ContainsKey(HttpContextItemKeys.Culture)) return null;
-            return (context.HttpContext.Items[HttpContextItemKeys.Culture] as CultureInfo).Name.ToLowerInvariant();
         }
 
         private void HandleApiException(ExceptionContext context)

@@ -4,19 +4,24 @@
 #if NETFRAMEWORK
 #else
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Xml;
+using zAppDev.DotNet.Framework.Mvc.API;
 using zAppDev.DotNet.Framework.Utilities;
 
 namespace zAppDev.DotNet.Framework.Locales
 {
     public class LocalesService : ILocalesService
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
         private Dictionary<string, XmlDocument> _cache = new Dictionary<string, XmlDocument>();
 
         private Dictionary<string, Dictionary<string, string>> _formToResources = new Dictionary<string, Dictionary<string, string>>();
@@ -27,9 +32,10 @@ namespace zAppDev.DotNet.Framework.Locales
 
         public string DefaultLang { get; set; }
 
-        public LocalesService(ILogger<LocalesService> logger)
+        public LocalesService(ILogger<LocalesService> logger, IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public void ClearLocalesCache()
@@ -70,6 +76,11 @@ namespace zAppDev.DotNet.Framework.Locales
             if (!AvailiableLanguages.Contains(DefaultLang))
             {
                 DefaultLang = AvailiableLanguages.First();
+            }
+
+            if (lang == null)
+            {
+                lang = GetCurrentLanguage();
             }
 
             if (!AvailiableLanguages.Contains(lang))
@@ -168,6 +179,12 @@ namespace zAppDev.DotNet.Framework.Locales
             return resources;
         }
 
+        private string GetCurrentLanguage()
+        {
+
+            if (!_httpContextAccessor.HttpContext.Items.ContainsKey(HttpContextItemKeys.Culture)) return null;
+            return (_httpContextAccessor.HttpContext.Items[HttpContextItemKeys.Culture] as CultureInfo).Name.ToLowerInvariant();
+        }
     }
 
     public static class ServiceCollectionExtensions
@@ -176,7 +193,7 @@ namespace zAppDev.DotNet.Framework.Locales
         {
             services.AddSingleton<ILocalesService>((context) =>
             {
-                return new LocalesService(context.GetService<ILogger<LocalesService>>())
+                return new LocalesService(context.GetService<ILogger<LocalesService>>(), context.GetService<IHttpContextAccessor>())
                 {
                     DefaultLang = configuration.DefaultLang,
                     AvailiableLanguages = configuration.AvailiableLanguages

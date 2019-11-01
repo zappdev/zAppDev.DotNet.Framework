@@ -12,13 +12,14 @@ using zAppDev.DotNet.Framework.Utilities;
 
 namespace zAppDev.DotNet.Framework.Mvc.Application
 {
-    public class ApplicationInfoService : IApplicationInfoService
+    public class ApplicationInfoService : IApplicationInfoService, IDisposable
     {
         private static string _appVersion;
 
         private static long _lastOnChange;
         private ILogger<ApplicationInfoService> _logger;
         private readonly ILocalesService _localesService;
+        private static FileSystemWatcher _fileSystemWatcher;
         private static readonly object SyncRoot = new Object();
 
         public ApplicationInfoService(ILogger<ApplicationInfoService> logger,
@@ -40,17 +41,18 @@ namespace zAppDev.DotNet.Framework.Mvc.Application
                         {
                             var dir = Web.MapPath("");
                             var path = Path.Combine(dir, "projectInfo.json");
-                            using (var watcher = new FileSystemWatcher
+
+                            _fileSystemWatcher = new FileSystemWatcher
                             {
                                 Path = dir,
                                 NotifyFilter = NotifyFilters.LastWrite,
-                                Filter = "*.json",
-                                IncludeSubdirectories = false
-                            })
-                            {
-                                watcher.Changed += new FileSystemEventHandler(OnChanged);
-                                watcher.EnableRaisingEvents = true;
-                            }
+                                Filter = "projectInfo.json",
+                                IncludeSubdirectories = false,
+                                EnableRaisingEvents = true
+                            };
+
+                            _fileSystemWatcher.Changed += new FileSystemEventHandler(OnChanged);
+
                             UpdateAppVersion(path);
                         }
                     }
@@ -104,6 +106,10 @@ namespace zAppDev.DotNet.Framework.Mvc.Application
             _localesService.ClearLocalesCache();
         }
 
+        public void Dispose()
+        {
+            _fileSystemWatcher.Dispose();
+        }
     }
 }
 
