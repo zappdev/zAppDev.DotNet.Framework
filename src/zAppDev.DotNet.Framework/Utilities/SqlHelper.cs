@@ -86,6 +86,11 @@ namespace zAppDev.DotNet.Framework.Utilities
             }
         }
 
+        public static List<T> RunSqlQuery<T>(string query, Dictionary<string, object> parameters = null, int? timeOut = null, string connectionString = null)
+        {
+            return new QueryResultSerializer<T>().Serialize(RunSqlQuery(query, parameters, timeOut, connectionString));
+        }
+
         public static List<Dictionary<string, object>> RunStoredProcedureWithConnectionString(string procedureName, string connectionString)
         {
             return RunStoredProcedure(procedureName, null, connectionString);
