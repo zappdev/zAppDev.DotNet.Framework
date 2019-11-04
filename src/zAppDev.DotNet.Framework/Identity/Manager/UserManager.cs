@@ -20,6 +20,8 @@ namespace zAppDev.DotNet.Framework.Identity
     {
         private static ConcurrentDictionary<Guid, Model.ApplicationClient> _clients = new ConcurrentDictionary<Guid, Model.ApplicationClient>();
 
+        public static PasswordPolicyConfig PasswordPolicyConfig = new PasswordPolicyConfig();
+
         public UserManager(MiniSessionManager sessionManager) : base(new UserStore(sessionManager))
         {
         }
@@ -56,11 +58,11 @@ namespace zAppDev.DotNet.Framework.Identity
             // Configure validation logic for passwords
             manager.PasswordValidator = new PasswordValidator
             {
-                RequiredLength = 6,
-                RequireNonLetterOrDigit = true,
-                RequireDigit = true,
-                RequireLowercase = true,
-                RequireUppercase = true,
+                RequiredLength = PasswordPolicyConfig.RequiredLength,
+                RequireNonLetterOrDigit = PasswordPolicyConfig.RequireNonLetterOrDigit,
+                RequireDigit = PasswordPolicyConfig.RequireDigit,
+                RequireLowercase = PasswordPolicyConfig.RequireLowercase,
+                RequireUppercase = PasswordPolicyConfig.RequireUppercase
             };
             // Configure user lockout defaults
             manager.UserLockoutEnabledByDefault = false;

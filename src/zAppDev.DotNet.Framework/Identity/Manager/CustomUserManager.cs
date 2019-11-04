@@ -229,17 +229,22 @@ namespace zAppDev.DotNet.Framework.Identity
 
     public static class ServiceCollectionExtensions
     {
-        public static void AddIdentityManager(this IServiceCollection services, IConfiguration configuration)
+        public static void AddIdentityManager(this IServiceCollection services, IConfiguration configuration, PasswordPolicyConfig passwordPolicy = null)
         {
+            if (passwordPolicy == null)
+            {
+                passwordPolicy = new PasswordPolicyConfig();
+            }
+
             services.Configure<IdentityOptions>(options =>
             {
             // Password settings.
-            options.Password.RequireDigit = true;
-                options.Password.RequireLowercase = true;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
-                options.Password.RequiredLength = 6;
-                options.Password.RequiredUniqueChars = 1;
+            options.Password.RequireDigit = passwordPolicy.RequireDigit;
+            options.Password.RequireLowercase = passwordPolicy.RequireLowercase;
+            options.Password.RequireNonAlphanumeric = passwordPolicy.RequireNonLetterOrDigit;
+            options.Password.RequireUppercase = passwordPolicy.RequireUppercase;
+            options.Password.RequiredLength = passwordPolicy.RequiredLength;
+            options.Password.RequiredUniqueChars = 1;
 
             // Lockout settings.
             options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
