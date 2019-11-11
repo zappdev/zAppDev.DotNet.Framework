@@ -19,6 +19,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using zAppDev.DotNet.Framework.Identity.Model;
+using zAppDev.DotNet.Framework.Utilities;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace zAppDev.DotNet.Framework.Identity
 {
@@ -238,29 +242,29 @@ namespace zAppDev.DotNet.Framework.Identity
 
             services.Configure<IdentityOptions>(options =>
             {
-            // Password settings.
-            options.Password.RequireDigit = passwordPolicy.RequireDigit;
-            options.Password.RequireLowercase = passwordPolicy.RequireLowercase;
-            options.Password.RequireNonAlphanumeric = passwordPolicy.RequireNonLetterOrDigit;
-            options.Password.RequireUppercase = passwordPolicy.RequireUppercase;
-            options.Password.RequiredLength = passwordPolicy.RequiredLength;
-            options.Password.RequiredUniqueChars = 1;
+                // Password settings.
+                options.Password.RequireDigit = passwordPolicy.RequireDigit;
+                options.Password.RequireLowercase = passwordPolicy.RequireLowercase;
+                options.Password.RequireNonAlphanumeric = passwordPolicy.RequireNonLetterOrDigit;
+                options.Password.RequireUppercase = passwordPolicy.RequireUppercase;
+                options.Password.RequiredLength = passwordPolicy.RequiredLength;
+                options.Password.RequiredUniqueChars = 1;
 
-            // Lockout settings.
-            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                // Lockout settings.
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
                 options.Lockout.MaxFailedAccessAttempts = 5;
                 options.Lockout.AllowedForNewUsers = true;
 
-            // User settings.
-            options.User.RequireUniqueEmail = false;
+                // User settings.
+                options.User.RequireUniqueEmail = false;
                 options.User.AllowedUserNameCharacters =
                    "/\\ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-._@+";
             });
 
             services.Configure<CookiePolicyOptions>(options =>
             {
-            // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-            options.CheckConsentNeeded = context => true;
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
@@ -271,20 +275,34 @@ namespace zAppDev.DotNet.Framework.Identity
                 .AddUserManager<CustomUserManager>()
                 .AddDefaultTokenProviders();
 
+            var key = EncodingUtilities.StringToByteArray(configuration.GetValue("JWTKey", "asecretKeyfsdahflashflasdhfldksajfdfdsahfoakdsfhldashflasd"), "ascii");
+            services.AddAuthentication()
+                .AddCookie(options =>
+                {
+                    // Cookie authentication settings
+                    options.LoginPath = "/SignInPage/Load";
+                    options.ReturnUrlParameter = "returnUrl";
+                    options.LogoutPath = "/Login/Logout";
+                    options.AccessDeniedPath = "/Unauthorized/Render";
+                    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                    options.SlidingExpiration = true;
+                })
+                .AddJwtBearer(x =>
+                {
+                    x.RequireHttpsMetadata = false;
+                    x.SaveToken = true;
+                    x.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ValidateIssuer = false,
+                        ValidateAudience = false
+                    };
+                });
+
             //services.AddAuthentication()
             //    .AddCookie()
             //        { EXTERNAL_AUTHENTICATORS };
-
-            services.ConfigureApplicationCookie(options =>
-            {
-            // Cookie authentication settings
-            options.LoginPath = "/SignInPage/Load";
-                options.ReturnUrlParameter = "returnUrl";
-                options.LogoutPath = "/Login/Logout";
-                options.AccessDeniedPath = "/Unauthorized/Render";
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-                options.SlidingExpiration = true;
-            });
 
             services.AddTransient<CustomUserManager>();
             services.AddTransient<SignInManager<Model.IdentityUser>>();
