@@ -233,7 +233,7 @@ namespace zAppDev.DotNet.Framework.Identity
 
     public static class ServiceCollectionExtensions
     {
-        public static void AddIdentityManager(this IServiceCollection services, IConfiguration configuration, PasswordPolicyConfig passwordPolicy = null)
+        public static void AddIdentityManager(this IServiceCollection services, IConfiguration configuration, PasswordPolicyConfig passwordPolicy = null, ExternalLoginConfig externalLoginConfig = null)
         {
             if (passwordPolicy == null)
             {
@@ -275,34 +275,52 @@ namespace zAppDev.DotNet.Framework.Identity
                 .AddUserManager<CustomUserManager>()
                 .AddDefaultTokenProviders();
 
-            var key = EncodingUtilities.StringToByteArray(configuration.GetValue("JWTKey", "asecretKeyfsdahflashflasdhfldksajfdfdsahfoakdsfhldashflasd"), "ascii");
-            services.AddAuthentication()
-                .AddCookie(options =>
-                {
-                    // Cookie authentication settings
-                    options.LoginPath = "/SignInPage/Load";
-                    options.ReturnUrlParameter = "returnUrl";
-                    options.LogoutPath = "/Login/Logout";
-                    options.AccessDeniedPath = "/Unauthorized/Render";
-                    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-                    options.SlidingExpiration = true;
-                })
-                .AddJwtBearer(x =>
-                {
-                    x.RequireHttpsMetadata = false;
-                    x.SaveToken = true;
-                    x.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(key),
-                        ValidateIssuer = false,
-                        ValidateAudience = false
-                    };
-                });
+            var key = EncodingUtilities.StringToByteArray(configuration.GetValue("configuration:appSettings:add:JWTKey:value", "MIksRlTn0KG6nmjW*fzq*FYTY0RifkNQE%QTqdfS81CgNEGtUmMCY5XEgPTSL&28"), "ascii");
 
-            //services.AddAuthentication()
-            //    .AddCookie()
-            //        { EXTERNAL_AUTHENTICATORS };
+            var authenticationBuilder = services
+                .AddAuthentication();
+
+            authenticationBuilder.AddCookie(options =>
+            {
+                // Cookie authentication settings
+                options.LoginPath = "/SignInPage/Load";
+                options.ReturnUrlParameter = "returnUrl";
+                options.LogoutPath = "/Login/Logout";
+                options.AccessDeniedPath = "/Unauthorized/Render";
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                options.SlidingExpiration = true;
+            });
+
+            authenticationBuilder.AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+
+            if (externalLoginConfig != null && externalLoginConfig.IsGoogleEnabled)
+            {
+                authenticationBuilder.AddGoogle(options =>
+                {
+                    options.ClientId = externalLoginConfig.GoogleClientId;
+                    options.ClientSecret = externalLoginConfig.GoogleClientSecret;
+                });
+            }
+
+            if (externalLoginConfig != null && externalLoginConfig.IsFacebookEnabled)
+            {
+                authenticationBuilder.AddFacebook(options =>
+                {
+                    options.AppId = externalLoginConfig.FacebookClientId;
+                    options.AppSecret = externalLoginConfig.FacebookClientSecret;
+                });
+            }
 
             services.AddTransient<CustomUserManager>();
             services.AddTransient<SignInManager<Model.IdentityUser>>();

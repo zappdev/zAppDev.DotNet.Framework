@@ -208,6 +208,7 @@
     <PackageReference Include="SSH.NET" Version="2016.1.0" />
     <PackageReference Include="ExcelDataReader" Version="3.6.0" />
     <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="4.0.1" />
   </ItemGroup>
 
   <ItemGroup>
