@@ -278,7 +278,10 @@ namespace zAppDev.DotNet.Framework.Identity
             var key = EncodingUtilities.StringToByteArray(configuration.GetValue("configuration:appSettings:add:JWTKey:value", "MIksRlTn0KG6nmjW*fzq*FYTY0RifkNQE%QTqdfS81CgNEGtUmMCY5XEgPTSL&28"), "ascii");
 
             var authenticationBuilder = services
-                .AddAuthentication();
+                .AddAuthentication(options =>
+                {
+                    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                });
 
             authenticationBuilder.AddCookie(options =>
             {
@@ -291,17 +294,17 @@ namespace zAppDev.DotNet.Framework.Identity
                 options.SlidingExpiration = true;
             });
 
-            authenticationBuilder.AddJwtBearer(x =>
+            authenticationBuilder.AddJwtBearer(options =>
             {
-                x.RequireHttpsMetadata = false;
-                x.SaveToken = true;
-                x.TokenValidationParameters = new TokenValidationParameters
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
                     ValidateAudience = false
-                };
+                };                
             });
 
             if (externalLoginConfig != null && externalLoginConfig.IsGoogleEnabled)
