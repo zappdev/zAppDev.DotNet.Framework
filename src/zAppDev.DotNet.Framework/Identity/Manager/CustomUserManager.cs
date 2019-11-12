@@ -280,7 +280,7 @@ namespace zAppDev.DotNet.Framework.Identity
             var authenticationBuilder = services
                 .AddAuthentication(options =>
                 {
-                    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultScheme = "Identity.Application";
                 });
 
             authenticationBuilder.AddCookie(options =>
