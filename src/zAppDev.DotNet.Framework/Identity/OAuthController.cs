@@ -14,6 +14,13 @@ using zAppDev.DotNet.Framework.Utilities;
 
 namespace zAppDev.DotNet.Framework.Identity
 {
+    public class AuthRequest
+    {
+        public string Username { get; set; }
+
+        public string Password { get; set; }
+    }
+
     [Route("OAuth")]
     [ApiController]
     [SwaggerTag("Return JWT Tokens")]
@@ -38,18 +45,18 @@ namespace zAppDev.DotNet.Framework.Identity
         }
 
         [Route("Token")]
-        [HttpGet]
-        public IActionResult Token(string username, string password)
+        [HttpPost]
+        public IActionResult Token(AuthRequest authRequest)
         {
             using (var session = _manager.OpenSession())
             {
-                var success = IdentityHelper.SignIn(username, password, false);
+                var success = IdentityHelper.SignIn(authRequest.Username, authRequest.Password, false);
 
                 ActionResult response = new EmptyResult();
 
                 if (success == true)
                 {
-                    var userInfo = IdentityHelper.GetApplicationUserByName(username);
+                    var userInfo = IdentityHelper.GetApplicationUserByName(authRequest.Username);
 
                     var claims = userInfo.Permissions.Select(p => new Claim(Model.ClaimTypes.Permission, p.Name)).ToList();
                     claims.Add(new Claim(ClaimTypes.Name, userInfo.UserName));
