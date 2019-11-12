@@ -123,6 +123,11 @@ namespace zAppDev.DotNet.Framework.Logging
 
         public void Log(string apiType, string apiTitle, LogMessage message, bool throwOnError)
         {
+            if (!_initialized)
+            {
+                return;
+            }
+
             new Task(() =>
                 {
                     var logger = LogManager.GetLogger(GetType());
@@ -130,6 +135,7 @@ namespace zAppDev.DotNet.Framework.Logging
                     {
                         // push to Log
                         logger.Debug(message.ToFullString());
+
                         // push to RabbitMQ
                         var topic = $@"api.log.{apiType}.{apiTitle}";
 
@@ -148,6 +154,11 @@ namespace zAppDev.DotNet.Framework.Logging
             ServiceConsumptionOptions options, object response, HttpStatusCode status,
             TimeSpan processingTime, bool throwOnError = false, bool cachedResponse = false)
         {
+            if (!_initialized)
+            {
+                return;
+            }
+
             var message = LogMessage.CreateMessage(requestId, options, service, operation, response, status, processingTime, cachedResponse);
             Log("external", $"{service}.{operation}", message, throwOnError);
         }
@@ -165,6 +176,11 @@ namespace zAppDev.DotNet.Framework.Logging
 
         public void LogExposedAPIAccess(Guid requestId, string apiTitle, HttpRequestMessage request, HttpResponseMessage response, TimeSpan processingTime, bool throwOnError, bool cacheHit)
         {
+            if (!_initialized)
+            {
+                return;
+            }
+
             var message = LogMessage.CreateMessage(requestId, request, response, processingTime, cacheHit);
             Log("exposed", apiTitle, message, throwOnError);
         }
