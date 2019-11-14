@@ -257,8 +257,7 @@ namespace zAppDev.DotNet.Framework.Identity
 
                 // User settings.
                 options.User.RequireUniqueEmail = false;
-                options.User.AllowedUserNameCharacters =
-                   "/\\ abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-._@+";
+                options.User.AllowedUserNameCharacters = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -._@+";
             });
 
             services.Configure<CookiePolicyOptions>(options =>
