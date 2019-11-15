@@ -145,8 +145,7 @@ namespace zAppDev.DotNet.Framework.Services
                         switch (options.PostType)
                         {
                             case PostType.JSON:
-								var jsonSerialized =
- new Utilities.Serializer<object>().ToJson(options.Data, false, options.IgnoreNullValues);
+								var jsonSerialized = new Utilities.Serializer<object>().ToJson(options.Data, false, options.IgnoreNullValues);
                                 resultBag.HttpResponseMessage = client
                                         .PostAsync("", new StringContent(jsonSerialized, Encoding.UTF8, "application/json"))
                                         .Result;
@@ -199,6 +198,7 @@ namespace zAppDev.DotNet.Framework.Services
 
                         break;
                     case RestHTTPVerb.PUT:
+#if NETFRAMEWORK
                         switch (options.PostType)
                         {
                             case PostType.JSON:
@@ -215,6 +215,9 @@ namespace zAppDev.DotNet.Framework.Services
                                 break;
                         }
                         break;
+#else
+                        throw new NotImplementedException("InnerConsume not implement for .Net Core");
+#endif
                     case RestHTTPVerb.DELETE:
                         resultBag.HttpResponseMessage = client.DeleteAsync("").Result;
                         break;

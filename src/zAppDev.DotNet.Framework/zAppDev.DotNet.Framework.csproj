@@ -134,6 +134,7 @@
     <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNet.Web.Optimization" Version="1.1.0" />
     <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.6" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.6" />
     <PackageReference Include="Microsoft.AspNet.WebApi.WebHost" Version="5.2.6" />
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
@@ -170,7 +171,6 @@
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="5.0.0-rc2" />
     <PackageReference Include="Autofac.Extras.CommonServiceLocator" Version="5.0.0" />
     <PackageReference Include="DotNetZip.NetStandard" Version="1.12.0" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="2.2.0" />
@@ -189,6 +189,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Formatters.Json" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Formatters.Xml" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="2.2.0" />

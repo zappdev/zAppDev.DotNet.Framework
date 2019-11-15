@@ -7,12 +7,15 @@ using System.Text;
 using System.IO;
 using System.Reflection;
 using System.Configuration;
-using System.Net.Http.Formatting;
 using System.Xml.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NHibernate.Util;
 using System.Text.RegularExpressions;
+
+#if NETFRAMEWORK
+using System.Net.Http.Formatting;
+#endif 
 
 namespace zAppDev.DotNet.Framework.Utilities
 {
@@ -445,12 +448,15 @@ namespace zAppDev.DotNet.Framework.Utilities
                     }
                     else if (obj is JObject)
                     {
+#if NETFRAMEWORK
                         var settings = new JsonSerializerSettings
                         {
                             ContractResolver = new JsonContractResolver(new XmlMediaTypeFormatter())
                         };
-
                         result = JsonConvert.DeserializeObject<T>(obj?.ToString(), settings);
+#else
+                        result = JsonConvert.DeserializeObject<T>(obj?.ToString());
+#endif
                     }
                     else
                     {
@@ -730,7 +736,7 @@ namespace zAppDev.DotNet.Framework.Utilities
             return IsTypeCollection(prop.PropertyType);
         }
 
-        #region Type Conversions
+#region Type Conversions
 
         public static T ConvertToEnum<T>(string str, bool throwException = true) where T : struct, IConvertible
         {
@@ -883,9 +889,9 @@ namespace zAppDev.DotNet.Framework.Utilities
             }
         }
 
-        #endregion
+#endregion
 
-        #region Type Conversions (Nullable)        
+#region Type Conversions (Nullable)        
 
         public static decimal? ConvertToNullableDecimal(string str)
         {
@@ -996,7 +1002,7 @@ namespace zAppDev.DotNet.Framework.Utilities
             }
         }
 
-        #endregion
+#endregion
 
         public static string Base64Encode(string plainText)
         {
