@@ -46,8 +46,6 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         protected string description;
         [DataMember(Name="IsCustom")]
         protected bool isCustom;
-        [DataMember(Name="VersionTimestamp")]
-        protected byte[] versionTimestamp;
 
 #pragma warning disable 0649
         private bool disableInternalAdditions;
@@ -119,22 +117,7 @@ namespace zAppDev.DotNet.Framework.Identity.Model
                 isCustom = value;
             }
         }
-/// <summary>
-/// The VersionTimestamp property
-///Provides concurrency control for the class
-/// </summary>
-///
-        public virtual byte[] VersionTimestamp
-        {
-            get
-            {
-                return versionTimestamp;
-            }
-            set
-            {
-                versionTimestamp = value;
-            }
-        }
+
         #endregion
         #region ApplicationPermission's Participant Properties
         [DataMember(Name="Users")]

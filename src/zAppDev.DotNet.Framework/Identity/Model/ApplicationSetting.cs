@@ -49,8 +49,6 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         protected string _value;
         [DataMember(Name = "IsCustom")]
         protected bool isCustom;
-        [DataMember(Name = "VersionTimestamp")]
-        protected byte[] versionTimestamp;
 
         #endregion
         #region ApplicationSetting's Properties
@@ -119,22 +117,7 @@ namespace zAppDev.DotNet.Framework.Identity.Model
                 isCustom = value;
             }
         }
-        /// <summary>
-        /// The VersionTimestamp property
-        ///Provides concurrency control for the class
-        /// </summary>
-        ///
-        public virtual byte[] VersionTimestamp
-        {
-            get
-            {
-                return versionTimestamp;
-            }
-            set
-            {
-                versionTimestamp = value;
-            }
-        }
+
         #endregion
         #region Constructors
         /// <summary>

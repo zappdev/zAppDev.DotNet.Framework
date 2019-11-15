@@ -63,8 +63,6 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         protected string phoneNumber;
         [DataMember(Name="LockoutEndDate")]
         protected DateTime? lockoutEndDate;
-        [DataMember(Name="VersionTimestamp")]
-        protected byte[] versionTimestamp;
 
 #pragma warning disable 0649
         private bool disableInternalAdditions;
@@ -264,22 +262,7 @@ namespace zAppDev.DotNet.Framework.Identity.Model
                 lockoutEndDate = value;
             }
         }
-/// <summary>
-/// The VersionTimestamp property
-///Provides concurrency control for the class
-/// </summary>
-///
-        public virtual byte[] VersionTimestamp
-        {
-            get
-            {
-                return versionTimestamp;
-            }
-            set
-            {
-                versionTimestamp = value;
-            }
-        }
+
         #endregion
         #region ApplicationUser's Participant Properties
         [DataMember(Name="Permissions")]

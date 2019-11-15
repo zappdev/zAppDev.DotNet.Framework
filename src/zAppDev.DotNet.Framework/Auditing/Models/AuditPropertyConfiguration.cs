@@ -86,13 +86,6 @@ namespace zAppDev.DotNet.Framework.Auditing.Model
         [DataMember(Name = "IsCollection")]
         public virtual bool IsCollection { get; set; }
 
-        /// <summary>
-        /// The VersionTimestamp property
-        ///Provides concurrency control for the class
-        /// </summary>
-        ///
-        [DataMember(Name = "VersionTimestamp")]
-        public virtual byte[] VersionTimestamp { get; set; }
 
         [DataMember(Name="Entity")]
         protected AuditEntityConfiguration entity;
@@ -400,8 +393,7 @@ namespace zAppDev.DotNet.Framework.Auditing.Model
         public static bool SkipProperty(string property)
         {
             return property == "TransientId" 
-                || property == "DbTimestamp" 
-                || property == "VersionTimestamp";
+                || property == "DbTimestamp";
         }
     }
 }

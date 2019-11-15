@@ -44,8 +44,6 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         protected string name;
         [DataMember(Name="Description")]
         protected string description;
-        [DataMember(Name="VersionTimestamp")]
-        protected byte[] versionTimestamp;
 
         #endregion
         #region ApplicationTheme's Properties
@@ -98,22 +96,7 @@ namespace zAppDev.DotNet.Framework.Identity.Model
                 description = value;
             }
         }
-/// <summary>
-/// The VersionTimestamp property
-///Provides concurrency control for the class
-/// </summary>
-///
-        public virtual byte[] VersionTimestamp
-        {
-            get
-            {
-                return versionTimestamp;
-            }
-            set
-            {
-                versionTimestamp = value;
-            }
-        }
+
         #endregion
         #region Constructors
 /// <summary>
