@@ -66,14 +66,6 @@ namespace zAppDev.DotNet.Framework.Auditing.Model
         [DataMember(Name = "ShortName")]
         public virtual string ShortName { get; set; }
 
-        /// <summary>
-        /// The VersionTimestamp property
-        ///Provides concurrency control for the class
-        /// </summary>
-        ///
-        [DataMember(Name = "VersionTimestamp")]
-        public virtual byte[] VersionTimestamp { get; set; }
-
         [DataMember(Name = "Properties")]
         protected IList<AuditPropertyConfiguration> properties = new List<AuditPropertyConfiguration>();
         public virtual List<AuditPropertyConfiguration> Properties

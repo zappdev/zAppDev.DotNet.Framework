@@ -13,9 +13,6 @@ Licensed under the AGPL-3.0 license. See LICENSE file in the project root for fu
                 <param name="optimizer">pooled-lo</param>
             </generator>
         </id>
-        <version name="VersionTimestamp" column="`VersionTimestamp`" type="Byte[]" generated="always">
-            <column name="`VersionTimestamp`" not-null="false" sql-type="timestamp" />
-        </version>
         <property name="FullName" column="`FullName`" type="String" not-null="false" length="4000" />
         <property name="ShortName" column="`ShortName`" type="String" not-null="false" length="4000" />
         <bag batch-size="100" name="Properties" access="field.camelcase" inverse="true" cascade="persist,merge,all-delete-orphan">
