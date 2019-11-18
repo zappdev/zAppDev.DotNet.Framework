@@ -23,6 +23,7 @@ using zAppDev.DotNet.Framework.Utilities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace zAppDev.DotNet.Framework.Identity
 {
@@ -240,26 +241,6 @@ namespace zAppDev.DotNet.Framework.Identity
                 passwordPolicy = new PasswordPolicyConfig();
             }
 
-            services.Configure<IdentityOptions>(options =>
-            {
-                // Password settings.
-                options.Password.RequireDigit = passwordPolicy.RequireDigit;
-                options.Password.RequireLowercase = passwordPolicy.RequireLowercase;
-                options.Password.RequireNonAlphanumeric = passwordPolicy.RequireNonLetterOrDigit;
-                options.Password.RequireUppercase = passwordPolicy.RequireUppercase;
-                options.Password.RequiredLength = passwordPolicy.RequiredLength;
-                options.Password.RequiredUniqueChars = 1;
-
-                // Lockout settings.
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-                options.Lockout.MaxFailedAccessAttempts = 5;
-                options.Lockout.AllowedForNewUsers = true;
-
-                // User settings.
-                options.User.RequireUniqueEmail = false;
-                options.User.AllowedUserNameCharacters = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -._@+";
-            });
-
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -267,7 +248,25 @@ namespace zAppDev.DotNet.Framework.Identity
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.AddIdentity<Model.IdentityUser, IdentityRole>()
+            services.AddCustomIdentity<Model.IdentityUser, IdentityRole>(options =>
+                {
+                    // Password settings.
+                    options.Password.RequireDigit = passwordPolicy.RequireDigit;
+                    options.Password.RequireLowercase = passwordPolicy.RequireLowercase;
+                    options.Password.RequireNonAlphanumeric = passwordPolicy.RequireNonLetterOrDigit;
+                    options.Password.RequireUppercase = passwordPolicy.RequireUppercase;
+                    options.Password.RequiredLength = passwordPolicy.RequiredLength;
+                    options.Password.RequiredUniqueChars = 1;
+
+                    // Lockout settings.
+                    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+                    options.Lockout.MaxFailedAccessAttempts = 5;
+                    options.Lockout.AllowedForNewUsers = true;
+
+                    // User settings.
+                    options.User.RequireUniqueEmail = false;
+                    options.User.AllowedUserNameCharacters = @"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -._@+";
+                })
                 .AddRoles<IdentityRole>()
                 .AddRoleStore<RoleStore<IdentityRole>>()
                 .AddUserStore<UserStore>()
@@ -279,19 +278,8 @@ namespace zAppDev.DotNet.Framework.Identity
             var authenticationBuilder = services
                 .AddAuthentication(options =>
                 {
-                    options.DefaultScheme = "Identity.Application";
+                    options.DefaultScheme = IdentityConstants.ApplicationScheme;
                 });
-
-            authenticationBuilder.AddCookie(options =>
-            {
-                // Cookie authentication settings
-                options.LoginPath = "/SignInPage/Load";
-                options.ReturnUrlParameter = "returnUrl";
-                options.LogoutPath = "/Login/Logout";
-                options.AccessDeniedPath = "/Unauthorized/Render";
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-                options.SlidingExpiration = true;
-            });
 
             authenticationBuilder.AddJwtBearer(options =>
             {
@@ -303,7 +291,7 @@ namespace zAppDev.DotNet.Framework.Identity
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
                     ValidateAudience = false
-                };                
+                };
             });
 
             if (externalLoginConfig != null && externalLoginConfig.IsGoogleEnabled)
@@ -335,5 +323,78 @@ namespace zAppDev.DotNet.Framework.Identity
         }
     }
 
+    public static class CustomIdentityServiceCollectionExtensions
+    {
+        public static IdentityBuilder AddCustomIdentity<TUser, TRole>(
+            this IServiceCollection services,
+            Action<IdentityOptions> setupAction)
+            where TUser : class
+            where TRole : class
+        {
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+                options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+                options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+            })
+            .AddCookie(IdentityConstants.ApplicationScheme, o =>
+            {
+                // Cookie authentication settings
+                o.Cookie.Name = IdentityConstants.ApplicationScheme;
+                o.LoginPath = new PathString("/SignInPage/Load");
+                o.ReturnUrlParameter = "returnUrl";
+                o.LogoutPath = new PathString("/Login/Logout");
+                o.AccessDeniedPath = new PathString("/Unauthorized/Render");
+                o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                o.SlidingExpiration = true;
+                o.Events = new CookieAuthenticationEvents
+                {
+                    OnValidatePrincipal = SecurityStampValidator.ValidatePrincipalAsync
+                };
+            })
+            .AddCookie(IdentityConstants.ExternalScheme, o =>
+            {
+                o.Cookie.Name = IdentityConstants.ExternalScheme;
+                o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+            })
+            .AddCookie(IdentityConstants.TwoFactorRememberMeScheme, o =>
+            {
+                o.Cookie.Name = IdentityConstants.TwoFactorRememberMeScheme;
+                o.Events = new CookieAuthenticationEvents
+                {
+                    OnValidatePrincipal = SecurityStampValidator.ValidateAsync<ITwoFactorSecurityStampValidator>
+                };
+            })
+            .AddCookie(IdentityConstants.TwoFactorUserIdScheme, o =>
+            {
+                o.Cookie.Name = IdentityConstants.TwoFactorUserIdScheme;
+                o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+            });
+
+            // Hosting doesn't add IHttpContextAccessor by default
+            services.AddHttpContextAccessor();
+            // Identity services
+            services.TryAddScoped<IUserValidator<TUser>, UserValidator<TUser>>();
+            services.TryAddScoped<IPasswordValidator<TUser>, PasswordValidator<TUser>>();
+            services.TryAddScoped<IPasswordHasher<TUser>, PasswordHasher<TUser>>();
+            services.TryAddScoped<ILookupNormalizer, UpperInvariantLookupNormalizer>();
+            services.TryAddScoped<IRoleValidator<TRole>, RoleValidator<TRole>>();
+            // No interface for the error describer so we can add errors without rev'ing the interface
+            services.TryAddScoped<IdentityErrorDescriber>();
+            services.TryAddScoped<ISecurityStampValidator, SecurityStampValidator<TUser>>();
+            services.TryAddScoped<ITwoFactorSecurityStampValidator, TwoFactorSecurityStampValidator<TUser>>();
+            services.TryAddScoped<IUserClaimsPrincipalFactory<TUser>, UserClaimsPrincipalFactory<TUser, TRole>>();
+            services.TryAddScoped<UserManager<TUser>>();
+            services.TryAddScoped<SignInManager<TUser>>();
+            services.TryAddScoped<RoleManager<TRole>>();
+
+            if (setupAction != null)
+            {
+                services.Configure(setupAction);
+            }
+
+            return new IdentityBuilder(typeof(TUser), typeof(TRole), services);
+        }
+    }
 }
 #endif
