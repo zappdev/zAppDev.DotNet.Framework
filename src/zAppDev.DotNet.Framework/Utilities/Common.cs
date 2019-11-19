@@ -12,10 +12,11 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NHibernate.Util;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Configuration;
 
 #if NETFRAMEWORK
 using System.Net.Http.Formatting;
-#endif 
+#endif
 
 namespace zAppDev.DotNet.Framework.Utilities
 {
@@ -653,9 +654,14 @@ namespace zAppDev.DotNet.Framework.Utilities
 
         public static string GetConfigurationKey(string key)
         {
+#if NETFRAMEWORK
             return ConfigurationManager.AppSettings.AllKeys.Contains(key)
                     ? ConfigurationManager.AppSettings[key]
                     : null;
+#else
+            var configurations = ServiceLocator.Current.GetInstance<IConfiguration>(); 
+            return configurations.GetValue<string>($"configuration:appSettings:add:{key}:value", null);
+#endif
         }
 
         public static int GetIntConfigurationKey(string key)
