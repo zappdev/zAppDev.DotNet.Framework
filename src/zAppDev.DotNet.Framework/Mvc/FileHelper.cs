@@ -1,5 +1,6 @@
 // Copyright (c) 2017 CLMS. All rights reserved.
 // Licensed under the AGPL-3.0 license. See LICENSE file in the project root for full license information.
+
 using System;
 using System.IO;
 using System.Linq;
@@ -12,6 +13,7 @@ using zAppDev.DotNet.Framework.Owin;
 using Microsoft.AspNet.Identity.Owin;
 #else
 using zAppDev.DotNet.Framework.Utilities;
+using Microsoft.AspNetCore.Http;
 #endif
 
 namespace zAppDev.DotNet.Framework.Mvc
@@ -85,7 +87,17 @@ namespace zAppDev.DotNet.Framework.Mvc
                     OwinHelper.GetOwinContext(HttpContext.Current)?.Set(pendingUpload);
                     return pendingUpload;
 #else
-                    throw new NotImplementedException();
+                    var httpContext = ServiceLocator.Current.GetInstance<IHttpContextAccessor>().HttpContext;
+                    object pendingUploadValue = null;
+                    if (httpContext.Items.TryGetValue("pendingUplaod", out pendingUploadValue))
+                    {
+                        return pendingUploadValue as PendingUploads;
+                    }
+                    
+                    var pendingUpload = new PendingUploads();
+                    _pendingUploadsInstance = pendingUpload;
+                    httpContext.Items.Add("pendingUpload", pendingUpload);
+                    return pendingUpload;                    
 #endif
                 }
                 catch (NotImplementedException ex)
@@ -118,7 +130,17 @@ namespace zAppDev.DotNet.Framework.Mvc
                     OwinHelper.GetOwinContext(HttpContext.Current)?.Set(pendingDowload);
                     return pendingDowload;
 #else
-                    throw new NotImplementedException();
+                    var httpContext = ServiceLocator.Current.GetInstance<IHttpContextAccessor>().HttpContext;
+                    object pendingDownloadValue = null;
+                    if(httpContext.Items.TryGetValue("pendingDownload", out pendingDownloadValue))
+                    {
+                        return pendingDownloadValue as PendingDownloads;
+                    }
+                    
+                    var pendingDownload = new PendingDownloads();
+                    _pendingDownloadsInstance = pendingDownload;
+                    httpContext.Items.Add("pendingDownload", pendingDownload);
+                    return pendingDownload;
 #endif
                 }
                 catch (NotImplementedException ex)
