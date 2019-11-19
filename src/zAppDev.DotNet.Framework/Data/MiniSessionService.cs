@@ -176,7 +176,31 @@ namespace zAppDev.DotNet.Framework.Data
                 CloseSession();
             }
         }
+        public T ExecuteInTransaction<T>(Func<T> func)
+        {
+            try
+            {
+                this.OpenSessionWithTransaction();
+                T result = func();
+                this.Commit();
+                return result;
+            }
+            catch (Exception)
+            {
+                this.Rollback();
+                // This causes unhandled if called in a new thread!
+                throw;
+            }
+        }
 
+        public void ExecuteInTransaction(Action action)
+        {
+            ExecuteInTransaction<object>(() =>
+            {
+                action();
+                return null;
+            });
+        }
     }
 }
 

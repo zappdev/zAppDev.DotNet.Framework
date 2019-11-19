@@ -22,5 +22,9 @@ namespace zAppDev.DotNet.Framework.Data
         ISession OpenTransaction();
 
         void CommitChanges(Exception exception = null, Action postAction = null);
+
+        T ExecuteInTransaction<T>(Func<T> func);
+
+        void ExecuteInTransaction(Action action);
     }
 }
