@@ -89,7 +89,7 @@ namespace zAppDev.DotNet.Framework.Mvc
 #else
                     var httpContext = ServiceLocator.Current.GetInstance<IHttpContextAccessor>().HttpContext;
                     object pendingUploadValue = null;
-                    if (httpContext.Items.TryGetValue("pendingUplaod", out pendingUploadValue))
+                    if (httpContext.Items.TryGetValue("pendingUpload", out pendingUploadValue))
                     {
                         return pendingUploadValue as PendingUploads;
                     }
