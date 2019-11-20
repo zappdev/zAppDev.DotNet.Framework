@@ -424,20 +424,29 @@ namespace zAppDev.DotNet.Framework.Utilities
 
         public class Session
         {
+#if NETFRAMEWORK
             public static AppDevCache.ICache<string> GetCache()
             {
-#if NETFRAMEWORK
+
                 return AppDevCache.CacheManager.Current;
-#else
-                return ServiceLocator.Current.GetInstance<AppDevCache.ICache<string>>();
-#endif
             }
+#else
+            public static CacheManager.Core.ICacheManager<object> GetCache()
+            {
+                return ServiceLocator.Current.GetInstance<CacheManager.Core.ICacheManager<object>>("SessionStateStorage");
+            }
+#endif
 
             public static Dictionary<string, object> GetStorage()
             {
                 var sessionId = GetSessionId();
+#if NETFRAMEWORK
                 var items = GetCache().KeyValuePair(item => item.Key.StartsWith(sessionId));
                 return items.ToDictionary(item => item.Key.Replace(sessionId, ""), item => item.Value);
+#else
+                throw new NotImplementedException("Web.GetStorage isn't implemented on .NET Core");
+#endif
+
             }
 
             private static string GetSessionId()
@@ -454,7 +463,7 @@ namespace zAppDev.DotNet.Framework.Utilities
 
                 return httpRequestMessage.GetCorrelationId().ToString();
 #else
-                var sessionId = GetContext().Connection?.Id?.ToString();
+                var sessionId = GetContext().Session?.Id?.ToString();
                 if (!string.IsNullOrWhiteSpace(sessionId)) return sessionId;
 
                 throw new ApplicationException("Session Id is empty");
@@ -464,7 +473,8 @@ namespace zAppDev.DotNet.Framework.Utilities
             public static T Get<T>(string key, T fallbackItem = default(T))
             {
                 key = $"{GetSessionId()}{key}";
-                var value = GetCache().Get<T>(key);
+                var cache = GetCache();
+                var value = cache.Get<T>(key);
 
                 return (value != null) ? value : fallbackItem;
             }
@@ -477,24 +487,37 @@ namespace zAppDev.DotNet.Framework.Utilities
             public static void Set(string key, object value)
             {
                 key = $"{GetSessionId()}{key}";
+#if NETFRAMEWORK
                 GetCache().Set(key, value);
+#else
+                GetCache().Add(key, value);
+#endif
             }
 
             public static void Add(string key, object value)
             {
                 key = $"{GetSessionId()}{key}";
-                GetCache().Add(key, value);
+                var cache = GetCache();
+                cache.Add(key, value);
             }
 
             public static void Remove(string key)
             {
                 key = $"{GetSessionId()}{key}";
+#if NETFRAMEWORK
                 GetCache().Remove<object>(key);
+#else
+                GetCache().Remove(key);
+#endif
             }
 
             public static bool HasKey(string key)
             {
+#if NETFRAMEWORK
                 return GetCache().HasKey($"{GetSessionId()}{key}");
+#else
+                return GetCache().Exists($"{GetSessionId()}{key}");
+#endif
             }
         }
 
