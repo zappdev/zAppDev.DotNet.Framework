@@ -12,8 +12,8 @@ namespace zAppDev.DotNet.Framework.Utilities
 #if NETFRAMEWORK
             return System.Configuration.ConfigurationManager.ConnectionStrings["Database"].ConnectionString;
 #else
-            var config = ConfigurationHandler.GetAppConfiguration();
-            return config.ConnectionStrings["Database"].ConnectionString;
+            var config = ConfigurationHandler.GetDatabaseSetting("Database");
+            return config.ConnectionString;
 #endif
         }
 
@@ -26,8 +26,7 @@ namespace zAppDev.DotNet.Framework.Utilities
 #if NETFRAMEWORK
             var timeoutParam = System.Configuration.ConfigurationManager.AppSettings["SQLQueryTimeoutInSeconds"];
 #else
-            var config = ConfigurationHandler.GetAppConfiguration();
-            var timeoutParam = config.AppSettings["SQLQueryTimeoutInSeconds"];
+            var timeoutParam = ConfigurationHandler.GetAppSetting("SQLQueryTimeoutInSeconds");
 #endif
 
             return int.TryParse(timeoutParam, out var commandTimeout) ? commandTimeout : 30;

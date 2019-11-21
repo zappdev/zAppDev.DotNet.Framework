@@ -103,7 +103,7 @@ namespace zAppDev.DotNet.Framework.Utilities
 #else
                 const string prefix = "IMAP:";
 
-                ImapConfiguration = ConfigurationHandler.GetAppConfiguration().ImapConfiguration;
+                ImapConfiguration = ConfigurationHandler.GetImapSettings();
 
                 if (string.IsNullOrWhiteSpace(ImapConfiguration.Host)) throw new ArgumentNullException(nameof(ImapSettings), $"Missing setting: [{prefix}host]");
                 
@@ -158,7 +158,7 @@ namespace zAppDev.DotNet.Framework.Utilities
 #if NETFRAMEWORK
              var appConfiguration = ConfigurationManager.AppSettings;
 #else
-            var appConfiguration = ConfigurationHandler.GetAppConfiguration().AppSettings;  
+            var appConfiguration = ConfigurationHandler.GetAppConfiguration();  
 #endif
             if (string.IsNullOrEmpty(message.From))
             {

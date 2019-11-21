@@ -32,6 +32,26 @@ namespace zAppDev.DotNet.Framework.Configuration
                 .Get<MailSettings>();
         }
 
+        public static ImapConfiguration GetImapSettings()
+        {
+            var config = ServiceLocator.Current.GetInstance<IConfiguration>();
+
+            var status = bool.TryParse(config?[$"configuration:appSettings:add:host:value"], out var enableSsl);
+            enableSsl = status ? enableSsl : false;
+
+            int.TryParse(config?[$"configuration:appSettings:add:host:value"], out var port);
+            port = status ? port : 0;
+
+            return new ImapConfiguration
+            {
+                Host = config?[$"configuration:appSettings:add:host:value"],
+                Username = config?[$"configuration:appSettings:add:username:value"],
+                Password = config?[$"configuration:appSettings:add:password:value"],
+                EnableSsl = enableSsl,
+                Port = port
+            };
+        }
+
         public static string GetAppSetting(string key)
         {
             var config = ServiceLocator.Current.GetInstance<IConfiguration>();
@@ -40,7 +60,19 @@ namespace zAppDev.DotNet.Framework.Configuration
 
         public static AppConfiguration GetAppConfiguration()
         {
-            return GetInjectedConfig().Get<AppConfiguration>();
+            var config = ServiceLocator.Current.GetInstance<IConfiguration>();
+            return new AppConfiguration(config);
+        }
+
+        public static ConnectionSettings GetDatabaseSetting(string key)
+        {
+            var config = ServiceLocator.Current.GetInstance<IConfiguration>();
+            return new ConnectionSettings
+            {
+                ConnectionString = config?[$"configuration:connectionStrings:add:{key}:connectionString"],
+                Name = config?[$"configuration:connectionStrings:add:{key}:name"],
+                ProviderName = config?[$"configuration:connectionStrings:add:{key}:providerName"]
+            };
         }
 
         public static ConfigurationBuilder SetUpConfigurationBuilder(ConfigurationBuilder config)

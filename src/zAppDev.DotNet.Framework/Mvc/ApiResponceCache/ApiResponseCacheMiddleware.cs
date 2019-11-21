@@ -77,7 +77,7 @@ namespace zAppDev.DotNet.Framework.Middleware
         }
 
         private bool MustCached(HttpContext context) =>
-            context.Response.StatusCode == 500 &&
+            context.Response.StatusCode != 500 &&
             context.Items.ContainsKey(HttpContextItemKeys.HitCache) && 
             ((bool)context.Items[HttpContextItemKeys.HitCache]) == false;
 
