@@ -4,6 +4,7 @@ using System;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
 using zAppDev.DotNet.Framework.Utilities;
 
 namespace zAppDev.DotNet.Framework.Mvc.API
@@ -68,7 +69,7 @@ namespace zAppDev.DotNet.Framework.Mvc.API
         {
             var httpContext = context.HttpContext;
 
-            var cache = ServiceLocator.Current.GetInstance<IApiCacheService>();
+            var cache = context.HttpContext.RequestServices.GetRequiredService<IApiCacheService>();  //ServiceLocator.Current.GetInstance<IApiCacheService>();
 
             if (cache.TryGetValue(httpContext, out var value))
             {

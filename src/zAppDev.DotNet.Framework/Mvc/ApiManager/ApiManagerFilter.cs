@@ -1,6 +1,7 @@
 ﻿#if NETFRAMEWORK
 #else
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
 using zAppDev.DotNet.Framework.Data;
 using zAppDev.DotNet.Framework.Utilities;
 
@@ -21,14 +22,16 @@ namespace zAppDev.DotNet.Framework.Mvc.API
 
             context.HttpContext.SetApiRequestConfig(LogEnabled, AllowPartialResponse, controller, action);
 
-            var manager = ServiceLocator.Current.GetInstance<IMiniSessionService>();
+            // var manager = ServiceLocator.Current.GetInstance<IMiniSessionService>();
+            var manager = context.HttpContext.RequestServices.GetRequiredService<IMiniSessionService>();
             manager.OpenSessionWithTransaction();
         }
 
         public override void OnActionExecuted(ActionExecutedContext context)
         {
             base.OnActionExecuted(context);
-            var manager = ServiceLocator.Current.GetInstance<IMiniSessionService>();
+            // var manager = ServiceLocator.Current.GetInstance<IMiniSessionService>();
+            var manager = context.HttpContext.RequestServices.GetRequiredService<IMiniSessionService>();
 
             manager.CommitChanges(context.Exception);
         }
