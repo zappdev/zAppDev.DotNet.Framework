@@ -305,6 +305,13 @@ namespace zAppDev.DotNet.Framework.Utilities
 		{
 			var log = LogManager.GetLogger(typeof(Email));
 		    var settings = FetchSmtpSettings();
+
+#if NETFRAMEWORK
+             var appConfiguration = ConfigurationManager.AppSettings;
+#else
+            var appConfiguration = ConfigurationHandler.GetAppConfiguration();
+#endif
+
             SmtpClient client = null;
 			try
 			{
@@ -323,14 +330,14 @@ namespace zAppDev.DotNet.Framework.Utilities
 			    log.Debug("host: " + client.Host);
                 log.Debug("port: " + client.Port);
 
-				if (bool.TryParse(ConfigurationManager.AppSettings["EnableSSL"], out var ssl))
+                if (bool.TryParse(appConfiguration["EnableSSL"], out var ssl))
 				{
 					client.EnableSsl = ssl;
 				}
 
                 log.Debug("SSL: " + client.EnableSsl);
 
-                var emailSecureConnectionType = ConfigurationManager.AppSettings["EmailSecureConnectionType"];
+                var emailSecureConnectionType = appConfiguration["EmailSecureConnectionType"];
 			    if (string.IsNullOrWhiteSpace(emailSecureConnectionType)) {
 			        emailSecureConnectionType = "TLS";
 			    }

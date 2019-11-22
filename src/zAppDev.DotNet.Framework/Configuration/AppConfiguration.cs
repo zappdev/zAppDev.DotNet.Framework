@@ -20,7 +20,10 @@ namespace zAppDev.DotNet.Framework.Configuration
             set => SetValue(key, value);
         }
 
-        public string GetValue(string key) => _configuration?[$"configuration:appSettings:add:{key}:value"];
+        public string GetValue(string key)
+        {
+            return _configuration?[$"configuration:appSettings:add:{key}:value"]; 
+        }
 
         public void SetValue(string key, string value)
         {

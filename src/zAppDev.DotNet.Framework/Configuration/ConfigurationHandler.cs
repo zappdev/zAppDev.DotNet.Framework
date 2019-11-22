@@ -28,8 +28,24 @@ namespace zAppDev.DotNet.Framework.Configuration
 
         public static MailSettings GetSmtpSettings()
         {
-            return GetInjectedConfig().GetSection("system.net:mailSettings")
-                .Get<MailSettings>();
+            var config = ServiceLocator.Current.GetInstance<IConfiguration>();
+
+            int.TryParse(config?[$"configuration:system.net:mailSettings:smtp:network:port"], out var port);
+
+            return new MailSettings
+            {
+                Smtp = new SmtpSettings
+                {
+                    From = config?[$"configuration:system.net:mailSettings:smtp:from"],
+                    Network = new SmtpNetworkSettings
+                    {
+                        Host = config?[$"configuration:system.net:mailSettings:smtp:network:host"],
+                        Password = config?[$"configuration:system.net:mailSettings:smtp:network:password"],
+                        Port = port,
+                        UserName = config?[$"configuration:system.net:mailSettings:smtp:network:userName"]
+                    }
+                }
+            };
         }
 
         public static ImapConfiguration GetImapSettings()
