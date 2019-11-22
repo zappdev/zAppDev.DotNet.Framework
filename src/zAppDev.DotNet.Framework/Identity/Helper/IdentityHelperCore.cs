@@ -12,13 +12,13 @@ using log4net;
 using System.Threading.Tasks;
 using zAppDev.DotNet.Framework.Data;
 using zAppDev.DotNet.Framework.Utilities;
-using zAppDev.DotNet.Framework.Data.Domain;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
 using NHibernate;
 
 using zAppDev.DotNet.Framework.Identity.Model;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace zAppDev.DotNet.Framework.Identity
 {
@@ -29,14 +29,18 @@ namespace zAppDev.DotNet.Framework.Identity
 
         public static bool AdminCanResetPassword = true;
 
-        public static CustomUserManager GetUserManager()
+        public static CustomUserManager GetUserManager(HttpContext context = null)
         {
-            return ServiceLocator.Current.GetInstance<CustomUserManager>();
+            context = context ?? Web.GetContext();
+
+            return context.RequestServices.GetRequiredService<CustomUserManager>();
         }
 
-        public static SignInManager<Model.IdentityUser> GetSignInManager()
+        public static SignInManager<Model.IdentityUser> GetSignInManager(HttpContext context = null)
         {
-            return ServiceLocator.Current.GetInstance<SignInManager<Model.IdentityUser>>();
+            context = context ?? Web.GetContext();
+
+            return context.RequestServices.GetRequiredService<SignInManager<Model.IdentityUser>>();
         }
 
         public static bool SignIn(string username, string password, bool isPersistent)

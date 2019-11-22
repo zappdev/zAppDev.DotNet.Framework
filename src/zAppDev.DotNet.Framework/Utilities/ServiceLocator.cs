@@ -46,10 +46,13 @@ namespace zAppDev.DotNet.Framework.Utilities
 #else
         public object GetInstance(Type serviceType, string name = null)
         {
-            if (string.IsNullOrEmpty(name))
-                return _currentServiceProvider.GetService(serviceType);
+            var context = Web.GetContext();
+            var serviceProvider = (context != null) ? context.RequestServices : _currentServiceProvider;
 
-            if (_currentServiceProvider is AutofacServiceProvider autofac)
+            if (string.IsNullOrEmpty(name))
+                return serviceProvider.GetService(serviceType);
+
+            if (serviceProvider is AutofacServiceProvider autofac)
             {
                 return autofac.LifetimeScope.ResolveNamed(name, serviceType);
             }
@@ -59,12 +62,15 @@ namespace zAppDev.DotNet.Framework.Utilities
 
         public TService GetInstance<TService>(string name = null)
         {
+            var context = Web.GetContext();
+            var serviceProvider = (context != null) ? context.RequestServices : _currentServiceProvider;
+
             if (string.IsNullOrEmpty(name))
-                return _currentServiceProvider.GetService<TService>();
+                return serviceProvider.GetService<TService>();
 
             try
             {
-                if (_currentServiceProvider is AutofacServiceProvider autofac)
+                if (serviceProvider is AutofacServiceProvider autofac)
                 {
                     return autofac.LifetimeScope.ResolveNamed<TService>(name);
                 }
