@@ -60,8 +60,9 @@ namespace zAppDev.DotNet.Framework.Utilities
 #if NETFRAMEWORK
             return HttpContext.Current.Request.Url;
 #else
-            var contextAccessor = ServiceLocator.Current.GetInstance<IHttpContextAccessor>();
-            var req = contextAccessor.HttpContext.Request;
+            ////var contextAccessor = ServiceLocator.Current.GetInstance<IHttpContextAccessor>();
+            ////var req = contextAccessor.HttpContext.Request;
+            var req = Mvc.Helper.AppContext.Current.Request;
             return new Uri($"{req.Scheme}://{req.Host}{req.Path}{req.QueryString}"); ;
 #endif
         }
@@ -71,8 +72,10 @@ namespace zAppDev.DotNet.Framework.Utilities
 #if NETFRAMEWORK
             return HttpContext.Current;
 #else
-            var contextAccessor = ServiceLocator.Current.GetInstance<IHttpContextAccessor>();
-            return contextAccessor.HttpContext;
+            //var contextAccessor = ServiceLocator.Current.GetInstance<IHttpContextAccessor>();
+            //return contextAccessor.HttpContext;
+
+            return Mvc.Helper.AppContext.Current;
 #endif
         }
 
@@ -84,8 +87,9 @@ namespace zAppDev.DotNet.Framework.Utilities
  string.IsNullOrEmpty(ip) == false ? ip.Split(',')[0].Trim() : HttpContext.Current.Request.ServerVariables["REMOTE_ADDR"];
             return ip;
 #else
-            var contextAccessor = ServiceLocator.Current.GetInstance<IHttpContextAccessor>();
-            return contextAccessor.HttpContext.Connection.RemoteIpAddress.ToString();
+            //var contextAccessor = ServiceLocator.Current.GetInstance<IHttpContextAccessor>();
+            //return contextAccessor.HttpContext.Connection.RemoteIpAddress.ToString();
+            return Mvc.Helper.AppContext.Current.Connection.RemoteIpAddress.ToString();
 #endif
         }
 
