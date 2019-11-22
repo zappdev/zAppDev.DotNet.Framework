@@ -50,6 +50,8 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         protected bool isAvailableToAnonymous;
         [DataMember(Name="IsAvailableToAllAuthorizedUsers")]
         protected bool isAvailableToAllAuthorizedUsers;
+        [DataMember(Name="VersionTimestamp")]
+        protected byte[] versionTimestamp;
 
 #pragma warning disable 0649
         private bool disableInternalAdditions;
@@ -153,7 +155,22 @@ namespace zAppDev.DotNet.Framework.Identity.Model
                 isAvailableToAllAuthorizedUsers = value;
             }
         }
-
+/// <summary>
+/// The VersionTimestamp property
+///Provides concurrency control for the class
+/// </summary>
+///
+        public virtual byte[] VersionTimestamp
+        {
+            get
+            {
+                return versionTimestamp;
+            }
+            set
+            {
+                versionTimestamp = value;
+            }
+        }
         #endregion
         #region ApplicationOperation's Participant Properties
         [DataMember(Name="Permissions")]

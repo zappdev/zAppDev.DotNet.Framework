@@ -61,6 +61,14 @@ namespace zAppDev.DotNet.Framework.Auditing.Model
         public virtual string Name { get; set; }
 
         /// <summary>
+        /// The VersionTimestamp property
+        ///Provides concurrency control for the class
+        /// </summary>
+        ///
+        [DataMember(Name = "VersionTimestamp")]
+        public virtual byte[] VersionTimestamp { get; set; }
+
+        /// <summary>
         /// Public constructors of the AuditLogEntryType class
         /// </summary>
         /// <returns>New AuditLogEntryType object</returns>

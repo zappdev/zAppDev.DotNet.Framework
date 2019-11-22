@@ -13,6 +13,9 @@ Licensed under the AGPL-3.0 license. See LICENSE file in the project root for fu
                 <param name="optimizer">pooled-lo</param>
             </generator>
         </id>
+        <version name="VersionTimestamp" column="`VersionTimestamp`" type="Byte[]" generated="always">
+            <column name="`VersionTimestamp`" not-null="false" sql-type="timestamp" />
+        </version>
         <property name="ClientKey" column="`ClientKey`" type="String" not-null="false" length="500" />
         <property name="IPAddress" column="`IPAddress`" type="String" not-null="false" length="100" />
         <property name="SessionId" column="`SessionId`" type="String" not-null="false" length="100" />

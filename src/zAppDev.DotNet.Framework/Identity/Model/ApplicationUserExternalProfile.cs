@@ -52,6 +52,8 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         protected string email;
         [DataMember(Name="Provider")]
         protected string provider;
+        [DataMember(Name="VersionTimestamp")]
+        protected byte[] versionTimestamp;
 
         #endregion
         #region ApplicationUserExternalProfile's Properties
@@ -168,7 +170,22 @@ namespace zAppDev.DotNet.Framework.Identity.Model
                 provider = value;
             }
         }
-
+/// <summary>
+/// The VersionTimestamp property
+///Provides concurrency control for the class
+/// </summary>
+///
+        public virtual byte[] VersionTimestamp
+        {
+            get
+            {
+                return versionTimestamp;
+            }
+            set
+            {
+                versionTimestamp = value;
+            }
+        }
         #endregion
         #region Constructors
 /// <summary>

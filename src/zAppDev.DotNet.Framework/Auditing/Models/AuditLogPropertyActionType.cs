@@ -36,6 +36,8 @@ namespace zAppDev.DotNet.Framework.Auditing.Model
             }
         }
 
+        [DataMember(Name="VersionTimestamp")]
+        protected byte[] versionTimestamp;
         
         /// <summary>
         /// The Id property
@@ -61,7 +63,15 @@ namespace zAppDev.DotNet.Framework.Auditing.Model
         ///
         [DataMember(Name = "Name")]
         public virtual string Name { get; set; }
-       
+
+        /// <summary>
+        /// The VersionTimestamp property
+        ///Provides concurrency control for the class
+        /// </summary>
+        ///
+        [DataMember(Name = "VersionTimestamp")]
+        public virtual byte[] VersionTimestamp { get; set; }
+        
         
         /// <summary>
         /// Public constructors of the AuditLogPropertyActionType class

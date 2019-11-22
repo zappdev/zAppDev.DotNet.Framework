@@ -54,6 +54,8 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         protected string shortTimePattern;
         [DataMember(Name="YearMonthPattern")]
         protected string yearMonthPattern;
+        [DataMember(Name="VersionTimestamp")]
+        protected byte[] versionTimestamp;
 
         #endregion
         #region DateTimeFormat's Properties
@@ -186,7 +188,22 @@ namespace zAppDev.DotNet.Framework.Identity.Model
                 yearMonthPattern = value;
             }
         }
-
+/// <summary>
+/// The VersionTimestamp property
+///Provides concurrency control for the class
+/// </summary>
+///
+        public virtual byte[] VersionTimestamp
+        {
+            get
+            {
+                return versionTimestamp;
+            }
+            set
+            {
+                versionTimestamp = value;
+            }
+        }
         #endregion
         #region DateTimeFormat's Participant Properties
         [DataMember(Name="ApplicationLanguage")]

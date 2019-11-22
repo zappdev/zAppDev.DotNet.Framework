@@ -44,6 +44,8 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         protected string key;
         [DataMember(Name="Value")]
         protected string _value;
+        [DataMember(Name="VersionTimestamp")]
+        protected byte[] versionTimestamp;
 
         #endregion
         #region ProfileSetting's Properties
@@ -96,7 +98,22 @@ namespace zAppDev.DotNet.Framework.Identity.Model
                 _value = value;
             }
         }
-
+/// <summary>
+/// The VersionTimestamp property
+///Provides concurrency control for the class
+/// </summary>
+///
+        public virtual byte[] VersionTimestamp
+        {
+            get
+            {
+                return versionTimestamp;
+            }
+            set
+            {
+                versionTimestamp = value;
+            }
+        }
         #endregion
         #region ProfileSetting's Participant Properties
         [DataMember(Name="ParentProfile")]

@@ -50,6 +50,8 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         protected string issuer;
         [DataMember(Name="OriginalIssuer")]
         protected string originalIssuer;
+        [DataMember(Name="VersionTimestamp")]
+        protected byte[] versionTimestamp;
 
         #endregion
         #region ApplicationUserClaim's Properties
@@ -150,7 +152,22 @@ namespace zAppDev.DotNet.Framework.Identity.Model
                 originalIssuer = value;
             }
         }
-
+/// <summary>
+/// The VersionTimestamp property
+///Provides concurrency control for the class
+/// </summary>
+///
+        public virtual byte[] VersionTimestamp
+        {
+            get
+            {
+                return versionTimestamp;
+            }
+            set
+            {
+                versionTimestamp = value;
+            }
+        }
         #endregion
         #region ApplicationUserClaim's Participant Properties
         [DataMember(Name="User")]

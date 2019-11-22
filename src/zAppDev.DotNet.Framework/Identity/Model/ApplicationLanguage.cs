@@ -46,6 +46,8 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         protected string code;
         [DataMember(Name="Icon")]
         protected byte[] icon;
+        [DataMember(Name="VersionTimestamp")]
+        protected byte[] versionTimestamp;
 
         #endregion
         #region ApplicationLanguage's Properties
@@ -114,7 +116,22 @@ namespace zAppDev.DotNet.Framework.Identity.Model
                 icon = value;
             }
         }
-
+/// <summary>
+/// The VersionTimestamp property
+///Provides concurrency control for the class
+/// </summary>
+///
+        public virtual byte[] VersionTimestamp
+        {
+            get
+            {
+                return versionTimestamp;
+            }
+            set
+            {
+                versionTimestamp = value;
+            }
+        }
         #endregion
         #region ApplicationLanguage's Participant Properties
         [DataMember(Name="DateTimeFormat")]

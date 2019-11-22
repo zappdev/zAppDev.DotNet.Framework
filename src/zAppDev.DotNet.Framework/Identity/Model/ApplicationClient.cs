@@ -48,6 +48,8 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         protected string sessionId;
         [DataMember(Name="ConnectedOn")]
         protected DateTime? connectedOn;
+        [DataMember(Name="VersionTimestamp")]
+        protected byte[] versionTimestamp;
 
         #endregion
         #region ApplicationClient's Properties
@@ -132,7 +134,22 @@ namespace zAppDev.DotNet.Framework.Identity.Model
                 connectedOn = value;
             }
         }
-
+/// <summary>
+/// The VersionTimestamp property
+///Provides concurrency control for the class
+/// </summary>
+///
+        public virtual byte[] VersionTimestamp
+        {
+            get
+            {
+                return versionTimestamp;
+            }
+            set
+            {
+                versionTimestamp = value;
+            }
+        }
         #endregion
         #region ApplicationClient's Participant Properties
         [DataMember(Name="User")]
