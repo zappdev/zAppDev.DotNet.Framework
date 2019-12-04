@@ -19,6 +19,9 @@ namespace zAppDev.DotNet.Framework.Utilities
             ContractResolver = new NHibernateContractResolver()
         };
 
+        private static object _dictionaryLock = new object();
+        private static Dictionary<string, object> _lock = new Dictionary<string, object>();
+
         public static ICacheManager<object> Instance
         {
             get
@@ -88,6 +91,33 @@ namespace zAppDev.DotNet.Framework.Utilities
         {
             var serialized = JsonConvert.SerializeObject(value, DefaultDeserializationSettingsWithCycles);
             Instance.Put(key, serialized);
+        }
+
+        public static bool AddIfNotExists<TV>(string key, TV value)
+        {
+            object lockVariable = null;
+            lock(_dictionaryLock)
+            {
+                if (!_lock.ContainsKey(key))
+                {
+                    lockVariable = new object();
+                   _lock.Add(key, lockVariable);
+                } else
+                {
+                    lockVariable = _lock[key];
+                }
+            }
+
+            lock(lockVariable)
+            {
+                if (Instance.Exists(key)) {
+                    return false;
+                }
+
+                var serialized = JsonConvert.SerializeObject(value, DefaultDeserializationSettingsWithCycles);
+                Instance.Put(key, serialized);
+                return true;
+            }
         }
     }
 }
