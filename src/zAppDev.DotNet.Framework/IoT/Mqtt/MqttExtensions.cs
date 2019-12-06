@@ -2,14 +2,11 @@
 // Licensed under the AGPL-3.0 license. See LICENSE file in the project root for full license information.
 #if NETFRAMEWORK
 #else
-using MQTTnet;
 using MQTTnet.Server;
 using MQTTnet.AspNetCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
-using System;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 namespace zAppDev.DotNet.Framework.IoT.Mqtt
@@ -19,8 +16,10 @@ namespace zAppDev.DotNet.Framework.IoT.Mqtt
         public static void AddMqttWebsocketBroker(this IServiceCollection services, IConfiguration configuration)
         {
             var mqttServerOptions = new MqttServerOptionsBuilder().WithoutDefaultEndpoint().Build();
-            services.AddHostedMqttServer(mqttServerOptions).AddMqttConnectionHandler().AddConnections();
-
+            services
+                .AddHostedMqttServer(mqttServerOptions)
+                .AddMqttConnectionHandler()
+                .AddConnections();
         }
     }
 
