@@ -13,8 +13,8 @@ Licensed under the AGPL-3.0 license. See LICENSE file in the project root for fu
                 <param name="optimizer">pooled-lo</param>
             </generator>
         </id>
-        <version name="VersionTimestamp" column="`VersionTimestamp`" type="Byte[]" generated="always">
-            <column name="`VersionTimestamp`" not-null="false" sql-type="timestamp" />
+        <version name="VersionTimestamp" column="`VersionTimestamp`" type="System.Int32" generated="never" unsaved-value="1">
+          <column name="`VersionTimestamp`" not-null="true" sql-type="int" default="1"/>
         </version>
         <property name="LanguageLCID" column="`LanguageLCID`" type="System.Nullable`1[[System.Int32, mscorlib]], mscorlib" not-null="false" />
         <property name="LocaleLCID" column="`LocaleLCID`" type="System.Nullable`1[[System.Int32, mscorlib]], mscorlib" not-null="false" />

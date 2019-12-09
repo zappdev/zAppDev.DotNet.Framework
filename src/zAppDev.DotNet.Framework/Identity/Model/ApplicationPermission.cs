@@ -47,7 +47,7 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         [DataMember(Name="IsCustom")]
         protected bool isCustom;
         [DataMember(Name="VersionTimestamp")]
-        protected byte[] versionTimestamp;
+        protected int? versionTimestamp;
 
 #pragma warning disable 0649
         private bool disableInternalAdditions;
@@ -124,7 +124,7 @@ namespace zAppDev.DotNet.Framework.Identity.Model
 ///Provides concurrency control for the class
 /// </summary>
 ///
-        public virtual byte[] VersionTimestamp
+        public virtual int? VersionTimestamp
         {
             get
             {
