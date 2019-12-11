@@ -59,7 +59,8 @@ namespace zAppDev.DotNet.Framework.Mvc
         public ExpirationMode ExpirationMode { get; set; }
 		public string ApiName { get; set; }
         public bool LogEnabled { get; set; }
-        
+        public string[] HeadersToInlcudeInCacheKey { get; set; }
+
         private readonly Guid _id = Guid.NewGuid();                
 
         private static Dictionary<string, MambaDefinedShortTime> _mambaDefinedShortTimeObjects = new Dictionary<string, MambaDefinedShortTime>();
@@ -111,6 +112,7 @@ namespace zAppDev.DotNet.Framework.Mvc
                 {
                     ((CustomCacheKeyGenerator)cacheKeyGenerator).CachePerUser = CachePerUser;
                     ((CustomCacheKeyGenerator)cacheKeyGenerator).ApiName = ApiName;
+                    ((CustomCacheKeyGenerator)cacheKeyGenerator).HeadersToInlcudeInCacheKey = HeadersToInlcudeInCacheKey;
                 }
 
                 var responseMediaType = actionExecutedContext.Request.Properties[CurrentRequestMediaType] as MediaTypeHeaderValue ?? GetExpectedMediaType(httpConfig, actionExecutedContext.ActionContext);
@@ -186,7 +188,8 @@ namespace zAppDev.DotNet.Framework.Mvc
 			{
 				((CustomCacheKeyGenerator)cacheKeyGenerator).CachePerUser = CachePerUser;
 				((CustomCacheKeyGenerator)cacheKeyGenerator).ApiName = ApiName;
-			}
+				((CustomCacheKeyGenerator)cacheKeyGenerator).HeadersToInlcudeInCacheKey = HeadersToInlcudeInCacheKey;
+            }
 
             var responseMediaType = GetExpectedMediaType(config, actionContext);
             actionContext.Request.Properties[CurrentRequestMediaType] = responseMediaType;

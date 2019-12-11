@@ -18,6 +18,7 @@ namespace zAppDev.DotNet.Framework.Services
     {
         public bool CachePerUser { get; set; }
 		public string ApiName { get; set; }
+        public string[] HeadersToInlcudeInCacheKey { get; set; }
 
         private readonly ICacheKeyHasher _cacheKeyHasher = new CacheKeyHasher();
 
@@ -62,6 +63,23 @@ namespace zAppDev.DotNet.Framework.Services
                 argumentsString = string.Join("&", queryStrings);
             }
 
+            var headers = "";
+            if (HeadersToInlcudeInCacheKey != null && HeadersToInlcudeInCacheKey.Length > 0)
+            {
+                foreach (var key in HeadersToInlcudeInCacheKey)
+                {
+                    IEnumerable<string> headerValues = null;
+                    if (context.Request.Headers.TryGetValues(key, out headerValues))
+                    {
+                        headers += key + ":" + string.Join(";", headerValues.ToArray());
+                    }
+                    else
+                    {
+                        headers += key + ":null";
+                    }
+                }
+            }
+
             var postBody = "";
 
             if (context.Request.Method == HttpMethod.Post ||
@@ -88,7 +106,7 @@ namespace zAppDev.DotNet.Framework.Services
            _cacheKeyHasher.ApiName = this.ApiName;
            _cacheKeyHasher.Operation = actionName;
            _cacheKeyHasher.UserName = usernameCacheKey;
-           _cacheKeyHasher.OriginalKey = $"{baseCachekey}|{usernameCacheKey}|{argumentsString}|{postBody}|{mediaType}";
+           _cacheKeyHasher.OriginalKey = $"{baseCachekey}|{usernameCacheKey}|{headers}|{argumentsString}|{postBody}|{mediaType}";
 
             return _cacheKeyHasher.GetHashedKey();
         }
