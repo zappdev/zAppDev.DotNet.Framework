@@ -230,6 +230,11 @@ namespace zAppDev.DotNet.Framework.Logging
             throw new NotImplementedException();
         }
 
+        public void LogExternalAPIAccess(Guid requestId, string service, string operation, ServiceConsumptionOptions options, object response, HttpStatusCode status, TimeSpan processingTime, bool throwOnError = false, bool cachedResponse = false)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Dispose()
         {
         }

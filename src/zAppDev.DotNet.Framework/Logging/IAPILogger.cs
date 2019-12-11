@@ -27,6 +27,10 @@ namespace zAppDev.DotNet.Framework.Logging
         void Log(string apiType, string apiTitle, LogMessage message, bool throwOnError);
 #else
         void LogExposedAPIAccess(string controller, string action, Guid requestId, TimeSpan processingTime, bool cacheHit);
+
+        void LogExternalAPIAccess(Guid requestId, string service, string operation,
+                                  ServiceConsumptionOptions options, object response,
+                                  HttpStatusCode status, TimeSpan processingTime, bool throwOnError = false, bool cachedResponse = false);
 #endif
     }
 }
