@@ -512,7 +512,7 @@ namespace zAppDev.DotNet.Framework.Mvc
             if (!string.IsNullOrWhiteSpace(format) && (cellValue is double || cellValue is DateTime))
             {
                 var formatting = cellValue is DateTime
-                    ? zAppDev.DotNet.Framework.Utilities.Common.ConvertMomentFormat(format)
+                    ? Framework.Utilities.Common.ConvertMomentFormat(format)
                     : format.Replace("'", "");
 
                 cells.Style.Numberformat.Format = format;
@@ -1053,13 +1053,30 @@ namespace zAppDev.DotNet.Framework.Mvc
             }
             else if (cellValue is DateTime)
             {
-                var format = zAppDev.DotNet.Framework.Utilities.Common.ConvertMomentFormat(columnOptions.Formatting);
-                var dateTime = (cellValue as DateTime?).GetValueOrDefault();
-
+                var format = Framework.Utilities.Common.ConvertMomentFormat(columnOptions.Formatting);
+                var dateTime = ProceedDatetimeFields(cellValue).GetValueOrDefault();
                 cellValue = applyFormatting ? (object)dateTime.ToString(format) : dateTime;
             }
 
             return cellValue;
+        }
+
+        private static DateTime? ProceedDatetimeFields(object value)
+        {
+            var result = ((DateTime)value);
+            if (result == null) return null;
+
+            switch (result.Kind)
+            {
+                case DateTimeKind.Utc:
+                    return result.ToLocalTime();
+                case DateTimeKind.Local:
+                    return result.ToLocalTime();
+                case DateTimeKind.Unspecified:
+                    return DateTime.SpecifyKind(result, DateTimeKind.Utc).ToLocalTime();
+            }
+
+            return result.ToLocalTime();
         }
 
         public string Export(List<T> items, List<AggregatorInfo<T>> aggregators)

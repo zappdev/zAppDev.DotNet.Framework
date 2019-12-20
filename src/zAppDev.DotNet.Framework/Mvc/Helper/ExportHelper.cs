@@ -404,9 +404,6 @@ namespace zAppDev.DotNet.Framework.Mvc
         public static string ExportListToPDF(ExportOptions opt, List<ExportRecordDTO> result, int totalRows,
             Func<Document, Table, object> _pdfOvveride)
         {
-            Unit availableWidth;
-            Unit availableColumnWidth;
-
             var firstResult = result.First();
 
             firstResult.MarkVisibleColumns(opt);
@@ -414,7 +411,7 @@ namespace zAppDev.DotNet.Framework.Mvc
             var columns = result.First().Columns;
             var visibleColumns = columns.Where(c => c.IsVisible);
 
-            var document = InitializePDFDocument(visibleColumns.Count(), out availableWidth, out availableColumnWidth, opt.PortraitOrientation);
+            var document = InitializePDFDocument(visibleColumns.Count(), out Unit availableWidth, out Unit availableColumnWidth, opt.PortraitOrientation);
 
             //create section wrapper of table
             Section section = new Section();
@@ -478,8 +475,6 @@ namespace zAppDev.DotNet.Framework.Mvc
 
            foreach (var record in result)
             {
-
- 
                 var rowIn = table.AddRow();
                 rowCounter++;
                 rowIn.Shading.Color = rowCounter % 2 != 0
@@ -668,12 +663,11 @@ namespace zAppDev.DotNet.Framework.Mvc
                         : ((double)value).ToString(formatting);
 
                 case "datetime":
-                    var result = ((DateTime)value);
+                    var result = ProceedDatetimeFields(value);
                     if (result == null) return "";
-                    result = result.ToLocalTime();
                     return culture != null
-                        ? result.ToString(formatting, culture)
-                        : result.ToString(formatting);
+                        ? result.Value.ToString(formatting, culture)
+                        : result.Value.ToString(formatting);
 
                 default:
                     return value.ToString();
@@ -692,10 +686,28 @@ namespace zAppDev.DotNet.Framework.Mvc
 
             if (column.ColumnDataType.ToLowerInvariant() == "datetime" && (column?.Value as DateTime?).HasValue)
             {
-                return (column?.Value as DateTime?)?.ToLocalTime().ToOADate().ToString() ?? "";
+                return ProceedDatetimeFields(column?.Value)?.ToLocalTime().ToOADate().ToString() ?? "";
             }
 
             return column?.Value?.ToString() ?? "";
+        }
+
+        private static DateTime? ProceedDatetimeFields(object value)
+        {
+            var result = ((DateTime)value);
+            if (result == null) return null;
+
+            switch (result.Kind)
+            {
+                case DateTimeKind.Utc:
+                    return result.ToLocalTime();
+                case DateTimeKind.Local:
+                    return result.ToLocalTime();
+                case DateTimeKind.Unspecified:
+                    return DateTime.SpecifyKind(result, DateTimeKind.Utc).ToLocalTime();
+            }
+
+            return result.ToLocalTime();
         }
 
         #endregion
