@@ -176,14 +176,15 @@ namespace zAppDev.DotNet.Framework.Mvc
             }
         }
 
-        public static string ExportList(List<ExportRecordDTO> result, ExportOptions options, int totalRows)
+        public static string ExportList(List<ExportRecordDTO> result, ExportOptions options, int totalRows,
+            Func<Document, Table, object> _pdfOvveride = null)
         {
             var link = string.Empty;
 
             switch (options.Type)
             {
                 case Type.PDF:
-                    link = ExportListToPDF(options, result, totalRows);
+                    link = ExportListToPDF(options, result, totalRows, _pdfOvveride);
                     break;
 
                 case Type.EXCEL:
@@ -400,7 +401,8 @@ namespace zAppDev.DotNet.Framework.Mvc
         
         //PM> Install-Package PdfSharp
         //license: http://www.pdfsharp.net/PDFsharp_License.ashx
-        public static string ExportListToPDF(ExportOptions opt, List<ExportRecordDTO> result, int totalRows)
+        public static string ExportListToPDF(ExportOptions opt, List<ExportRecordDTO> result, int totalRows,
+            Func<Document, Table, object> _pdfOvveride)
         {
             Unit availableWidth;
             Unit availableColumnWidth;
@@ -514,9 +516,20 @@ namespace zAppDev.DotNet.Framework.Mvc
 
             //Add the table to the section and the document is ready for render
             if (opt.IncludeGridLines) table.Borders.Visible = true;
-            section.Add(table);
-            PdfDocumentRenderer pdfRenderer = new PdfDocumentRenderer(true);
-            pdfRenderer.Document = document;
+
+            if (_pdfOvveride == null)
+            {
+                section.Add(table);
+            }
+            else
+            {
+                _pdfOvveride?.Invoke(document, table);
+            }
+
+            PdfDocumentRenderer pdfRenderer = new PdfDocumentRenderer(true)
+            {
+                Document = document
+            };
             pdfRenderer.RenderDocument();
 
             return CreateFileAndSendDownloadLink(opt.Filename, null, "pdf", pdfRenderer);
@@ -566,7 +579,7 @@ namespace zAppDev.DotNet.Framework.Mvc
             return f > width.Millimeter;
         }
 
-        private static MigraDoc.DocumentObjectModel.Document InitializePDFDocument(int columnNumber, out Unit availableWidth, out Unit availableColumnWidth, bool orientationPDF, bool groupmode = false, bool includeAggregateColumn = false)
+        private static Document InitializePDFDocument(int columnNumber, out Unit availableWidth, out Unit availableColumnWidth, bool orientationPDF, bool groupmode = false, bool includeAggregateColumn = false)
         {
             //create Document setup
             var document = new MigraDoc.DocumentObjectModel.Document();
