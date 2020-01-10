@@ -201,6 +201,8 @@ namespace zAppDev.DotNet.Framework.Mvc
         private MigraDoc.DocumentObjectModel.Unit _availablePDFWidthInMillimeter;
         private static readonly int AGGREGATOR_PDF_COLUMN_SIZE = 150;
         private static readonly int DEFAULT_PDF_COLUMN_SIZE = 150;
+        private static readonly int _headerRowLeftPadding = 5;
+        private static readonly int _headerRowRightPadding = 5;
 
 
         public ExportHelperV2(ExportOptionsV2 options, Dictionary<string, Func<T, object>> getters)
@@ -589,7 +591,11 @@ namespace zAppDev.DotNet.Framework.Mvc
 
             for (var i = 0; i < Options.ColumnInfo.Count; i++)
             {
-                headerRow.Cells[i].AddParagraph(Options.ColumnInfo[i].Caption);
+                headerRow.Cells[i].Column.LeftPadding = _headerRowLeftPadding;
+                headerRow.Cells[i].Column.RightPadding = _headerRowRightPadding;
+                var headerCaption = Options.ColumnInfo[i].Caption;
+                var adjustedValue = AdjustIfTooWideToFitInPDFCell(headerRow.Cells[i], headerCaption);
+                headerRow.Cells[i].AddParagraph(adjustedValue);
                 SetParagraphFormatting(headerRow.Cells[i].Format);
             }
             if (aggregators.Any())
@@ -631,7 +637,8 @@ namespace zAppDev.DotNet.Framework.Mvc
                         var aggregatorInfo = currentTypeAggregators.FirstOrDefault(a => a.Column == Options.ColumnInfo[i].Name);
                         if (aggregatorInfo == null) continue;
 
-                        aggregatorRow.Cells[i].AddParagraph(aggregatorInfo.ValueFormatted);
+                        var adjustedValue = AdjustIfTooWideToFitInPDFCell(aggregatorRow.Cells[i], aggregatorInfo.ValueFormatted);
+                        aggregatorRow.Cells[i].AddParagraph(adjustedValue);
                         SetParagraphFormatting(aggregatorRow.Cells[i].Format);
                     }
 
@@ -735,12 +742,20 @@ namespace zAppDev.DotNet.Framework.Mvc
 
                     for (var i = 0; i < groupedColumns.Count; i++)
                     {
-                        headerRow.Cells[i].AddParagraph(Options.ColumnInfo.SingleOrDefault(c => c?.Name?.ToLower() == groupedColumns[i]?.ToLower())?.Caption);
+                        headerRow.Cells[i].Column.LeftPadding = _headerRowLeftPadding;
+                        headerRow.Cells[i].Column.RightPadding = _headerRowRightPadding;
+                        var headerCaption = Options.ColumnInfo.SingleOrDefault(c => c?.Name?.ToLower() == groupedColumns[i]?.ToLower())?.Caption;
+                        var adjustedValue = AdjustIfTooWideToFitInPDFCell(headerRow.Cells[i], headerCaption);
+                        headerRow.Cells[i].AddParagraph(adjustedValue);
                         SetParagraphFormatting(headerRow.Cells[i].Format);
                     }
                     for (var i = 0; i < ungroupedColumns.Count; i++)
                     {
-                        headerRow.Cells[groupedColumns.Count + i].AddParagraph(Options.ColumnInfo.SingleOrDefault(c => c?.Name?.ToLower() == ungroupedColumns[i]?.Name.ToLower())?.Caption);
+                        headerRow.Cells[groupedColumns.Count + i].Column.LeftPadding = _headerRowLeftPadding;
+                        headerRow.Cells[groupedColumns.Count + i].Column.RightPadding = _headerRowRightPadding;
+                        var headerCaption = Options.ColumnInfo.SingleOrDefault(c => c?.Name?.ToLower() == ungroupedColumns[i]?.Name.ToLower())?.Caption;
+                        var adjustedValue = AdjustIfTooWideToFitInPDFCell(headerRow.Cells[groupedColumns.Count + i], headerCaption);
+                        headerRow.Cells[groupedColumns.Count + i].AddParagraph(adjustedValue);
                         SetParagraphFormatting(headerRow.Cells[groupedColumns.Count + i].Format);
                     }
                     if (Options.ColumnInfo.Count < _totalColumns)
@@ -896,7 +911,7 @@ namespace zAppDev.DotNet.Framework.Mvc
             //Set fonts
             var style = pdfDocument.Styles.AddStyle("CustomTableStyle", "Normal");
             style.Font.Name = "Verdana";
-            style.Font.Size = 11;
+            style.Font.Size = SetFontSize();
 
             _PDFTextMeasurement = new TextMeasurement(style.Font.Clone());
 
@@ -969,7 +984,36 @@ namespace zAppDev.DotNet.Framework.Mvc
 
         private void SetParagraphFormatting(MigraDoc.DocumentObjectModel.ParagraphFormat format)
         {
-            format.Font.Size = _totalColumns > 9 ? 7 : 11;
+            if(_totalColumns <= 6)
+            {
+                format.Font.Size = 12;
+            }
+            else if(_totalColumns <= 9)
+            {
+                format.Font.Size = 9;
+            }
+            else
+            {
+                format.Font.Size = 6;
+            }
+
+            //format.Font.Size = _totalColumns > 9 ? 7 : 11;
+        }
+
+        private int SetFontSize()
+        {
+            if (_totalColumns <= 6)
+            {
+                return 12;
+            }
+            else if (_totalColumns <= 9)
+            {
+                return 9;
+            }
+            else
+            {
+                return 6;
+            }
         }
 
         private string SavePDFFile(MigraDoc.DocumentObjectModel.Document pdfDocument, MigraDoc.DocumentObjectModel.Tables.Table table, string filename)
