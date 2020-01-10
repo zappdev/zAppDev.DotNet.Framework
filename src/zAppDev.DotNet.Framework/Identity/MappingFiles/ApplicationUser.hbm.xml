@@ -6,7 +6,7 @@ Licensed under the AGPL-3.0 license. See LICENSE file in the project root for fu
 <hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" default-lazy="true" auto-import="false" assembly="zAppDev.DotNet.Framework" namespace="zAppDev.DotNet.Framework.Identity.Model">
     <class name="ApplicationUser" table="`ApplicationUsers`" schema="`security`">
         <cache usage="read-write" region="security" />
-        <id name="UserName" column="`UserName`" type="String" length="256">
+        <id name="UserName" column="`UserName`" type="String" length="255">
             <generator class="assigned" />
         </id>
         <version name="VersionTimestamp" column="`VersionTimestamp`" type="System.Int32" generated="never" unsaved-value="1">

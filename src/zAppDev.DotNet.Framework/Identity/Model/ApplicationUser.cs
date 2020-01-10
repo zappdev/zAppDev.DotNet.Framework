@@ -905,9 +905,9 @@ namespace zAppDev.DotNet.Framework.Identity.Model
             {
                 __errors.Add("String 'UserName' cannot be empty.");
             }
-            if (UserName != null && UserName.Length > 256)
+            if (UserName != null && UserName.Length > 255)
             {
-                __errors.Add("Length of property 'UserName' cannot be greater than 256.");
+                __errors.Add("Length of property 'UserName' cannot be greater than 255.");
             }
             if (PasswordHash != null && PasswordHash.Length > 2147483647)
             {
