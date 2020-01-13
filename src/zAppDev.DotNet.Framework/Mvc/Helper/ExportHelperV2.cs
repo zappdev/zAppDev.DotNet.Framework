@@ -552,7 +552,8 @@ namespace zAppDev.DotNet.Framework.Mvc
 
 #region PDF Exporting
 
-        private string ExportToPDF(List<T> items, List<AggregatorInfo<T>> aggregators)
+        private string ExportToPDF(List<T> items, List<AggregatorInfo<T>> aggregators,
+            Func<MigraDoc.DocumentObjectModel.Document, MigraDoc.DocumentObjectModel.Tables.Table, object> _pdfOvverideFunction = null)
         {
             _totalColumns = Options.ColumnInfo.Count + (aggregators.Any() ? 1 : 0);
             _totalPDFColumnWidth = Options.ColumnInfo.Sum(c => c.Width) + (aggregators.Any() ? AGGREGATOR_PDF_COLUMN_SIZE : 0);
@@ -652,10 +653,11 @@ namespace zAppDev.DotNet.Framework.Mvc
             }
 
             //Save PDF
-            return SavePDFFile(pdfDocument, table, Options.Filename);
+            return SavePDFFile(pdfDocument, table, Options.Filename, _pdfOvverideFunction);
         }
 
-        private string ExportToPDF(GroupTree<T> groups, GroupTree<T> aggregators, Func<T, ActionResult> postProcessAction)
+        private string ExportToPDF(GroupTree<T> groups, GroupTree<T> aggregators, Func<T, ActionResult> postProcessAction,
+            Func<MigraDoc.DocumentObjectModel.Document, MigraDoc.DocumentObjectModel.Tables.Table, object> _pdfOvverideFunction = null)
         {
             _totalColumns = Options.ColumnInfo.Count + (aggregators.Aggregates.Any(a => a.Column != "__Count") ? 1 : 0);
             _totalPDFColumnWidth = Options.ColumnInfo.Sum(c => c.Width) + (aggregators.Aggregates.Any(a => a.Column != "__Count") ? AGGREGATOR_PDF_COLUMN_SIZE : 0);
@@ -666,7 +668,7 @@ namespace zAppDev.DotNet.Framework.Mvc
 
             ParseSubGroupForPDF(table, groups, aggregators, new List<string>(), 1, postProcessAction);
             
-            return SavePDFFile(pdfDocument, table, Options.Filename);
+            return SavePDFFile(pdfDocument, table, Options.Filename, _pdfOvverideFunction);
         }
 
         private int ParseSubGroupForPDF(MigraDoc.DocumentObjectModel.Tables.Table table, GroupTree<T> group, GroupTree<T> aggregators, List<string> groupedColumns, int currentLine, Func<T, ActionResult> postProcessAction)
@@ -1016,10 +1018,19 @@ namespace zAppDev.DotNet.Framework.Mvc
             }
         }
 
-        private string SavePDFFile(MigraDoc.DocumentObjectModel.Document pdfDocument, MigraDoc.DocumentObjectModel.Tables.Table table, string filename)
+        private string SavePDFFile(MigraDoc.DocumentObjectModel.Document pdfDocument, MigraDoc.DocumentObjectModel.Tables.Table table, string filename,
+            Func<MigraDoc.DocumentObjectModel.Document, MigraDoc.DocumentObjectModel.Tables.Table, object> _pdfOvverideFunction = null)
         {
             //Add the table to the section
-            pdfDocument.LastSection.Add(table);
+            if(_pdfOvverideFunction == null)
+            {
+                pdfDocument.LastSection.Add(table);
+            }
+            else
+            {
+                _pdfOvverideFunction?.Invoke(pdfDocument, table);
+            }
+
 
             var randomFolderName = Guid.NewGuid().ToString();
             var randomPath = Path.Combine(Path.GetTempPath(), randomFolderName);
@@ -1079,14 +1090,15 @@ namespace zAppDev.DotNet.Framework.Mvc
             return result.ToLocalTime();
         }
 
-        public string Export(List<T> items, List<AggregatorInfo<T>> aggregators)
+        public string Export(List<T> items, List<AggregatorInfo<T>> aggregators,
+            Func<MigraDoc.DocumentObjectModel.Document, MigraDoc.DocumentObjectModel.Tables.Table, object> _pdfOvverideFunction = null)
         {
             switch (Options.Type)
             {
                 case ExportHelper.Type.EXCEL:
                     return ExportToExcel(items, aggregators);
                 case ExportHelper.Type.PDF:
-                    return ExportToPDF(items, aggregators);
+                    return ExportToPDF(items, aggregators, _pdfOvverideFunction);
                 case ExportHelper.Type.WORD:
                     throw new Exception("Word export is not implemented yet");
                 default:
@@ -1094,14 +1106,15 @@ namespace zAppDev.DotNet.Framework.Mvc
             }
         }
 
-        public string Export(GroupTree<T> groups, GroupTree<T> aggregators, Func<T, ActionResult> postProcessAction = null)
+        public string Export(GroupTree<T> groups, GroupTree<T> aggregators, Func<T, ActionResult> postProcessAction = null,
+            Func<MigraDoc.DocumentObjectModel.Document, MigraDoc.DocumentObjectModel.Tables.Table, object> _pdfOvverideFunction = null)
         {
             switch (Options.Type)
             {
                 case ExportHelper.Type.EXCEL:
                     return ExportToExcel(groups, aggregators, postProcessAction);
                 case ExportHelper.Type.PDF:
-                    return ExportToPDF(groups, aggregators, postProcessAction);
+                    return ExportToPDF(groups, aggregators, postProcessAction,_pdfOvverideFunction);
                 case ExportHelper.Type.WORD:
                     throw new Exception("Word export is not implemented yet");
                 default:
