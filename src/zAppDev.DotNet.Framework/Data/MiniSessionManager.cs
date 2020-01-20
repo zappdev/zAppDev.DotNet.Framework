@@ -10,6 +10,7 @@ using log4net;
 using NHibernate;
 using NHibernate.Cfg;
 using zAppDev.DotNet.Framework.Data.DAL;
+using System.Collections.Generic;
 
 #if NETFRAMEWORK
 using zAppDev.DotNet.Framework.Owin;
@@ -379,13 +380,17 @@ namespace zAppDev.DotNet.Framework.Data
             }), manager);
         }
 #else
+        public static Stack<MiniSessionService> UoWContext = new Stack<MiniSessionService>();
+
         public static T ExecuteInUoW<T>(Func<MiniSessionService, T> action)
         {
             var factory = ServiceLocator.Current.GetInstance<ISessionFactory>();
             using (var manager = new MiniSessionService(factory))
             {
                 manager.OpenSessionWithTransaction();
+                UoWContext.Push(manager);
                 var result = action(manager);
+                UoWContext.Pop();
                 manager.CommitChanges();
                 return result;
             }
@@ -397,7 +402,9 @@ namespace zAppDev.DotNet.Framework.Data
             using (var manager = new MiniSessionService(factory))
             {
                 manager.OpenSessionWithTransaction();
+                UoWContext.Push(manager);
                 action(manager);
+                UoWContext.Pop();
                 manager.CommitChanges();
             }
         }
