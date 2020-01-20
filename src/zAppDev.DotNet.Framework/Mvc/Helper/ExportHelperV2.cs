@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017 CLMS. All rights reserved.
+// Copyright (c) 2017 CLMS. All rights reserved.
 // Licensed under the AGPL-3.0 license. See LICENSE file in the project root for full license information.
 using System;
 using System.Collections.Generic;
@@ -11,6 +11,7 @@ using OfficeOpenXml.Style;
 using System.ComponentModel;
 
 using UnitType = MigraDoc.DocumentObjectModel.UnitType;
+using zAppDev.DotNet.Framework.Identity;
 
 #if NETFRAMEWORK
 using System.Web.Mvc;
@@ -201,9 +202,21 @@ namespace zAppDev.DotNet.Framework.Mvc
         private MigraDoc.DocumentObjectModel.Unit _availablePDFWidthInMillimeter;
         private static readonly int AGGREGATOR_PDF_COLUMN_SIZE = 150;
         private static readonly int DEFAULT_PDF_COLUMN_SIZE = 150;
-        private static readonly int _headerRowLeftPadding = 5;
-        private static readonly int _headerRowRightPadding = 5;
-
+        private static readonly int _headerRowLeftPadding = 2;
+        private static readonly int _headerRowRightPadding = 2;
+        
+        private static TimeZoneInfo GetTimezoneInfo()
+        {
+            try
+            {
+                var timezoneInfo = TimeZoneInfo.FindSystemTimeZoneById(ProfileHelper.GetCurrentTimezoneId());
+                return timezoneInfo;
+            }
+            catch (Exception e)
+            {
+                return TimeZoneInfo.Utc;
+            }
+        }
 
         public ExportHelperV2(ExportOptionsV2 options, Dictionary<string, Func<T, object>> getters)
         {
@@ -611,7 +624,7 @@ namespace zAppDev.DotNet.Framework.Mvc
                 dataRow.Shading.Color = (i + 1) % 2 == 0 ? EvenMigraDocColor : OddMigraDocColor;
                 dataRow.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
                 dataRow.VerticalAlignment = MigraDoc.DocumentObjectModel.Tables.VerticalAlignment.Center;
-                dataRow.Format.Font.Size = 11;
+                //dataRow.Format.Font.Size = 11;
 
                 for (var j = 0; j < Options.ColumnInfo.Count; j++)
                 {
@@ -1076,17 +1089,20 @@ namespace zAppDev.DotNet.Framework.Mvc
         {
             var result = ((DateTime)value);
             if (result == null) return null;
-
+            TimeZoneInfo timeZoneInfo = GetTimezoneInfo();
+            DateTime targetTime;
             switch (result.Kind)
             {
                 case DateTimeKind.Utc:
-                    return result.ToLocalTime();
                 case DateTimeKind.Local:
-                    return result.ToLocalTime();
+                    targetTime = TimeZoneInfo.ConvertTime(result, timeZoneInfo);
+                    return targetTime;
                 case DateTimeKind.Unspecified:
-                    return DateTime.SpecifyKind(result, DateTimeKind.Utc).ToLocalTime();
+                    result = DateTime.SpecifyKind(result, DateTimeKind.Utc);
+                    targetTime = TimeZoneInfo.ConvertTime(result, timeZoneInfo);
+                    return targetTime;
             }
-
+            
             return result.ToLocalTime();
         }
 

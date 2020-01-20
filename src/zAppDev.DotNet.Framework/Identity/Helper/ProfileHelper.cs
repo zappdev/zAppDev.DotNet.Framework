@@ -62,6 +62,24 @@ namespace zAppDev.DotNet.Framework.Identity
             }
         }
 
+        public static string GetCurrentTimezoneId()
+        {
+            var defaultId = "UTC";
+            try
+            {
+                var currentUser = IdentityHelper.GetCurrentApplicationUser();
+                var id = string.IsNullOrEmpty(currentUser?.Profile?.TimezoneId)
+                         ? defaultId
+                         : currentUser.Profile.TimezoneId;
+                return id;
+            }
+            catch (Exception e)
+            {
+                log4net.LogManager.GetLogger(typeof(ProfileHelper)).Error("Could not get current Timezone ID", e);
+                return defaultId;
+            }
+        }
+
         public static object GetCurrentProfileTheme(string defaultThemeName = "DarkTheme")
         {
             var currentUser = IdentityHelper.GetCurrentApplicationUser();
@@ -233,6 +251,11 @@ namespace zAppDev.DotNet.Framework.Identity
         #region Language & Theme Methods
 
         // Maybe we should place them elsewhere, but for the moment they are fine here...
+
+        public static List<TimeZoneInfo> GetAvailableTimezoneInfos()
+        {
+            return TimeZoneInfo.GetSystemTimeZones().ToList();
+        }
 
         public static List<ApplicationLanguage> GetAllAvailableLanguages()
         {
