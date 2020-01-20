@@ -380,7 +380,12 @@ namespace zAppDev.DotNet.Framework.Data
             }), manager);
         }
 #else
-        public static Stack<MiniSessionService> UoWContext = new Stack<MiniSessionService>();
+        private static Stack<MiniSessionService> UoWContext = new Stack<MiniSessionService>();
+
+        public static MiniSessionService GetUoWContect ()
+        {
+            return (UoWContext.Any()) ? UoWContext?.First() : null;
+        }
 
         public static T ExecuteInUoW<T>(Func<MiniSessionService, T> action)
         {
