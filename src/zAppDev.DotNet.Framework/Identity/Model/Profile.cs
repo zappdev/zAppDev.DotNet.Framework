@@ -114,10 +114,14 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         {
             get
             {
-                var info = TimeZoneInfo.FindSystemTimeZoneById(timezoneID ?? ProfileHelper.GetDefaultTimezone());
+                if (string.IsNullOrEmpty(timezoneID))
+                    timezoneID = ProfileHelper.GetDefaultTimezone();
+
+                var info = TimeZoneInfo.FindSystemTimeZoneById(timezoneID);
 
                 return new ApplicationTimezoneInfo 
                 { 
+                    Id  = info.Id,
                     StandardName = info.StandardName,
                     DisplayName = info.DisplayName,
                     BaseUtcOffset = info.BaseUtcOffset

@@ -256,6 +256,7 @@ namespace zAppDev.DotNet.Framework.Identity
         {
             return TimeZoneInfo.GetSystemTimeZones().Select(x => new ApplicationTimezoneInfo
             {
+                Id = x.Id,
                 DisplayName = x.DisplayName,
                 StandardName = x.StandardName,
                 BaseUtcOffset = x.BaseUtcOffset

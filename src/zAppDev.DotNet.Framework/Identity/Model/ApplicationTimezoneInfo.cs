@@ -73,11 +73,11 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         {
             get
             {
-                return DisplayName;
+                return displayName;
             }
             set
             {
-                DisplayName = value;
+                displayName = value;
             }
         }
         /// <summary>
@@ -89,11 +89,11 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         {
             get
             {
-                return StandardName;
+                return standardName;
             }
             set
             {
-                StandardName = value;
+                standardName = value;
             }
         }
         /// <summary>
