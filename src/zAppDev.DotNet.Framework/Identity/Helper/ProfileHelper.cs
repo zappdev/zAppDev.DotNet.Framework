@@ -68,9 +68,9 @@ namespace zAppDev.DotNet.Framework.Identity
             try
             {
                 var currentUser = IdentityHelper.GetCurrentApplicationUser();
-                var id = string.IsNullOrEmpty(currentUser?.Profile?.TimezoneInfo?.Id)
+                var id = string.IsNullOrEmpty(currentUser?.Profile?.TimezoneInfoID)
                          ? defaultId
-                         : currentUser.Profile.TimezoneInfo.Id;
+                         : currentUser.Profile.TimezoneInfoID;
                 return id;
             }
             catch (Exception e)

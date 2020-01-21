@@ -110,26 +110,15 @@ namespace zAppDev.DotNet.Framework.Identity.Model
 ///
 /// </summary>
 ///
-        public virtual ApplicationTimezoneInfo TimezoneInfo
+        public virtual string TimezoneInfoID
         {
             get
             {
-                if (string.IsNullOrEmpty(timezoneID))
-                    timezoneID = ProfileHelper.GetDefaultTimezone();
-
-                var info = TimeZoneInfo.FindSystemTimeZoneById(timezoneID);
-
-                return new ApplicationTimezoneInfo 
-                { 
-                    Id  = info.Id,
-                    StandardName = info.StandardName,
-                    DisplayName = info.DisplayName,
-                    BaseUtcOffset = info.BaseUtcOffset
-                };
+                return timezoneID;
             }
             set
             {
-                timezoneID = value.Id;
+                timezoneID = value;
             }
         }
         public virtual string TimezoneId
