@@ -72,7 +72,7 @@ namespace zAppDev.DotNet.Framework.Identity
 
         public static string GetCurrentTimezoneId()
         {
-            var defaultId = "UTC";
+            var defaultId = GetDefaultTimezone();
             try
             {
                 var currentUser = IdentityHelper.GetCurrentApplicationUser();
@@ -356,6 +356,12 @@ namespace zAppDev.DotNet.Framework.Identity
             var configuration = ServiceLocator.Current.GetInstance<IConfiguration>();
             var lang = configuration["configuration:appSettings:add:DefaultLocale:value"];
             return GetAllAvailableLanguages().Find(language => Equals(language.Id.ToString(), lang));
+        }
+
+        public static string GetDefaultTimezone()
+        {
+            var configuration = ServiceLocator.Current.GetInstance<IConfiguration>();
+            return configuration["configuration:appSettings:add:DefaultTimezoneId:value"] ?? "UTC";
         }
 
         public static ApplicationLanguage GetCurrentLanguage()

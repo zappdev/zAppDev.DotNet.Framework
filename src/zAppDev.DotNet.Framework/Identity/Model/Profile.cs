@@ -114,7 +114,7 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         {
             get
             {
-                var info = TimeZoneInfo.FindSystemTimeZoneById(timezoneID ?? "UTC");
+                var info = TimeZoneInfo.FindSystemTimeZoneById(timezoneID ?? ProfileHelper.GetDefaultTimezone());
 
                 return new ApplicationTimezoneInfo 
                 { 
