@@ -3,15 +3,11 @@
 using System;
 using System.Runtime.Serialization;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Collections;
 using System.ComponentModel.DataAnnotations;
-using System.Linq.Expressions;
-using zAppDev.DotNet.Framework.Linq;
 using zAppDev.DotNet.Framework.Data.Domain;
-using zAppDev.DotNet.Framework.Workflow;
 using zAppDev.DotNet.Framework.Exceptions;
 
 namespace zAppDev.DotNet.Framework.Identity.Model
@@ -22,7 +18,7 @@ namespace zAppDev.DotNet.Framework.Identity.Model
     /// </summary>
     [Serializable]
     [DataContract]
-    public class ApplicationTimezonInfo : IDomainModelClass
+    public class ApplicationTimezoneInfo : IDomainModelClass
     {
         #region ApplicationTimezonInfo's Fields
 
@@ -39,11 +35,13 @@ namespace zAppDev.DotNet.Framework.Identity.Model
             }
         }
         [DataMember(Name = "Id")]
-        protected int? id = 0;
+        protected string id;
         [DataMember(Name = "DisplayName")]
         protected string displayName;
         [DataMember(Name = "StandardName")]
         protected string standardName;
+        [DataMember(Name = "BaseUtcOffset")]
+        protected TimeSpan baseUtcOffset;
         [DataMember(Name = "VersionTimestamp")]
         protected byte[] versionTimestamp;
 
@@ -55,7 +53,7 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         /// </summary>
         ///
         [Key]
-        public virtual int? Id
+        public virtual string Id
         {
             get
             {
@@ -115,9 +113,7 @@ namespace zAppDev.DotNet.Framework.Identity.Model
             }
         }
         #endregion
-        #region ApplicationTimezonInfo's Participant Properties
-        [DataMember(Name = "BaseUtcOffset")]
-        protected TimeSpan baseUtcOffset;
+        #region ApplicationTimezonInfo's Participant Properties       
         public virtual TimeSpan BaseUtcOffset
         {
             get
@@ -137,7 +133,7 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         /// </summary>
         /// <returns>New ApplicationTimezonInfo object</returns>
         /// <remarks></remarks>
-        public ApplicationTimezonInfo() { }
+        public ApplicationTimezoneInfo() { }
         #endregion
         #region Methods
 
@@ -190,15 +186,15 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         /// <param name="reuseNestedObjects">If asNew is true, this flag if set, forces the reuse of all external objects.</param>
         /// <param name="copy">Optional - An existing [ApplicationLanguage] instance to use as the destination.</param>
         /// <returns>A copy of the object</returns>
-        public virtual ApplicationTimezonInfo Copy(bool deep = false, Hashtable copiedObjects = null, bool asNew = false, bool reuseNestedObjects = false, ApplicationTimezonInfo copy = null)
+        public virtual ApplicationTimezoneInfo Copy(bool deep = false, Hashtable copiedObjects = null, bool asNew = false, bool reuseNestedObjects = false, ApplicationTimezoneInfo copy = null)
         {
             if (copiedObjects == null)
             {
                 copiedObjects = new Hashtable();
             }
             if (copy == null && copiedObjects.Contains(this))
-                return (ApplicationTimezonInfo)copiedObjects[this];
-            copy = copy ?? new ApplicationTimezonInfo();
+                return (ApplicationTimezoneInfo)copiedObjects[this];
+            copy = copy ?? new ApplicationTimezoneInfo();
             if (!asNew)
             {
                 copy.TransientId = this.TransientId;
@@ -220,7 +216,7 @@ namespace zAppDev.DotNet.Framework.Identity.Model
 
         public override bool Equals(object obj)
         {
-            var compareTo = obj as ApplicationTimezonInfo;
+            var compareTo = obj as ApplicationTimezoneInfo;
             if (ReferenceEquals(this, compareTo))
             {
                 return true;
@@ -240,7 +236,7 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         }
 
         // Maintain equality operator semantics for entities.
-        public static bool operator ==(ApplicationTimezonInfo x, ApplicationTimezonInfo y)
+        public static bool operator ==(ApplicationTimezoneInfo x, ApplicationTimezoneInfo y)
         {
             // By default, == and Equals compares references. In order to
             // maintain these semantics with entities, we need to compare by
@@ -250,7 +246,7 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         }
 
         // Maintain inequality operator semantics for entities.
-        public static bool operator !=(ApplicationTimezonInfo x, ApplicationTimezonInfo y)
+        public static bool operator !=(ApplicationTimezoneInfo x, ApplicationTimezoneInfo y)
         {
             return !(x == y);
         }
@@ -308,7 +304,7 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         /// </summary>
         public virtual bool IsTransient()
         {
-            return this.Id == default(int) || this.Id.Equals(default(int));
+            return this.Id == default || this.Id.Equals(default);
         }
 
         /// <summary>
@@ -320,7 +316,7 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         ///
         ///     Related discussion is at http://groups.google.com/group/sharp-architecture/browse_thread/thread/ddd05f9baede023a ...thanks Jay Oliver!
         /// </summary>
-        protected virtual System.Type GetTypeUnproxied()
+        protected virtual Type GetTypeUnproxied()
         {
             return this.GetType();
         }
@@ -329,7 +325,7 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         ///     Returns true if self and the provided entity have the same Id values
         ///     and the Ids are not of the default Id value
         /// </summary>
-        protected bool HasSameNonDefaultIdAs(ApplicationTimezonInfo compareTo)
+        protected bool HasSameNonDefaultIdAs(ApplicationTimezoneInfo compareTo)
         {
             return !this.IsTransient() && !compareTo.IsTransient() && this.Id.Equals(compareTo.Id);
         }

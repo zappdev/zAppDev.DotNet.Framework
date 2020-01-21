@@ -76,9 +76,9 @@ namespace zAppDev.DotNet.Framework.Identity
             try
             {
                 var currentUser = IdentityHelper.GetCurrentApplicationUser();
-                var id = string.IsNullOrEmpty(currentUser?.Profile?.TimezoneId)
+                var id = string.IsNullOrEmpty(currentUser?.Profile?.TimezoneInfo?.Id)
                          ? defaultId
-                         : currentUser.Profile.TimezoneId;
+                         : currentUser.Profile.TimezoneInfo.Id;
                 return id;
             }
             catch (Exception e)
@@ -302,10 +302,14 @@ namespace zAppDev.DotNet.Framework.Identity
         #region Language & Theme Methods
 
         // Maybe we should place them elsewhere, but for the moment they are fine here...
-
-        public static List<TimeZoneInfo> GetAvailableTimeZoneInfos()
+        
+        public static List<ApplicationTimezoneInfo> GetAvailableTimezoneInfos()
         {
-            return TimeZoneInfo.GetSystemTimeZones().ToList();
+            return TimeZoneInfo.GetSystemTimeZones().Select(x => new ApplicationTimezoneInfo { 
+                DisplayName = x.DisplayName,
+                StandardName = x.StandardName,
+                BaseUtcOffset = x.BaseUtcOffset
+            }).ToList();
         }
         public static List<ApplicationLanguage> GetAllAvailableLanguages()
         {

@@ -110,6 +110,24 @@ namespace zAppDev.DotNet.Framework.Identity.Model
 ///
 /// </summary>
 ///
+        public virtual ApplicationTimezoneInfo TimezoneInfo
+        {
+            get
+            {
+                var info = TimeZoneInfo.FindSystemTimeZoneById(timezoneID ?? "UTC");
+
+                return new ApplicationTimezoneInfo 
+                { 
+                    StandardName = info.StandardName,
+                    DisplayName = info.DisplayName,
+                    BaseUtcOffset = info.BaseUtcOffset
+                };
+            }
+            set
+            {
+                timezoneID = value.Id;
+            }
+        }
         public virtual string TimezoneId
         {
             get
