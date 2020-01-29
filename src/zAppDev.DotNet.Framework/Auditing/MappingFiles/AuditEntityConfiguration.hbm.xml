@@ -20,7 +20,7 @@ Licensed under the AGPL-3.0 license. See LICENSE file in the project root for fu
         <property name="ShortName" column="`ShortName`" type="String" not-null="false" length="4000" />
         <bag batch-size="100" name="Properties" access="field.camelcase" inverse="true" cascade="persist,merge,all-delete-orphan">
             <cache usage="read-write" region="audit" />
-            <key column="`Entity`" foreign-key="FK_AuditEntityConfigurations_To_AuditPropertyConfigurations_On_Properties" />
+            <key column="`Entity`" foreign-key="FK_AuditPropertyConfigurations_Properties" />
             <one-to-many class="AuditPropertyConfiguration" />
         </bag>
     </class>

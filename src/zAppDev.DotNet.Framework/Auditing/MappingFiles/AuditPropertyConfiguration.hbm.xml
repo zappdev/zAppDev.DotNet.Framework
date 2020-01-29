@@ -21,6 +21,6 @@ Licensed under the AGPL-3.0 license. See LICENSE file in the project root for fu
         <property name="IsAuditable" column="`IsAuditable`" type="System.Boolean" not-null="false" />
         <property name="IsComplex" column="`IsComplex`" type="System.Boolean" not-null="false" />
         <property name="IsCollection" column="`IsCollection`" type="System.Boolean" not-null="false" />
-        <many-to-one name="Entity" access="field.camelcase" class="AuditEntityConfiguration" column="`Entity`" cascade="persist,merge,save-update" foreign-key="FK_AuditPropertyConfigurations_To_AuditEntityConfigurations_On_Entity" />
+        <many-to-one name="Entity" access="field.camelcase" class="AuditEntityConfiguration" column="`Entity`" cascade="persist,merge,save-update" foreign-key="FK_AuditEntityConfigurations_Entity" />
     </class>
 </hibernate-mapping>

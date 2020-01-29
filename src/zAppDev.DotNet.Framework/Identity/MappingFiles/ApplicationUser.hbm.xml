@@ -27,7 +27,7 @@ Licensed under the AGPL-3.0 license. See LICENSE file in the project root for fu
         </property>
         <bag batch-size="100" name="Permissions" table="`ApplicationPermissions_To_ApplicationUsers`" schema="`security`" access="field.camelcase" cascade="persist,merge,save-update">
             <cache usage="read-write" region="security" />
-            <key column="`Users`" foreign-key="FK_ApplicationUsers_To_ApplicationPermissions_On_Permissions" />
+            <key column="`Users`" foreign-key="FK_Users_To_Permissions_On_Permissions" />
             <many-to-many class="ApplicationPermission" column="`Permissions`" />
         </bag>
         <bag batch-size="100" name="Roles" table="`ApplicationRoles_To_ApplicationUsers`" schema="`security`" access="field.camelcase" cascade="persist,merge,save-update">
