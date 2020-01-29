@@ -44,6 +44,8 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         protected int? languageLCID;
         [DataMember(Name="LocaleLCID")]
         protected int? localeLCID;
+        [DataMember(Name = "TimezoneID")]
+        protected string timezoneID;
         [DataMember(Name="Theme")]
         protected string theme;
         [DataMember(Name="VersionTimestamp")]
@@ -104,10 +106,37 @@ namespace zAppDev.DotNet.Framework.Identity.Model
             }
         }
 /// <summary>
-/// The Theme property
+/// The TimezoneID property
 ///
 /// </summary>
 ///
+        public virtual string TimezoneInfoID
+        {
+            get
+            {
+                return timezoneID;
+            }
+            set
+            {
+                timezoneID = value;
+            }
+        }
+        public virtual string TimezoneId
+        {
+            get
+            {
+                return timezoneID;
+            }
+            set
+            {
+                timezoneID = value;
+            }
+        }
+        /// <summary>
+        /// The Theme property
+        ///
+        /// </summary>
+        ///
         public virtual string Theme
         {
             get

@@ -16,7 +16,7 @@ namespace zAppDev.DotNet.Framework.Services
     {
         protected readonly ICacheManager<object> CacheManagerCache;
 
-        private static readonly IList<string> Keys = new List<string>();
+        private static readonly ISet<string> Keys = new HashSet<string>();
 
         private ICacheKeyHasher _keyHasher = new CacheKeyHasher();
 
@@ -66,9 +66,9 @@ namespace zAppDev.DotNet.Framework.Services
                 if (value == _nullCacheObject)
                 {
                     found = true;
-                    return default(T);
+                    return default;
                 }
-                return default(T); //Just return a default object, leaving found as "false"
+                return default;
             }
         }
 
@@ -99,8 +99,6 @@ namespace zAppDev.DotNet.Framework.Services
             CacheManagerCache.Put(item);
             if (!Keys.Contains(key)) Keys.Add(key);
         }
-
-
 
         public IEnumerable<string> AllKeys => Keys;
 

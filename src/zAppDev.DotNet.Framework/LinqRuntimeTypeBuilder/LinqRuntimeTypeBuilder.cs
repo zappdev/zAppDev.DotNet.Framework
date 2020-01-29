@@ -318,7 +318,7 @@ namespace zAppDev.DotNet.Framework.LinqRuntimeTypeBuilder
                 GenerateExecutable = false,
                 GenerateInMemory = true
             };
-            compilerParameters.ReferencedAssemblies.Add("System.Core.Dll");
+            compilerParameters.ReferencedAssemblies.Add("System.Core.dll");
 
             var results = provider.CompileAssemblyFromSource(compilerParameters, codeToCompile);
             if (!results.Errors.HasErrors) return results.CompiledAssembly;
@@ -340,9 +340,9 @@ namespace zAppDev.DotNet.Framework.LinqRuntimeTypeBuilder
 
             var references = new MetadataReference[]
             {
-                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Linq.Dll")),
-                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Private.CoreLib.Dll")),
-                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Linq.Expressions.Dll"))
+                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Linq.dll")),
+                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Private.CoreLib.dll")),
+                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Linq.Expressions.dll"))
             };
 
             var compilation = CSharpCompilation.Create(

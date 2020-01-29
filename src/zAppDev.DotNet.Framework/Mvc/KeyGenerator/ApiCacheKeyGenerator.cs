@@ -18,6 +18,8 @@ namespace zAppDev.DotNet.Framework.Mvc.API
 
         private static readonly string AcceptType = "Accept";
 
+        private const string AnonymusUserName = "anon";
+
         private readonly ICacheKeyHasher _cacheKeyHasher;
 
         public ApiCacheKeyGenerator(ICacheKeyHasher cacheKeyHasher)
@@ -54,13 +56,12 @@ namespace zAppDev.DotNet.Framework.Mvc.API
             {
                 return context.User.Identity.IsAuthenticated
                                     ? context.User.Identity.Name
-                                    : "anon";
+                                    : AnonymusUserName;
             }
             else
             {
                 return "";
             }
-
         }
 
         private string GetBodyKey(HttpContext context, ApiResponseCacheConfig config)

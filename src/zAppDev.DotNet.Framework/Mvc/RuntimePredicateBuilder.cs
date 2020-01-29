@@ -837,8 +837,8 @@ $@"public static System.Dynamic.ExpandoObject {methodName}({TypeName(type)} inpu
             var compilerparams = new CompilerParameters();
             compilerparams.GenerateExecutable = false;
             compilerparams.GenerateInMemory = true;
-            compilerparams.ReferencedAssemblies.Add("System.Core.Dll");
-            compilerparams.ReferencedAssemblies.Add("System.Dll");
+            compilerparams.ReferencedAssemblies.Add("System.Core.dll");
+            compilerparams.ReferencedAssemblies.Add("System.dll");
 #else
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var assemblyName = Path.GetRandomFileName();
@@ -847,23 +847,23 @@ $@"public static System.Dynamic.ExpandoObject {methodName}({TypeName(type)} inpu
 
             var references = new List<MetadataReference>
             {
-                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Dll")),
-                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Private.CoreLib.Dll")),
-                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Linq.Dll")),
-                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Linq.Expressions.Dll")),
+                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.dll")),
+                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Private.CoreLib.dll")),
+                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Linq.dll")),
+                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Linq.Expressions.dll")),
                 MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "netstandard.dll")),
-                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Core.Dll")),
-                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Collections.Dll")),
-                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Runtime.Dll"))
+                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Core.dll")),
+                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Collections.dll")),
+                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Runtime.dll"))
             };
 #endif
 
             if (withCSharp)
             {
 #if NETFRAMEWORK
-                compilerparams.ReferencedAssemblies.Add("Microsoft.CSharp.Dll");
+                compilerparams.ReferencedAssemblies.Add("Microsoft.CSharp.dll");
 #else
-                references.Add(MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "Microsoft.CSharp.Dll")));
+                references.Add(MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "Microsoft.CSharp.dll")));
 #endif
             }
             foreach (var path in RequiredAssembliesPaths)

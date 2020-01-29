@@ -62,6 +62,24 @@ namespace zAppDev.DotNet.Framework.Identity
             }
         }
 
+        public static string GetCurrentTimezoneId()
+        {
+            var defaultId = GetDefaultTimezone();
+            try
+            {
+                var currentUser = IdentityHelper.GetCurrentApplicationUser();
+                var id = string.IsNullOrEmpty(currentUser?.Profile?.TimezoneInfoID)
+                         ? defaultId
+                         : currentUser.Profile.TimezoneInfoID;
+                return id;
+            }
+            catch (Exception e)
+            {
+                log4net.LogManager.GetLogger(typeof(ProfileHelper)).Error("Could not get current Timezone ID", e);
+                return defaultId;
+            }
+        }
+
         public static object GetCurrentProfileTheme(string defaultThemeName = "DarkTheme")
         {
             var currentUser = IdentityHelper.GetCurrentApplicationUser();
@@ -234,6 +252,17 @@ namespace zAppDev.DotNet.Framework.Identity
 
         // Maybe we should place them elsewhere, but for the moment they are fine here...
 
+        public static List<ApplicationTimezoneInfo> GetAvailableTimezoneInfos()
+        {
+            return TimeZoneInfo.GetSystemTimeZones().Select(x => new ApplicationTimezoneInfo
+            {
+                Id = x.Id,
+                DisplayName = x.DisplayName,
+                StandardName = x.StandardName,
+                BaseUtcOffset = x.BaseUtcOffset
+            }).ToList();
+        }
+
         public static List<ApplicationLanguage> GetAllAvailableLanguages()
         {
             var langs = new List<ApplicationLanguage>();
@@ -275,6 +304,11 @@ namespace zAppDev.DotNet.Framework.Identity
         {
             var lang = ConfigurationManager.AppSettings["DefaultLocale"];
             return GetAllAvailableLanguages().Find(language => Equals(language.Id.ToString(), lang));
+        }
+
+        public static string GetDefaultTimezone()
+        {
+            return ConfigurationManager.AppSettings["DefaultTimezoneId"] ?? "UTC";
         }
 
         public static ApplicationLanguage GetCurrentLanguage()

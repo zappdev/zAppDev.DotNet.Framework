@@ -1,31 +1,85 @@
 ﻿// Copyright (c) 2017 CLMS. All rights reserved.
 // Licensed under the AGPL-3.0 license. See LICENSE file in the project root for full license information.
 #if NETFRAMEWORK
-using CacheManager.Core;
-using zAppDev.DotNet.Framework.Logging;
-using Newtonsoft.Json;
+#else
 using System;
-using System.Diagnostics;
 using System.Net;
-using System.Web.Http;
+using System.Diagnostics;
 using log4net;
-using WebApi.OutputCache.Core.Time;
+using zAppDev.DotNet.Framework.Logging;
+using zAppDev.DotNet.Framework.Utilities;
+using CacheManager.Core;
+using zAppDev.DotNet.Framework.Mvc;
 
 namespace zAppDev.DotNet.Framework.Services
 {
+    public class CacheTime
+    {
+        // client cache length in seconds
+        public TimeSpan ClientTimeSpan { get; set; }
+
+        public TimeSpan? SharedTimeSpan { get; set; }
+
+        public DateTimeOffset AbsoluteExpiration { get; set; }
+    }
+
+    public interface IModelQuery<in TModel, out TResult>
+    {
+        TResult Execute(TModel model);
+    }
+
+    public class ShortTime : IModelQuery<DateTime, CacheTime>
+    {
+        private readonly int serverTimeInSeconds;
+        private readonly int clientTimeInSeconds;
+        private readonly int? sharedTimeInSecounds;
+
+        public ShortTime(int serverTimeInSeconds, int clientTimeInSeconds, int? sharedTimeInSecounds)
+        {
+            if (serverTimeInSeconds < 0)
+                serverTimeInSeconds = 0;
+
+            this.serverTimeInSeconds = serverTimeInSeconds;
+
+            if (clientTimeInSeconds < 0)
+                clientTimeInSeconds = 0;
+
+            this.clientTimeInSeconds = clientTimeInSeconds;
+
+            if (sharedTimeInSecounds.HasValue && sharedTimeInSecounds.Value < 0)
+                sharedTimeInSecounds = 0;
+
+            this.sharedTimeInSecounds = sharedTimeInSecounds;
+        }
+
+        public CacheTime Execute(DateTime model)
+        {
+            var cacheTime = new CacheTime
+            {
+                AbsoluteExpiration = model.AddSeconds(serverTimeInSeconds),
+                ClientTimeSpan = TimeSpan.FromSeconds(clientTimeInSeconds),
+                SharedTimeSpan = sharedTimeInSecounds.HasValue ? (TimeSpan?)TimeSpan.FromSeconds(sharedTimeInSecounds.Value) : null
+            };
+
+            return cacheTime;
+        }
+    }
+
     public class ServiceConsumer<T>
     {
         #region Fields
-        private readonly Func<ServiceConsumptionContainer, T> _invokeService;
-        private readonly Func<T, TimeSpan> _calculateExpiration;
-        private GenericCacheKeyGenerator _cacheKeyGenerator;
-        private readonly CustomCacheProvider _webApiCache = new CustomCacheProvider();
         private string _cacheKey;
-        private string StatusCodeCacheKeyPostFix = "|StatusCode";
+        private ExternalServiceCacheKeyGenerator _cacheKeyGenerator;
+        private readonly Func<T, TimeSpan> _calculateExpiration;
+        private readonly Func<ServiceConsumptionContainer, T> _invokeService;
+
+        private readonly string StatusCodeCacheKeyPostFix = "|StatusCode";
         private readonly Guid _id = Guid.NewGuid();
-   
-        protected IAPILogger APILogger =>
-            GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(IAPILogger)) as IAPILogger;
+
+        protected IAPILogger APILogger => ServiceLocator.Current.GetInstance<IAPILogger>();
+
+        protected IExternalServiceCacheProvider ServiceCacheProvider => ServiceLocator.Current.GetInstance<IExternalServiceCacheProvider>();
+
         #endregion
 
         #region Constructors
@@ -82,23 +136,15 @@ namespace zAppDev.DotNet.Framework.Services
 
         #region Helpful methods
 
-        public static JsonSerializerSettings CacheJsonSerializerSettings =>
-            new JsonSerializerSettings
-            {
-                PreserveReferencesHandling = PreserveReferencesHandling.Objects,
-                MetadataPropertyHandling = MetadataPropertyHandling.ReadAhead,
-                DateTimeZoneHandling = DateTimeZoneHandling.Utc,
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-            };
-
         private void SetCacheKey(ServiceConsumptionOptions serviceConsumptionOptions)
         {
-            _cacheKeyGenerator = new GenericCacheKeyGenerator(serviceConsumptionOptions)
+            _cacheKeyGenerator = new ExternalServiceCacheKeyGenerator(ServiceLocator.Current.GetInstance<ICacheKeyHasher>())
             {
                 CachePerUser = (serviceConsumptionOptions as ServiceConsumptionOptions).CachePerUser,
                 ApiName = (serviceConsumptionOptions as ServiceConsumptionOptions).ApiName
             };
 
+            _cacheKeyGenerator.SetServiceOptions(serviceConsumptionOptions);
             _cacheKey = _cacheKeyGenerator.MakeCacheKey();
         } //end SetCacheKey()
 
@@ -108,9 +154,9 @@ namespace zAppDev.DotNet.Framework.Services
 
             var statusCodeKey = _cacheKey + StatusCodeCacheKeyPostFix;
 
-            if (!_webApiCache.Contains(statusCodeKey)) return default;
+            if (!ServiceCacheProvider.Contains(statusCodeKey)) return default;
 
-            var val = _webApiCache.GetGeneric<HttpStatusCode>(statusCodeKey, out found);
+            found = ServiceCacheProvider.TryGetValue<HttpStatusCode>(statusCodeKey, out var val);
 
             if (!found) return default;
 
@@ -123,14 +169,13 @@ namespace zAppDev.DotNet.Framework.Services
 
             SetCacheKey(serviceConsumptionOptions);
 
-            if (!_webApiCache.Contains(_cacheKey)) return default;
-            var val = _webApiCache.GetGeneric<T>(_cacheKey, out found);
+            if (!ServiceCacheProvider.Contains(_cacheKey)) return default;
+            found = ServiceCacheProvider.TryGetValue<T>(_cacheKey, out var val);
             if (!found) return default;
 
-            LogManager.GetLogger(GetType()).Debug("Cache hit for: " + _cacheKey);
-
+            LogManager.GetLogger(this.GetType()).Debug("Cache hit for: " + _cacheKey);
             return val;
-        }//end GetFromCache()
+        } //end GetFromCache()
 
         private void Validate(ServiceConsumptionOptions serviceConsumptionOptions)
         {
@@ -162,21 +207,21 @@ namespace zAppDev.DotNet.Framework.Services
 
             if (cacheTime.AbsoluteExpiration > DateTime.UtcNow || serviceConsumptionOptions.ExpirationMode == ExpirationMode.None)
             {
-                var baseKey = serviceConsumptionOptions.Url.Replace("/", "").Replace(":","") ;
-                _webApiCache.ExpirationMode = serviceConsumptionOptions.ExpirationMode; 
+                var baseKey = serviceConsumptionOptions.Url.Replace("/", "").Replace(":", "");
+                ServiceCacheProvider.ExpirationMode = (Mvc.API.ExpirationMode)serviceConsumptionOptions.ExpirationMode;
 
-                if (_webApiCache is CustomCacheProvider)
+                if (ServiceCacheProvider is ExternalServiceCacheProvider)
                 {
-                    _webApiCache.ExpirationTimeSpan = cacheTime.ClientTimeSpan;
+                    ServiceCacheProvider.ExpirationTimeSpan = cacheTime.ClientTimeSpan;
                 }
 
-				//_webApiCache.Add(baseKey, string.Empty, cacheTime.AbsoluteExpiration);
-                _webApiCache.Add(_cacheKey, result, cacheTime.AbsoluteExpiration);
+                //_webApiCache.Add(baseKey, string.Empty, cacheTime.AbsoluteExpiration);
+                ServiceCacheProvider.Set(_cacheKey, result, cacheTime.AbsoluteExpiration);
 
                 // store status code
                 if (statusCode != null)
                 {
-                    _webApiCache.Add(_cacheKey + StatusCodeCacheKeyPostFix,
+                    ServiceCacheProvider.Set(_cacheKey + StatusCodeCacheKeyPostFix,
                                     statusCode,
                                     cacheTime.AbsoluteExpiration, baseKey);
                 }
@@ -186,7 +231,7 @@ namespace zAppDev.DotNet.Framework.Services
                 //                "etag", //todo
                 //                cacheTime.AbsoluteExpiration, baseKey);
             }
-        } // end AddToCache()
+        }// end AddToCache()
 
         #endregion  
 
@@ -208,7 +253,7 @@ namespace zAppDev.DotNet.Framework.Services
                 var cachedResult = GetFromCache(serviceConsumptionOptions, out bool found);
 
                 if (found)
-                {                    
+                {
                     if (serviceConsumptionOptions.LogAccess)
                     {
                         var cachedResultStatusCode = GetCachedResponseStatusCode(serviceConsumptionOptions, out bool statusCodeFound);
@@ -224,13 +269,13 @@ namespace zAppDev.DotNet.Framework.Services
                     return cachedResult;
                 }
             }
-            
+
             // Call service
             try
             {
                 var resultBag = new ServiceConsumptionContainer();
                 var result = _invokeService(resultBag);
-               
+
                 if (serviceConsumptionOptions.IsCachingEnabled &&
                     (resultBag.HttpResponseMessage == null || resultBag.HttpResponseMessage.IsSuccessStatusCode)) // null from SOAP service
                 {
@@ -253,20 +298,20 @@ namespace zAppDev.DotNet.Framework.Services
 
                 throw;
             }
-                      
+
         }// end Invoke()
 
         private void LogAccess(Stopwatch timer, ServiceConsumptionOptions serviceConsumptionOptions, object result, HttpStatusCode? code, bool cachedResponse)
-        {                                    
+        {
             timer.Stop();
 
             APILogger?.LogExternalAPIAccess(
-                _id, 
+                _id,
                 serviceConsumptionOptions.ApiName,
                 serviceConsumptionOptions.Operation,
-                serviceConsumptionOptions, 
-                result, 
-                code ?? default(HttpStatusCode), 
+                serviceConsumptionOptions,
+                result,
+                code ?? default(HttpStatusCode),
                 timer.Elapsed,
                 cachedResponse: cachedResponse
             );

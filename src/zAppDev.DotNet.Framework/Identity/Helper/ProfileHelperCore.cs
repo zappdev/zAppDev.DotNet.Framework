@@ -70,6 +70,24 @@ namespace zAppDev.DotNet.Framework.Identity
             }
         }
 
+        public static string GetCurrentTimezoneId()
+        {
+            var defaultId = GetDefaultTimezone();
+            try
+            {
+                var currentUser = IdentityHelper.GetCurrentApplicationUser();
+                var id = string.IsNullOrEmpty(currentUser?.Profile?.TimezoneInfoID)
+                         ? defaultId
+                         : currentUser.Profile.TimezoneInfoID;
+                return id;
+            }
+            catch (Exception e)
+            {
+                log4net.LogManager.GetLogger(typeof(ProfileHelper)).Error("Could not get current Timezone ID", e);
+                return defaultId;
+            }
+        }
+
         public static object GetCurrentProfileTheme(string defaultThemeName = null)
         {
             if (string.IsNullOrWhiteSpace(defaultThemeName))
@@ -284,7 +302,16 @@ namespace zAppDev.DotNet.Framework.Identity
         #region Language & Theme Methods
 
         // Maybe we should place them elsewhere, but for the moment they are fine here...
-
+        
+        public static List<ApplicationTimezoneInfo> GetAvailableTimezoneInfos()
+        {
+            return TimeZoneInfo.GetSystemTimeZones().Select(x => new ApplicationTimezoneInfo { 
+                Id = x.Id,
+                DisplayName = x.DisplayName,
+                StandardName = x.StandardName,
+                BaseUtcOffset = x.BaseUtcOffset
+            }).ToList();
+        }
         public static List<ApplicationLanguage> GetAllAvailableLanguages()
         {
             var configuration = ServiceLocator.Current.GetInstance<IConfiguration>();
@@ -330,6 +357,12 @@ namespace zAppDev.DotNet.Framework.Identity
             var configuration = ServiceLocator.Current.GetInstance<IConfiguration>();
             var lang = configuration["configuration:appSettings:add:DefaultLocale:value"];
             return GetAllAvailableLanguages().Find(language => Equals(language.Id.ToString(), lang));
+        }
+
+        public static string GetDefaultTimezone()
+        {
+            var configuration = ServiceLocator.Current.GetInstance<IConfiguration>();
+            return configuration["configuration:appSettings:add:DefaultTimezoneId:value"] ?? "UTC";
         }
 
         public static ApplicationLanguage GetCurrentLanguage()

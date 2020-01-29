@@ -18,6 +18,7 @@ Licensed under the AGPL-3.0 license. See LICENSE file in the project root for fu
         </version>
         <property name="LanguageLCID" column="`LanguageLCID`" type="System.Nullable`1[[System.Int32, mscorlib]], mscorlib" not-null="false" />
         <property name="LocaleLCID" column="`LocaleLCID`" type="System.Nullable`1[[System.Int32, mscorlib]], mscorlib" not-null="false" />
+        <property name="TimezoneId" column="`TimezoneId`" type="String" not-null="false" length="100" />
         <property name="Theme" column="`Theme`" type="String" not-null="false" length="100" />
         <bag batch-size="100" name="Settings" access="field.camelcase" inverse="true" cascade="persist,merge,all-delete-orphan">
             <cache usage="read-write" region="security" />

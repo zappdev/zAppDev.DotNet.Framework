@@ -176,14 +176,15 @@ namespace zAppDev.DotNet.Framework.Mvc
             }
         }
 
-        public static string ExportList(List<ExportRecordDTO> result, ExportOptions options, int totalRows)
+        public static string ExportList(List<ExportRecordDTO> result, ExportOptions options, int totalRows,
+            Func<Document, Table, object> _pdfOvveride = null)
         {
             var link = string.Empty;
 
             switch (options.Type)
             {
                 case Type.PDF:
-                    link = ExportListToPDF(options, result, totalRows);
+                    link = ExportListToPDF(options, result, totalRows, _pdfOvveride);
                     break;
 
                 case Type.EXCEL:
@@ -400,11 +401,9 @@ namespace zAppDev.DotNet.Framework.Mvc
         
         //PM> Install-Package PdfSharp
         //license: http://www.pdfsharp.net/PDFsharp_License.ashx
-        public static string ExportListToPDF(ExportOptions opt, List<ExportRecordDTO> result, int totalRows)
+        public static string ExportListToPDF(ExportOptions opt, List<ExportRecordDTO> result, int totalRows,
+            Func<Document, Table, object> _pdfOvveride)
         {
-            Unit availableWidth;
-            Unit availableColumnWidth;
-
             var firstResult = result.First();
 
             firstResult.MarkVisibleColumns(opt);
@@ -412,7 +411,7 @@ namespace zAppDev.DotNet.Framework.Mvc
             var columns = result.First().Columns;
             var visibleColumns = columns.Where(c => c.IsVisible);
 
-            var document = InitializePDFDocument(visibleColumns.Count(), out availableWidth, out availableColumnWidth, opt.PortraitOrientation);
+            var document = InitializePDFDocument(visibleColumns.Count(), out Unit availableWidth, out Unit availableColumnWidth, opt.PortraitOrientation);
 
             //create section wrapper of table
             Section section = new Section();
@@ -476,8 +475,6 @@ namespace zAppDev.DotNet.Framework.Mvc
 
            foreach (var record in result)
             {
-
- 
                 var rowIn = table.AddRow();
                 rowCounter++;
                 rowIn.Shading.Color = rowCounter % 2 != 0
@@ -514,9 +511,20 @@ namespace zAppDev.DotNet.Framework.Mvc
 
             //Add the table to the section and the document is ready for render
             if (opt.IncludeGridLines) table.Borders.Visible = true;
-            section.Add(table);
-            PdfDocumentRenderer pdfRenderer = new PdfDocumentRenderer(true);
-            pdfRenderer.Document = document;
+
+            if (_pdfOvveride == null)
+            {
+                section.Add(table);
+            }
+            else
+            {
+                _pdfOvveride?.Invoke(document, table);
+            }
+
+            PdfDocumentRenderer pdfRenderer = new PdfDocumentRenderer(true)
+            {
+                Document = document
+            };
             pdfRenderer.RenderDocument();
 
             return CreateFileAndSendDownloadLink(opt.Filename, null, "pdf", pdfRenderer);
@@ -566,7 +574,7 @@ namespace zAppDev.DotNet.Framework.Mvc
             return f > width.Millimeter;
         }
 
-        private static MigraDoc.DocumentObjectModel.Document InitializePDFDocument(int columnNumber, out Unit availableWidth, out Unit availableColumnWidth, bool orientationPDF, bool groupmode = false, bool includeAggregateColumn = false)
+        private static Document InitializePDFDocument(int columnNumber, out Unit availableWidth, out Unit availableColumnWidth, bool orientationPDF, bool groupmode = false, bool includeAggregateColumn = false)
         {
             //create Document setup
             var document = new MigraDoc.DocumentObjectModel.Document();
@@ -655,12 +663,11 @@ namespace zAppDev.DotNet.Framework.Mvc
                         : ((double)value).ToString(formatting);
 
                 case "datetime":
-                    var result = ((DateTime)value);
+                    var result = ProceedDatetimeFields(value);
                     if (result == null) return "";
-                    result = result.ToLocalTime();
                     return culture != null
-                        ? result.ToString(formatting, culture)
-                        : result.ToString(formatting);
+                        ? result.Value.ToString(formatting, culture)
+                        : result.Value.ToString(formatting);
 
                 default:
                     return value.ToString();
@@ -679,10 +686,28 @@ namespace zAppDev.DotNet.Framework.Mvc
 
             if (column.ColumnDataType.ToLowerInvariant() == "datetime" && (column?.Value as DateTime?).HasValue)
             {
-                return (column?.Value as DateTime?)?.ToLocalTime().ToOADate().ToString() ?? "";
+                return ProceedDatetimeFields(column?.Value)?.ToLocalTime().ToOADate().ToString() ?? "";
             }
 
             return column?.Value?.ToString() ?? "";
+        }
+
+        private static DateTime? ProceedDatetimeFields(object value)
+        {
+            var result = ((DateTime)value);
+            if (result == null) return null;
+
+            switch (result.Kind)
+            {
+                case DateTimeKind.Utc:
+                    return result.ToLocalTime();
+                case DateTimeKind.Local:
+                    return result.ToLocalTime();
+                case DateTimeKind.Unspecified:
+                    return DateTime.SpecifyKind(result, DateTimeKind.Utc).ToLocalTime();
+            }
+
+            return result.ToLocalTime();
         }
 
         #endregion
