@@ -1,67 +1,58 @@
-﻿// Copyright (c) 2017 CLMS. All rights reserved.
-// Licensed under the AGPL-3.0 license. See LICENSE file in the project root for full license information.
-using System.Collections.Generic;
-using zAppDev.DotNet.Framework.Configuration;
+﻿using System.Collections.Generic;
+using System.Data.Common;
 using zAppDev.DotNet.Framework.Data.DatabaseManagers.DatabaseUtilities;
+using zAppDev.DotNet.Framework.Utilities;
 
-namespace zAppDev.DotNet.Framework.Utilities
+namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
 {
-    public class SqlHelper_
+    public class DBManager : IDatabaseManager
     {
-        public static string _GetConnectionString()
+        public virtual string ConnectionString { get; }
+        public virtual DatabaseServerType DatabaseServerType { get; }
+
+        public DBManager()
         {
-#if NETFRAMEWORK
-            return System.Configuration.ConfigurationManager.ConnectionStrings["Database"].ConnectionString;
-#else
-            var config = ConfigurationHandler.GetDatabaseSetting("Database");
-            return config.ConnectionString;
-#endif
+            ConnectionString = CommonUtilities.GetConnectionString();
         }
 
-        private static int _GetCommandTimeout(int? timeOut = null)
-        {
-            if (timeOut.HasValue && timeOut.Value > -1)
-            {
-                return timeOut.Value;
-            }
-#if NETFRAMEWORK
-            var timeoutParam = System.Configuration.ConfigurationManager.AppSettings["SQLQueryTimeoutInSeconds"];
-#else
-            var timeoutParam = ConfigurationHandler.GetAppSetting("SQLQueryTimeoutInSeconds");
-#endif
+        public virtual void UpdateApplicationSettingsTable() { }
 
-            return int.TryParse(timeoutParam, out var commandTimeout) ? commandTimeout : 30;
-        }
+        public virtual DbConnectionStringBuilder GetConnectionStringBuilder(string connectionString) { return null; }
 
-        public static List<Dictionary<string, object>> RunSqlQuery(string query, Dictionary<string, object> parameters, string connectionString)
+        public virtual string GetMasterConnectionString(ref string databaseName) { return null; }
+
+        public virtual void RemoveSchemas(NHibernate.Cfg.Configuration configuration) { }
+
+        public virtual void CreateSchemas() { }
+
+        public List<Dictionary<string, object>> RunSqlQuery(string query, Dictionary<string, object> parameters, string connectionString)
         {
             return RunSqlQuery(query, parameters, null, connectionString);
-        }
+        }//end RunSqlQuery
 
-        public static List<Dictionary<string, object>> RunSqlQuery(string query, Dictionary<string, object> parameters = null, int? timeOut = null, string connectionString = null)
+        public List<Dictionary<string, object>> RunSqlQuery(string query, Dictionary<string, object> parameters = null, int? timeOut = null, string connectionString = null)
         {
             var results = new List<Dictionary<string, object>>();
 
             if (string.IsNullOrWhiteSpace(connectionString))
             {
-                connectionString = CommonUtilities.GetConnectionString();
+                connectionString = ConnectionString;
             }
 
-            using (var conn = new System.Data.SqlClient.SqlConnection(connectionString))
+            using (var conn = this.GetDatabaseConnection(connectionString))
             {
                 conn.Open();
 
-                using (var command = new System.Data.SqlClient.SqlCommand(query, conn)
+                using (var command = this.GetDbCommand(conn, query))
                 {
-                    CommandType = System.Data.CommandType.Text,
-                    CommandTimeout = CommonUtilities.GetCommandTimeout(timeOut)
-                })
-                {
+                    command.CommandType = System.Data.CommandType.Text;
+                    command.CommandTimeout = CommonUtilities.GetCommandTimeout(timeOut);
+
                     if (parameters != null)
                     {
                         foreach (var p in parameters)
                         {
-                            command.Parameters.Add(new System.Data.SqlClient.SqlParameter(p.Key, p.Value));
+                            command.Parameters.Add(this.GetDbParameter(p.Key, p.Value));
                         }
                     }
 
@@ -84,38 +75,40 @@ namespace zAppDev.DotNet.Framework.Utilities
 
                 return results;
             }
-        }
+        }//end RunSqlQuery
 
-        public static List<T> RunSqlQuery<T>(string query, Dictionary<string, object> parameters = null, int? timeOut = null, string connectionString = null)
+        public List<T> RunSqlQuery<T>(string query, Dictionary<string, object> parameters = null, int? timeOut = null, string connectionString = null)
         {
             return new QueryResultSerializer<T>().Serialize(RunSqlQuery(query, parameters, timeOut, connectionString));
-        }
+        }//end RunSqlQuery
 
-        public static List<Dictionary<string, object>> RunStoredProcedureWithConnectionString(string procedureName, string connectionString)
+        public List<Dictionary<string, object>> RunStoredProcedure(string procedureName, string connectionString)
         {
             return RunStoredProcedure(procedureName, null, connectionString);
-        }
+        }//end RunStoredProcedure()
 
-        public static List<Dictionary<string, object>> RunStoredProcedure(string procedureName, Dictionary<string, object> parameters = null, string connectionString = null, List<string> outParams = null)
+        public List<Dictionary<string, object>> RunStoredProcedure(string procedureName, Dictionary<string, object> parameters = null, string connectionString = null, List<string> outParams = null)
         {
             var results = new List<Dictionary<string, object>>();
 
             if (string.IsNullOrWhiteSpace(connectionString))
             {
-                connectionString = CommonUtilities.GetConnectionString();
+                connectionString = ConnectionString;
             }
 
-            using (var conn = new System.Data.SqlClient.SqlConnection(connectionString))
+            using (var conn = this.GetDatabaseConnection(this.ToProcedureConnectionString(connectionString)))
             {
                 conn.Open();
 
-                using (var command = new System.Data.SqlClient.SqlCommand(procedureName, conn) { CommandType = System.Data.CommandType.StoredProcedure })
+                using (var command = this.GetDbCommand(conn, procedureName))
                 {
+                    command.CommandType = System.Data.CommandType.StoredProcedure;
+
                     if (parameters != null)
                     {
                         foreach (var p in parameters)
                         {
-                            var commandParam = new System.Data.SqlClient.SqlParameter(p.Key, p.Value);
+                            var commandParam = this.GetDbParameter(p.Key, p.Value);
                             if (outParams != null)
                             {
                                 if (outParams.Contains(p.Key))
@@ -155,6 +148,7 @@ namespace zAppDev.DotNet.Framework.Utilities
 
                 return results;
             }
-        }
-    }
+        }//end RunStoredProcedure()
+
+    }//end MSSQLManager
 }

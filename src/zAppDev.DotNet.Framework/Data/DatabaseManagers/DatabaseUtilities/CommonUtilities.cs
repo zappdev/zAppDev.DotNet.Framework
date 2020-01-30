@@ -1,6 +1,9 @@
 ﻿using MySql.Data.MySqlClient;
+using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
+using zAppDev.DotNet.Framework.Configuration;
+
 
 namespace zAppDev.DotNet.Framework.Data.DatabaseManagers.DatabaseUtilities
 {
@@ -26,7 +29,6 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers.DatabaseUtilities
             }
         }//end GetDatabaseServerTypeFromConfiguration()
 
-
         public static IDatabaseManager CreateDatabaseManager()
         {
             var databaseServerType = GetDatabaseServerTypeFromConfiguration();
@@ -46,40 +48,6 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers.DatabaseUtilities
             }
         }//end CreateDatabaseManager()
 
-        public static DbCommand GetDbCommand(IDatabaseManager databaseManager, string command)
-        {
-            switch (databaseManager.DatabaseServerType)
-            {
-                case DatabaseServerType.MSSQL:
-                    return new SqlCommand(command);
-                case DatabaseServerType.MariaDB:
-                    return new MySqlCommand(command);
-                default:
-                    return null;
-            }
-        }//end GetDbCommand()
-
-        public static DbCommand GetDbCommand(DbConnection connection, DbTransaction transaction = null)
-        {
-            DbCommand command = connection.CreateCommand();
-            command.Connection = connection;
-            if (transaction != null) command.Transaction = transaction;
-            return command;
-        }//end GetDbCommand()
-
-        public static DbCommand GetDbCommand(IDatabaseManager databaseManager, DbConnection dbConnection, string command)
-        {
-            switch (databaseManager.DatabaseServerType)
-            {
-                case DatabaseServerType.MSSQL:
-                    return new SqlCommand(command, dbConnection as SqlConnection);
-                case DatabaseServerType.MariaDB:
-                    return new MySqlCommand(command, dbConnection as MySqlConnection);
-                default:
-                    return null;
-            }
-        }//end GetDbCommand()
-
         public static bool ReadCommandGetIsTrue(DbCommand command)
         {
             using (var reader = command.ExecuteReader())
@@ -92,20 +60,31 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers.DatabaseUtilities
             return false;
         }
 
-
-
-        public static DbConnection GetDatabaseConnection(IDatabaseManager databaseManager, string connectionString)
+        public static string GetConnectionString()
         {
-            switch (databaseManager.DatabaseServerType)
+
+#if NETFRAMEWORK
+            return System.Configuration.ConfigurationManager.ConnectionStrings["Database"].ConnectionString;
+#else
+            var config = ConfigurationHandler.GetDatabaseSetting("Database");
+            return config.ConnectionString;
+#endif
+        }
+
+        public static int GetCommandTimeout(int? timeOut = null)
+        {
+            if (timeOut.HasValue && timeOut.Value > -1)
             {
-                case DatabaseServerType.MSSQL:
-                    return new SqlConnection(connectionString);
-                case DatabaseServerType.MariaDB:
-                    return new MySqlConnection(connectionString);
-                default:
-                    return null;
+                return timeOut.Value;
             }
-        }//end GetDatabaseConnection()
+#if NETFRAMEWORK
+            var timeoutParam = System.Configuration.ConfigurationManager.AppSettings["SQLQueryTimeoutInSeconds"];
+#else
+            var timeoutParam = ConfigurationHandler.GetAppSetting("SQLQueryTimeoutInSeconds");
+#endif
+
+            return int.TryParse(timeoutParam, out var commandTimeout) ? commandTimeout : 30;
+        }
 
     }//end class
 }//end namespace

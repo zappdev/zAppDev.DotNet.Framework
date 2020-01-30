@@ -45,7 +45,7 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers.AccessLogManager
 
                 try
                 {
-                    using (var command = CommonUtilities.GetDbCommand(connection, transaction))
+                    using (var command = (new MariaDBManager()).GetDbCommand(connection, transaction))
                     {
                         command.CommandType = CommandType.Text;
                         command.CommandTimeout = 600;

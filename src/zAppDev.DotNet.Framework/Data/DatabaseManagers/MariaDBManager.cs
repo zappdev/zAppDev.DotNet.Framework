@@ -1,21 +1,19 @@
-﻿using log4net;
-using MySql.Data.MySqlClient;
-using System.Configuration;
+﻿using MySql.Data.MySqlClient;
 using System.Data.Common;
 using zAppDev.DotNet.Framework.Data.DatabaseManagers.AccessLogManager;
 
 namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
 {
-    public class MariaDBManager : IDatabaseManager
+    public class MariaDBManager : DBManager
     {
-        public DatabaseServerType DatabaseServerType { get; }
+        public override DatabaseServerType DatabaseServerType { get; }
 
-        public MariaDBManager()
+        public MariaDBManager():base()
         {
             DatabaseServerType = DatabaseServerType.MariaDB;
         }
 
-        public void UpdateApplicationSettingsTable()
+        public override void UpdateApplicationSettingsTable()
         {
             var disableAccessLogValue = AccessLogManagerUtilities.GetDisableAccessLogValue();
             if (!disableAccessLogValue.HasValue)
@@ -27,14 +25,14 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
             accessLogManager.Run();
         }
 
-        public DbConnectionStringBuilder GetConnectionStringBuilder(string connectionString)
+        public override DbConnectionStringBuilder GetConnectionStringBuilder(string connectionString)
         {
             return new MySqlConnectionStringBuilder(connectionString);
         }
 
-        public string GetMasterConnectionString(ref string databaseName)
+        public override string GetMasterConnectionString(ref string databaseName)
         {
-            var connectionString = ConfigurationManager.ConnectionStrings["Database"]?.ConnectionString;
+            var connectionString = ConnectionString;
 
             var sqlConnectionStringBuilder = GetConnectionStringBuilder(connectionString) as MySqlConnectionStringBuilder;
 
@@ -50,7 +48,7 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
             return sqlConnectionStringBuilder.ConnectionString;
         }
 
-        public void RemoveSchemas(NHibernate.Cfg.Configuration configuration)
+        public override void RemoveSchemas(NHibernate.Cfg.Configuration configuration)
         {
             foreach (var clsMapping in configuration.ClassMappings)
             {
@@ -79,7 +77,7 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
             }
         }
 
-        public void CreateSchemas()
+        public override void CreateSchemas()
         {
             return;
         }

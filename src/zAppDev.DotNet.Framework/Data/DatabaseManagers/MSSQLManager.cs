@@ -1,22 +1,19 @@
-﻿using System.Configuration;
-using System.Data.Common;
+﻿using System.Data.Common;
 using System.Data.SqlClient;
-using log4net;
-using NHibernate.Cfg;
 using zAppDev.DotNet.Framework.Data.DatabaseManagers.AccessLogManager;
 
 namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
 {
-    public class MSSQLManager : IDatabaseManager
+    public class MSSQLManager : DBManager
     {
-        public DatabaseServerType DatabaseServerType { get; }
+        public override DatabaseServerType DatabaseServerType { get; }
 
-        public MSSQLManager()
+        public MSSQLManager(): base()
         {
             DatabaseServerType = DatabaseServerType.MSSQL;
         }
 
-        public void UpdateApplicationSettingsTable()
+        public override void UpdateApplicationSettingsTable()
         {
             var disableAccessLogValue = AccessLogManagerUtilities.GetDisableAccessLogValue();
             if (!disableAccessLogValue.HasValue)
@@ -28,14 +25,14 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
             accessLogManager.Run();
         }
 
-        public DbConnectionStringBuilder GetConnectionStringBuilder(string connectionString)
+        public override DbConnectionStringBuilder GetConnectionStringBuilder(string connectionString)
         {
             return new SqlConnectionStringBuilder(connectionString);
         }
 
-        public string GetMasterConnectionString(ref string databaseName)
+        public override string GetMasterConnectionString(ref string databaseName)
         {
-            var connectionString = ConfigurationManager.ConnectionStrings["Database"]?.ConnectionString;
+            var connectionString = ConnectionString;
 
             var sqlConnectionStringBuilder = GetConnectionStringBuilder(connectionString) as SqlConnectionStringBuilder;
 
@@ -51,16 +48,12 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
             return sqlConnectionStringBuilder.ConnectionString;
         }
 
-        public void RemoveSchemas(NHibernate.Cfg.Configuration configuration)
-        {
-            return;
-        }
-
-        public void CreateSchemas()
+        public override void CreateSchemas()
         {
             MiniSessionManager.ExecuteScript(@"IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'wf') EXEC('CREATE SCHEMA wf AUTHORIZATION [dbo]');
                                 IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'security') EXEC('CREATE SCHEMA security AUTHORIZATION [dbo]');
                                 IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'audit') EXEC('CREATE SCHEMA audit AUTHORIZATION [dbo]');");
         }
-    }
+
+    }//end MSSQLManager
 }
