@@ -345,7 +345,7 @@ namespace zAppDev.DotNet.Framework.Identity
                 o.ReturnUrlParameter = "returnUrl";
                 o.LogoutPath = new PathString("/Login/Logout");
                 o.AccessDeniedPath = new PathString("/Unauthorized/Render");
-                o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                o.ExpireTimeSpan = TimeSpan.FromMinutes(15);
                 o.SlidingExpiration = true;
                 o.Events = new CookieAuthenticationEvents
                 {
@@ -355,7 +355,8 @@ namespace zAppDev.DotNet.Framework.Identity
             .AddCookie(IdentityConstants.ExternalScheme, o =>
             {
                 o.Cookie.Name = IdentityConstants.ExternalScheme;
-                o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                o.SlidingExpiration = true;
+                o.ExpireTimeSpan = TimeSpan.FromMinutes(15);
             })
             .AddCookie(IdentityConstants.TwoFactorRememberMeScheme, o =>
             {
@@ -368,7 +369,8 @@ namespace zAppDev.DotNet.Framework.Identity
             .AddCookie(IdentityConstants.TwoFactorUserIdScheme, o =>
             {
                 o.Cookie.Name = IdentityConstants.TwoFactorUserIdScheme;
-                o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                o.ExpireTimeSpan = TimeSpan.FromMinutes(15);
+                o.SlidingExpiration = true;
             });
 
             // Hosting doesn't add IHttpContextAccessor by default
