@@ -3,7 +3,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Drawing;
+using System.Numerics;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Png;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.Primitives;
+using SixLabors.Shapes;
+using Path = System.IO.Path;
 
 namespace zAppDev.DotNet.Framework.Mvc
 {
@@ -67,12 +74,15 @@ namespace zAppDev.DotNet.Framework.Mvc
 
             private static Image GetThumbnailImage(Image image, int w, int h)
             {
-                return image.GetThumbnailImage(w, h, () => false, IntPtr.Zero);
+                image.Mutate(x => x
+                     .Resize(w, h));
+                return image;
+                //return image.GetThumbnailImage(w, h, () => false, IntPtr.Zero);
             }
 
             private static string SaveThumbnailAndGetFullPath(string originalImagePath, int w, int h)
             {
-                var image = Image.FromFile(originalImagePath);
+                var image = Image.Load(originalImagePath);
                 
                 if (w == 0 && h == 0)
                 {
@@ -106,7 +116,9 @@ namespace zAppDev.DotNet.Framework.Mvc
 
                 var thumbnail = GetThumbnailImage(image, w, h);
                 var tempFilename = Path.GetTempFileName();
-                thumbnail.Save(tempFilename);
+                thumbnail.Save(tempFilename, new PngEncoder() {
+                    
+                });
 
                 _logger.Debug($"Thumbnail created in path: [{tempFilename}], width: [{w}], height: [{h}], original image path: [{originalImagePath}]");
 
