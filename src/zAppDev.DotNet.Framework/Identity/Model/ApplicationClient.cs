@@ -49,7 +49,7 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         [DataMember(Name="ConnectedOn")]
         protected DateTime? connectedOn;
         [DataMember(Name="VersionTimestamp")]
-        protected byte[] versionTimestamp;
+        protected int? versionTimestamp;
 
         #endregion
         #region ApplicationClient's Properties
@@ -139,7 +139,7 @@ namespace zAppDev.DotNet.Framework.Identity.Model
 ///Provides concurrency control for the class
 /// </summary>
 ///
-        public virtual byte[] VersionTimestamp
+        public virtual int? VersionTimestamp
         {
             get
             {

@@ -72,7 +72,7 @@ namespace zAppDev.DotNet.Framework.Auditing.Model
         /// </summary>
         ///
         [DataMember(Name = "VersionTimestamp")]
-        public virtual byte[] VersionTimestamp { get; set; }
+        public virtual int? VersionTimestamp { get; set; }
 
         [DataMember(Name = "Properties")]
         protected IList<AuditPropertyConfiguration> properties = new List<AuditPropertyConfiguration>();

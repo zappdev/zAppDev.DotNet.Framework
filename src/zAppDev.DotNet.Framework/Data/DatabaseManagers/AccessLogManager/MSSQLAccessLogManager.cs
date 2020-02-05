@@ -1,62 +1,39 @@
-﻿// Copyright (c) 2017 CLMS. All rights reserved.
+﻿// Copyright (c) 2020 CLMS. All rights reserved.
 // Licensed under the AGPL-3.0 license. See LICENSE file in the project root for full license information.
 using log4net;
 using System;
-using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using zAppDev.DotNet.Framework.Data.DatabaseManagers;
-using zAppDev.DotNet.Framework.Utilities;
 
-namespace zAppDev.DotNet.Framework.Mvc
+namespace zAppDev.DotNet.Framework.Data.DatabaseManagers.AccessLogManager
 {
-    public class AccessLogManager
+    public class MSSQLAccessLogManager : IAccessLogManager
     {
         private bool DoDisable { get; set; }
         private readonly string _applicationSettingsKey = "OperationAccessLog";
+        private readonly string _connectionString;
+        private readonly string _databaseName;
 
         private readonly ILog _logger;
 
-        public AccessLogManager()
+        public MSSQLAccessLogManager(IDatabaseManager databaseManager, bool doDisable)
         {
             _logger = LogManager.GetLogger(this.GetType());
+            _connectionString = databaseManager.GetMasterConnectionString(ref _databaseName);
+            DoDisable = doDisable;
         }
 
         public void Run()
         {
-            var setting = ConfigurationManager.AppSettings["DisableAccessLog"];
-            if (string.IsNullOrWhiteSpace(setting))
+            if (string.IsNullOrWhiteSpace(_connectionString))
             {
-                _logger.Warn("No {DisableAccessLog} found in configuration. Will not enable/disable the Access Log");
-                return;
-            }
-
-            if(!bool.TryParse(setting, out var doDisable))
-            {
-                _logger.Warn("The value of {DisableAccessLog} is incorrect. The Access Log will be Enabled, by default");
-            }
-
-            this.DoDisable = doDisable;
-
-            UpdateApplicationSettingsTable();
-        }//end Run()
-
-        private void UpdateApplicationSettingsTable()
-        {
-            var databaseName = "";
-
-            var databaseManager = ServiceLocator.Current.GetInstance<IDatabaseManager>();
-            var connectionString = databaseManager.GetMasterConnectionString(ref databaseName);
-
-            if (string.IsNullOrWhiteSpace(connectionString))
-            {
-                _logger.Error($@"Failed to get the Connection String from the web.config of the Application, in order to update the [{databaseName}].[security].[ApplicationSettings] table.
+                _logger.Error($@"Failed to get the Connection String from the web.config of the Application, in order to update the [{_databaseName}].[security].[ApplicationSettings] table.
                                  The Access Log configuration will remain unchanged.");
                 return;
             }
 
             //Queen-MariaDB TODO
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 connection.Open();
 
@@ -67,7 +44,7 @@ namespace zAppDev.DotNet.Framework.Mvc
                     command.CommandType = CommandType.Text;
                     command.CommandTimeout = 600;
 
-                    var table = $"[{databaseName}].[security].[ApplicationSettings]";
+                    var table = $"[{_databaseName}].[security].[ApplicationSettings]";
                     var value = DoDisable ? 0 : 1;
 
                     try
@@ -105,7 +82,7 @@ namespace zAppDev.DotNet.Framework.Mvc
                     catch (Exception ex)
                     {
                         _logger.Error(
-                            $@"Caught a [{ex.GetType()}] Exception while updating the [{databaseName}].[security].[ApplicationSettings] table.
+                            $@"Caught a [{ex.GetType()}] Exception while updating the [{_databaseName}].[security].[ApplicationSettings] table.
                            The Access Log configuration will remain unchanged. 
                            Exception: {ex.Message}"
                         );
@@ -114,4 +91,5 @@ namespace zAppDev.DotNet.Framework.Mvc
             }
         }//end UpdateApplicationSettingsTable()
     }//end AccessLogManager()
-}//end namespace
+}
+

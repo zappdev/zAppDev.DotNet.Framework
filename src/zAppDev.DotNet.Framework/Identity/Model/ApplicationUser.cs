@@ -64,7 +64,7 @@ namespace zAppDev.DotNet.Framework.Identity.Model
         [DataMember(Name="LockoutEndDate")]
         protected DateTime? lockoutEndDate;
         [DataMember(Name="VersionTimestamp")]
-        protected byte[] versionTimestamp;
+        protected int? versionTimestamp;
 
 #pragma warning disable 0649
         private bool disableInternalAdditions;
@@ -264,12 +264,12 @@ namespace zAppDev.DotNet.Framework.Identity.Model
                 lockoutEndDate = value;
             }
         }
-/// <summary>
-/// The VersionTimestamp property
-///Provides concurrency control for the class
-/// </summary>
-///
-        public virtual byte[] VersionTimestamp
+        /// <summary>
+        /// The VersionTimestamp property
+        ///Provides concurrency control for the class
+        /// </summary>
+        ///
+        public virtual int? VersionTimestamp
         {
             get
             {
@@ -905,9 +905,9 @@ namespace zAppDev.DotNet.Framework.Identity.Model
             {
                 __errors.Add("String 'UserName' cannot be empty.");
             }
-            if (UserName != null && UserName.Length > 256)
+            if (UserName != null && UserName.Length > 255)
             {
-                __errors.Add("Length of property 'UserName' cannot be greater than 256.");
+                __errors.Add("Length of property 'UserName' cannot be greater than 255.");
             }
             if (PasswordHash != null && PasswordHash.Length > 2147483647)
             {

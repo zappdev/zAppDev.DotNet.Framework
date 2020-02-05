@@ -37,7 +37,7 @@ namespace zAppDev.DotNet.Framework.Auditing.Model
         }
 
         [DataMember(Name="VersionTimestamp")]
-        protected byte[] versionTimestamp;
+        protected int? versionTimestamp;
         
         /// <summary>
         /// The Id property
@@ -70,7 +70,7 @@ namespace zAppDev.DotNet.Framework.Auditing.Model
         /// </summary>
         ///
         [DataMember(Name = "VersionTimestamp")]
-        public virtual byte[] VersionTimestamp { get; set; }
+        public virtual int? VersionTimestamp { get; set; }
         
         
         /// <summary>

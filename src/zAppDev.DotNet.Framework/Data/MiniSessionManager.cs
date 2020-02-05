@@ -10,6 +10,8 @@ using log4net;
 using NHibernate;
 using NHibernate.Cfg;
 using zAppDev.DotNet.Framework.Data.DAL;
+using NHibernate.Cfg.MappingSchema;
+using zAppDev.DotNet.Framework.Data.DatabaseManagers;
 using System.Collections.Generic;
 
 #if NETFRAMEWORK
@@ -61,13 +63,13 @@ namespace zAppDev.DotNet.Framework.Data
         private static ISessionFactory BuildSessionFactory()
         {
             _config = new NHibernate.Cfg.Configuration();
+
             var hibernateConfig = "hibernate.cfg.xml";
             //if not rooted, assume path from base directory
             if (System.IO.Path.IsPathRooted(hibernateConfig) == false)
                 hibernateConfig = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, hibernateConfig);
             if (System.IO.File.Exists(hibernateConfig))
 			{
-                //_config.Configure(new System.Xml.XmlTextReader(hibernateConfig));
 				using (var xmlTextReader = new System.Xml.XmlTextReader(hibernateConfig))
                 {
                     _config.Configure(xmlTextReader);
@@ -78,26 +80,32 @@ namespace zAppDev.DotNet.Framework.Data
                 // Look for config section in web.config
                 _config.Configure();
             }
+
+            ServiceLocator.Current.GetInstance<IDatabaseManager>().RemoveSchemas(_config);
+
             var factory = _config.BuildSessionFactory();
+
             //UpdateDatabaseSchema(_config);
 
             ObjectGraphWalker.Initialize(_config);
 
             return factory;
         }
-
+ 
         private static void UpdateDatabaseSchema(NHibernate.Cfg.Configuration cfg)
         {
-            ExecuteScript(@"IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'wf') EXEC('CREATE SCHEMA wf AUTHORIZATION [dbo]');
-                    IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'security') EXEC('CREATE SCHEMA security AUTHORIZATION [dbo]');
-					IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = N'audit') EXEC('CREATE SCHEMA audit AUTHORIZATION [dbo]');");
+            ServiceLocator.Current.GetInstance<IDatabaseManager>().CreateSchemas();
+
             var schemaUpdate = new NHibernate.Tool.hbm2ddl.SchemaUpdate(cfg);
             var updateCode = new System.Text.StringBuilder();
+
             schemaUpdate.Execute(row =>
             {
                 updateCode.AppendLine(row);
                 updateCode.AppendLine();
             }, true);
+
+
             UpdateDbScript = updateCode.ToString();
             UpdateDbErrors = string.Join("\n", schemaUpdate.Exceptions.Select(e => e.Message));
             DatabaseUpdateExecutedInRequest = true;
