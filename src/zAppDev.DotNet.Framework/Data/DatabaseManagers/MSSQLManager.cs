@@ -1,4 +1,5 @@
-﻿using System.Data.Common;
+﻿using Microsoft.Extensions.Configuration;
+using System.Data.Common;
 using System.Data.SqlClient;
 using zAppDev.DotNet.Framework.Data.DatabaseManagers.AccessLogManager;
 
@@ -8,10 +9,18 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
     {
         public override DatabaseServerType DatabaseServerType { get; }
 
+
+#if NETFRAMEWORK
         public MSSQLManager(): base()
         {
             DatabaseServerType = DatabaseServerType.MSSQL;
         }
+#else
+        public MSSQLManager(IConfiguration configuration) : base(configuration)
+        {
+            DatabaseServerType = DatabaseServerType.MSSQL;
+        }
+#endif	
 
         public override void UpdateApplicationSettingsTable()
         {

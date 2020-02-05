@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Microsoft.Extensions.Configuration;
+using MySql.Data.MySqlClient;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
@@ -11,14 +12,18 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers.DatabaseUtilities
     {
         private static readonly DatabaseServerType _defaultDatabaseServerType = DatabaseServerType.MSSQL;
 
-        public static DatabaseServerType GetDatabaseServerTypeFromConfiguration()
+        public static DatabaseServerType GetDatabaseServerTypeFromConfiguration(IConfiguration configuration = null)
         {
-            var configuration = System.Configuration.ConfigurationManager.AppSettings["DatabaseServerType"];
-            if (string.IsNullOrEmpty(configuration)) return _defaultDatabaseServerType;
+#if NETFRAMEWORK
+            var dbServerType = System.Configuration.ConfigurationManager.AppSettings["DatabaseServerType"];
+#else
+            var dbServerType = configuration["configuration:appSettings:add:DatabaseServerType:value"];
+#endif
+            if (string.IsNullOrEmpty(dbServerType)) return _defaultDatabaseServerType;
 
-            configuration = configuration.Trim().ToLower();
+            dbServerType = dbServerType.Trim().ToLower();
 
-            switch (configuration)
+            switch (dbServerType)
             {
                 case "mssql":
                     return DatabaseServerType.MSSQL;
@@ -28,6 +33,10 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers.DatabaseUtilities
                     return _defaultDatabaseServerType;
             }
         }//end GetDatabaseServerTypeFromConfiguration()
+
+
+
+#if NETFRAMEWORK
 
         public static IDatabaseManager CreateDatabaseManager()
         {
@@ -47,6 +56,28 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers.DatabaseUtilities
                     return null;
             }
         }//end CreateDatabaseManager()
+#else
+        public static IDatabaseManager CreateDatabaseManager(IConfiguration configuration)
+        {
+            var databaseServerType = GetDatabaseServerTypeFromConfiguration(configuration);
+            return CreateDatabaseManager(databaseServerType, configuration);
+        }//end CreateDatabaseManager()
+
+        public static IDatabaseManager CreateDatabaseManager(DatabaseServerType databaseServerType, IConfiguration configuration)
+        {
+            switch (databaseServerType)
+            {
+                case DatabaseServerType.MSSQL:
+                    return new MSSQLManager(configuration);
+                case DatabaseServerType.MariaDB:
+                    return new MariaDBManager(configuration);
+                default:
+                    return null;
+            }
+        }//end CreateDatabaseManager()
+#endif	
+
+
 
         public static bool ReadCommandGetIsTrue(DbCommand command)
         {
@@ -60,14 +91,13 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers.DatabaseUtilities
             return false;
         }
 
-        public static string GetConnectionString()
+        public static string GetConnectionString(IConfiguration configuration = null)
         {
 
 #if NETFRAMEWORK
             return System.Configuration.ConfigurationManager.ConnectionStrings["Database"].ConnectionString;
 #else
-            var config = ConfigurationHandler.GetDatabaseSetting("Database");
-            return config.ConnectionString;
+            return configuration[$"configuration:connectionStrings:add:Database:connectionString"];
 #endif
         }
 

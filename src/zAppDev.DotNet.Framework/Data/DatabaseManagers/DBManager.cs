@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 using System.Data.Common;
 using zAppDev.DotNet.Framework.Data.DatabaseManagers.DatabaseUtilities;
 using zAppDev.DotNet.Framework.Utilities;
@@ -10,10 +11,23 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
         public virtual string ConnectionString { get; }
         public virtual DatabaseServerType DatabaseServerType { get; }
 
+#if NETFRAMEWORK
         public DBManager()
         {
             ConnectionString = CommonUtilities.GetConnectionString();
         }
+#else
+        private readonly IConfiguration _configuration;
+
+        public DBManager(IConfiguration configuration)
+        {
+            _configuration = configuration;
+            ConnectionString = CommonUtilities.GetConnectionString(_configuration);
+        }
+#endif
+
+
+
 
         public virtual void UpdateApplicationSettingsTable() { }
 

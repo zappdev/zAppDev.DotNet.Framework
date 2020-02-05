@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using Microsoft.Extensions.Configuration;
+using MySql.Data.MySqlClient;
 using System.Data.Common;
 using zAppDev.DotNet.Framework.Data.DatabaseManagers.AccessLogManager;
 
@@ -8,13 +9,23 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
     {
         public override DatabaseServerType DatabaseServerType { get; }
 
+#if NETFRAMEWORK
         public MariaDBManager():base()
         {
             DatabaseServerType = DatabaseServerType.MariaDB;
         }
+#else
+        public MariaDBManager(IConfiguration configuration = null) : base(configuration)
+        {
+            DatabaseServerType = DatabaseServerType.MariaDB;
+        }
+#endif	
+
+
 
         public override void UpdateApplicationSettingsTable()
         {
+            return;
             var disableAccessLogValue = AccessLogManagerUtilities.GetDisableAccessLogValue();
             if (!disableAccessLogValue.HasValue)
             {
@@ -32,9 +43,7 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
 
         public override string GetMasterConnectionString(ref string databaseName)
         {
-            var connectionString = ConnectionString;
-
-            var sqlConnectionStringBuilder = GetConnectionStringBuilder(connectionString) as MySqlConnectionStringBuilder;
+            var sqlConnectionStringBuilder = GetConnectionStringBuilder(ConnectionString) as MySqlConnectionStringBuilder;
 
             databaseName = sqlConnectionStringBuilder.Database;
 
