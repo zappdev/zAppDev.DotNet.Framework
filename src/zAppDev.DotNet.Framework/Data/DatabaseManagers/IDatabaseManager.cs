@@ -6,6 +6,7 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
 {
     public enum DatabaseServerType
     {
+        Sqlite,
         MSSQL,
         MariaDB
     }

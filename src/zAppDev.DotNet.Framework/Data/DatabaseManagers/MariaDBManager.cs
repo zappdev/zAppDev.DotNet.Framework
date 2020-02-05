@@ -21,8 +21,6 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
         }
 #endif	
 
-
-
         public override void UpdateApplicationSettingsTable()
         {
             return;
