@@ -409,9 +409,9 @@ namespace zAppDev.DotNet.Framework.Data
             }
         }
 
-        public static void ExecuteInUoW(Action<MiniSessionService> action)
+        public static void ExecuteInUoW(Action<MiniSessionService> action, ISessionFactory factory = null)
         {
-            var factory = ServiceLocator.Current.GetInstance<ISessionFactory>();
+            factory = factory ?? ServiceLocator.Current.GetInstance<ISessionFactory>();
             using (var manager = new MiniSessionService(factory))
             {
                 manager.OpenSessionWithTransaction();
