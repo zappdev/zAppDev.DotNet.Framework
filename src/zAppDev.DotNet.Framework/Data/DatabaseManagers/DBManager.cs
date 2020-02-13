@@ -164,5 +164,9 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
             }
         }//end RunStoredProcedure()
 
+        public DatabaseServerType GetDatabaseServerType()
+        {
+            return DatabaseServerType;
+        }
     }//end MSSQLManager
 }

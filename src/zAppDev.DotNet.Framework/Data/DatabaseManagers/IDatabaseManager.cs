@@ -6,7 +6,7 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
 {
     public enum DatabaseServerType
     {
-        Sqlite,
+        SQLite,
         MSSQL,
         MariaDB
     }
@@ -23,6 +23,8 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
         void RemoveSchemas(NHibernate.Cfg.Configuration configuration);
         void UpdateApplicationSettingsTable();
         void CreateSchemas();
+
+        DatabaseServerType GetDatabaseServerType();
 
         List<Dictionary<string, object>> RunSqlQuery(string query, Dictionary<string, object> parameters, string connectionString);
         List<Dictionary<string, object>> RunSqlQuery(string query, Dictionary<string, object> parameters = null, int? timeOut = null, string connectionString = null);
