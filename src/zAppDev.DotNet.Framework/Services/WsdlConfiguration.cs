@@ -40,30 +40,30 @@ namespace zAppDev.DotNet.Framework.Services
             };
 
             var value = _configuration[$"{bindingTargetBasePath}:sendTimeout"];
-            if (string.IsNullOrEmpty(value))
+            if (!string.IsNullOrEmpty(value))
                 binding.SendTimeout = TimeSpan.Parse(value);
 
             value = _configuration[$"{bindingTargetBasePath}:receiveTimeout"];
-            if (string.IsNullOrEmpty(value))
+            if (!string.IsNullOrEmpty(value))
                 binding.ReceiveTimeout = TimeSpan.Parse(value);
 
             value = _configuration[$"{bindingTargetBasePath}:closeTimeout"];
-            if (string.IsNullOrEmpty(value))
+            if (!string.IsNullOrEmpty(value))
                 binding.SendTimeout = TimeSpan.Parse(value);
 
             value = _configuration[$"{bindingTargetBasePath}:openTimeout"];
-            if (string.IsNullOrEmpty(value))
+            if (!string.IsNullOrEmpty(value))
                 binding.SendTimeout = TimeSpan.Parse(value);
 
             value = _configuration[$"{bindingTargetBasePath}:allowCookies"];
-            if (string.IsNullOrEmpty(value))
+            if (!string.IsNullOrEmpty(value))
             {
                 bool.TryParse(value, out var result);
                 binding.AllowCookies = result;
             }
 
             value = _configuration[$"{bindingTargetBasePath}:useDefaultWebProxy"];
-            if (string.IsNullOrEmpty(value))
+            if (!string.IsNullOrEmpty(value))
             {
                 bool.TryParse(value, out var result);
                 binding.UseDefaultWebProxy = result;
