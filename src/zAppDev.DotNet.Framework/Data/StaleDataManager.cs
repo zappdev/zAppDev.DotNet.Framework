@@ -74,27 +74,33 @@ namespace zAppDev.DotNet.Framework.Data
             try
             {
                 bool isStale = false;
-                MiniSessionManager.ExecuteInUoW(manager =>
+
+
+#if NETFRAMEWORK
+                var miniSessionManager = MiniSessionManager.InstanceSafe;
+#else
+                var miniSessionManager = ServiceLocator.Current.GetInstance<IMiniSessionService>();
+#endif
+                
+                var entityInfo = GetEntityInfo(miniSessionManager, domainModelClass);
+                if (!entityInfo.IsVersioned)
                 {
-                    var entityInfo = GetEntityInfo(manager, domainModelClass);
-                    if (!entityInfo.IsVersioned)
-                    {
-                        return;
-                    }
-                    _entityName = entityInfo.EntityType.Name;
-                    var tableName = entityInfo.ClassMetaData.RootTableName;
-                    string _entityID = entityInfo.ClassMetaData.IdentifierPropertyName;
-                    _identifier = (domainModelClass.GetType().GetProperty(_entityID)).GetValue(domainModelClass, null);
-                    string currentTimestampString = (domainModelClass.GetType().GetProperty("VersionTimestamp")).GetValue(domainModelClass, null)?.ToString();
-                    int currentTimestamp = 0;
-                    if (int.TryParse(currentTimestampString, out int cts))
-                    {
-                        currentTimestamp = cts;
-                    }
-                    var sql = $"select 1 from {tableName} where {_entityID} = :idValue and VersionTimestamp > :currentTimestamp";
-                    var sqlQuery = manager.Session.CreateSQLQuery(sql).SetParameter("idValue", _identifier).SetParameter("currentTimestamp", currentTimestamp);
-                    isStale = sqlQuery.List().Count > 0;
-                });
+                    return false;
+                }
+                _entityName = entityInfo.EntityType.Name;
+                var tableName = entityInfo.ClassMetaData.RootTableName;
+                string _entityID = entityInfo.ClassMetaData.IdentifierPropertyName;
+                _identifier = (domainModelClass.GetType().GetProperty(_entityID)).GetValue(domainModelClass, null);
+                string currentTimestampString = (domainModelClass.GetType().GetProperty("VersionTimestamp")).GetValue(domainModelClass, null)?.ToString();
+                int currentTimestamp = 0;
+                if (int.TryParse(currentTimestampString, out int cts))
+                {
+                    currentTimestamp = cts;
+                }
+                var sql = $"select 1 from {tableName} where {_entityID} = :idValue and VersionTimestamp > :currentTimestamp";
+                var sqlQuery = miniSessionManager.Session.CreateSQLQuery(sql).SetParameter("idValue", _identifier).SetParameter("currentTimestamp", currentTimestamp);
+                isStale = sqlQuery.List().Count > 0;
+
                 entityName = _entityName;
                 identifier = _identifier;
                 return isStale;
