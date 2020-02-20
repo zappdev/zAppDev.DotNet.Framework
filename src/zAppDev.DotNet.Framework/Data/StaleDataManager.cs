@@ -3,6 +3,7 @@
 using log4net;
 using NHibernate.Persister.Entity;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using zAppDev.DotNet.Framework.Utilities;
 
@@ -27,13 +28,20 @@ namespace zAppDev.DotNet.Framework.Data
                 get;
                 set;
             }
+
+            public Domain.IDomainModelClass DomainModelClass
+            {
+                get;
+                set;
+            }
         }
 
-        private static Dictionary<Domain.IDomainModelClass, EntityInfo> entityInfos = new Dictionary<Domain.IDomainModelClass, EntityInfo>();
+        private static ConcurrentDictionary<string, EntityInfo> entityInfos = new ConcurrentDictionary<string, EntityInfo>();
 
         private static bool MustCheck(Domain.IDomainModelClass cls)
         {
-            if (entityInfos.ContainsKey(cls) && !entityInfos[cls].IsVersioned)
+            var domainModelClassTypeFullName = cls.GetType().FullName;
+            if (entityInfos.ContainsKey(domainModelClassTypeFullName) && !entityInfos[domainModelClassTypeFullName].IsVersioned)
             {
                 return false;
             }
@@ -47,9 +55,10 @@ namespace zAppDev.DotNet.Framework.Data
 #endif
         {
             EntityInfo entityInfo;
-            if (entityInfos.ContainsKey(domainModelClass))
+            var domainModelClassType = domainModelClass.GetType();
+            if (entityInfos.ContainsKey(domainModelClassType.FullName))
             {
-                entityInfo = entityInfos[domainModelClass];
+                entityInfo = entityInfos[domainModelClassType.FullName];
             }
             else
             {
@@ -57,7 +66,8 @@ namespace zAppDev.DotNet.Framework.Data
                 entityInfo.EntityType = domainModelClass.GetType();
                 entityInfo.ClassMetaData = ((AbstractEntityPersister)manager.Session.SessionFactory.GetAllClassMetadata()[entityInfo.EntityType.FullName]);
                 entityInfo.IsVersioned = entityInfo.ClassMetaData?.IsVersioned == true && entityInfo.ClassMetaData?.VersionType?.Name == "Int32";
-                entityInfos.Add(domainModelClass, entityInfo);
+                entityInfo.DomainModelClass = domainModelClass;
+                entityInfos.TryAdd(domainModelClassType.FullName, entityInfo);
             }
             return entityInfo;
         }
