@@ -4,6 +4,7 @@ using log4net;
 using NHibernate.Persister.Entity;
 using System;
 using System.Collections.Generic;
+using zAppDev.DotNet.Framework.Utilities;
 
 namespace zAppDev.DotNet.Framework.Data
 {
@@ -42,7 +43,7 @@ namespace zAppDev.DotNet.Framework.Data
 #if NETFRAMEWORK
         private static EntityInfo GetEntityInfo(MiniSessionManager manager, Domain.IDomainModelClass domainModelClass)
 #else
-        private static EntityInfo GetEntityInfo(MiniSessionService manager, Domain.IDomainModelClass domainModelClass)
+        private static EntityInfo GetEntityInfo(IMiniSessionService manager, Domain.IDomainModelClass domainModelClass)
 #endif
         {
             EntityInfo entityInfo;
@@ -81,7 +82,7 @@ namespace zAppDev.DotNet.Framework.Data
 #else
                 var miniSessionManager = ServiceLocator.Current.GetInstance<IMiniSessionService>();
 #endif
-                
+
                 var entityInfo = GetEntityInfo(miniSessionManager, domainModelClass);
                 if (!entityInfo.IsVersioned)
                 {
