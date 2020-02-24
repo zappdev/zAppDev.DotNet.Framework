@@ -71,7 +71,7 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers.DatabaseUtilities
             if(databaseManager.DatabaseServerType == DatabaseServerType.MariaDB)
             {
                 var builder = new MySqlConnectionStringBuilder(connectionString);
-                builder.Database = builder.Database.ToLower();
+                //builder.Database = builder.Database.ToLower();
                 return builder.ConnectionString;
             }
 

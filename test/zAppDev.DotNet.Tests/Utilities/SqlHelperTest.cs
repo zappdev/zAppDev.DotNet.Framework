@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using zAppDev.DotNet.Framework.Data.DatabaseManagers.DatabaseUtilities;
 using zAppDev.DotNet.Framework.Data.DatabaseManagers;
+using Microsoft.Extensions.Configuration;
 
 namespace zAppDev.DotNet.Framework.Tests.Utilities
 {
@@ -81,6 +82,30 @@ namespace zAppDev.DotNet.Framework.Tests.Utilities
 
             result = ServiceLocator.Current.GetInstance<MSSQLManager>().RunStoredProcedure("TestParam", parameters, ServiceLocator.Current.GetInstance<MSSQLManager>().ConnectionString);
             Assert.AreEqual(1, result?.Count);
+        }
+
+        [TestMethod]
+        public void RunMariaDBStoredProcedureTest()
+        {
+            var url = "Server=data.clmsuk.com;Port=3306;Uid=m.spanou@clmsuk.com;Pwd=13fb4af722fc4421a72bcd1cada3b3d941aad1c7bd0c4ccd8835eea4929ed88d1@;Database=seaonline_core_mspanou;CharSet=utf8";
+            var myConfiguration = new Dictionary<string, string>
+            {
+                {"configuration:connectionStrings:add:Database:connectionString", url}
+            };
+
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(myConfiguration)
+                .Build();
+
+            var parameters = new Dictionary<string, object>
+            {
+                {"Series", "A"}
+            };
+
+
+            var result = new MariaDBManager(configuration)
+                .RunStoredProcedure("GetNextTicketNumber", parameters, url);
+            Assert.AreEqual(91, result?.Count);
         }
     }
 #endif
