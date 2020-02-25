@@ -110,7 +110,7 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
                 connectionString = ConnectionString;
             }
 
-            using (var conn = this.GetDatabaseConnection(this.ToProcedureConnectionString(connectionString)))
+            using (var conn = this.GetDatabaseConnection(connectionString))
             {
                 conn.Open();
 

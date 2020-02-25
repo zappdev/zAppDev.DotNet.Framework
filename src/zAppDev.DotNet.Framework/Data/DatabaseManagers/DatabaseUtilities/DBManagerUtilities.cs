@@ -65,18 +65,5 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers.DatabaseUtilities
                     return null;
             }
         }//end GetDatabaseConnection()
-
-        public static string ToProcedureConnectionString(this IDatabaseManager databaseManager, string connectionString)
-        {
-            if(databaseManager.DatabaseServerType == DatabaseServerType.MariaDB)
-            {
-                var builder = new MySqlConnectionStringBuilder(connectionString);
-                //builder.Database = builder.Database.ToLower();
-                return builder.ConnectionString;
-            }
-
-            return connectionString;
-        }//end ToProcedureConnectionString()
-
     }//end class
 }//end namespace
