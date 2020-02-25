@@ -53,14 +53,14 @@ namespace zAppDev.DotNet.Framework.Utilities
             if (e is System.Data.ConstraintException)
             {
                 friendlyMessageDTO.Title = e.Message;
-                if (e.Data != null && e.Data.Count > 0)
+                /*if (e.Data != null && e.Data.Count > 0)
                 {
                     foreach (System.Collections.DictionaryEntry dictionaryEntry in e.Data)
                     {
                         var friendlyMessageEntry = new FriendlyMessageEntryDTO($"{dictionaryEntry.Key} : {dictionaryEntry.Value}", AppDevSemantic.None.ToString());
                         friendlyMessageDTO.Entries.Add(friendlyMessageEntry);
                     }
-                }
+                }*/
                 return friendlyMessageDTO;
             }
 
@@ -72,7 +72,7 @@ namespace zAppDev.DotNet.Framework.Utilities
 
             if (e.GetType().Name.ToLower() == "businessexception" && !string.IsNullOrWhiteSpace(e.Message))
             {
-                string[] stringSeparators = new string[] { "\r\n" };
+                string[] stringSeparators = new string[] { "\\r\\n" };
                 string[] lines = e.Message.Split(stringSeparators, StringSplitOptions.None);
 
                 foreach(var line in lines)
@@ -86,6 +86,7 @@ namespace zAppDev.DotNet.Framework.Utilities
                     var friendlyMessageEntry = new FriendlyMessageEntryDTO($"{line}", AppDevSemantic.None.ToString());
                     friendlyMessageDTO.Entries.Add(friendlyMessageEntry);
                 }
+                
                 return friendlyMessageDTO;
             }
 
