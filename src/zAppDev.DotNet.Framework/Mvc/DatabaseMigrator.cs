@@ -60,6 +60,17 @@ namespace zAppDev.DotNet.Framework.Mvc
         private void LoadMigrations()
         {
             ShouldRun = false;
+
+            var confValue = System.Configuration.ConfigurationManager.AppSettings["SkipDatabaseMigration"];
+            bool skipDatabaseMigration = false;
+            if (bool.TryParse(confValue, out bool _skipDatabaseMigration))
+            {
+                skipDatabaseMigration = _skipDatabaseMigration;
+            }
+
+            ShouldRun = !skipDatabaseMigration;
+            if (!ShouldRun) return;
+
 #if NETFRAMEWORK
             var _migrationsDirectory = HttpContext.Current.Server.MapPath("~/App_Data/Migrations");
 #else
@@ -68,6 +79,7 @@ namespace zAppDev.DotNet.Framework.Mvc
 
             if (!Directory.Exists(_migrationsDirectory))
             {
+                ShouldRun = false;
                 return;
             }
 
@@ -75,6 +87,7 @@ namespace zAppDev.DotNet.Framework.Mvc
 
             if (!migrationFiles.Any())
             {
+                ShouldRun = false;
                 return;
             }
 
