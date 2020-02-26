@@ -70,7 +70,7 @@ namespace zAppDev.DotNet.Framework.Utilities
                 friendlyMessageDTO.OriginalExceptionMessage = e.Data["ZAPPDEV_MESSAGE"].ToString();
             }
 
-            if (e.GetType().Name.ToLower() == "businessexception" && !string.IsNullOrWhiteSpace(e.Message))
+            if ((e.GetType().Name.ToLower() == "businessexception" || e.GetType().Name.ToLower() == "validationexception") && !string.IsNullOrWhiteSpace(e.Message))
             {
                 string[] stringSeparators = new string[] { "\\r\\n" };
                 string[] lines = e.Message.Split(stringSeparators, StringSplitOptions.None);
