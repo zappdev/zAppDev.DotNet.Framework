@@ -196,6 +196,24 @@ namespace zAppDev.DotNet.Framework.Auditing
                 }
                 return;
             }
+            if (type == "CREATE")
+            {
+                var entry = new AuditLogEntry
+                {
+                    EntityShortName = @event.Entity.GetType().Name,
+                    EntityFullName = fullName,
+                    UserName = username,
+                    EntityId = @event.Id.ToString(),
+                    EntryTypeId = _auditLogEntryTypes[type].Id,
+                    Timestamp = DateTime.UtcNow
+                };
+                using (var session = @event.Session.SessionWithOptions().OpenSession())
+                {
+                    session.Save(entry);
+                    session.Flush();
+                }
+                return;
+            }
             var propertyIndexes = oldState != null
                                   ? @event.Persister.FindDirty(newState, oldState, @event.Entity, @event.Session)
                                   : new int[0];
@@ -218,7 +236,7 @@ namespace zAppDev.DotNet.Framework.Auditing
                         continue;
                     // Ignore collections
                     var property = auditableEntity.Properties[key];
-                    if (property.IsCollection)
+                    if (property.IsCollection || property.IsComplex)                        
                         continue;
                     // Ignore simple properties when CREATE
                     if (type == "CREATE" && !property.IsComplex)
