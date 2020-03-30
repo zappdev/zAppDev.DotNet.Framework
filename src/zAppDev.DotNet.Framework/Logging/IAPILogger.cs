@@ -4,11 +4,13 @@ using System;
 using System.Net;
 #if NETFRAMEWORK
 using System.Web.Http.Controllers;
+using System.Web.Http.Filters;
 #else
 using Microsoft.AspNetCore.Http;
 #endif
 using zAppDev.DotNet.Framework.Services;
 using System.Net.Http;
+
 
 namespace zAppDev.DotNet.Framework.Logging
 {
@@ -25,8 +27,12 @@ namespace zAppDev.DotNet.Framework.Logging
             HttpResponseMessage response, TimeSpan processingTime, bool throwOnError, bool cacheHit);
 
         void Log(string apiType, string apiTitle, LogMessage message, bool throwOnError);
+
+        void LogExposedAPIInfo(HttpActionExecutedContext context, TimeSpan elapsed);
 #else
         void LogExposedAPIAccess(string controller, string action, Guid requestId, TimeSpan processingTime, bool cacheHit);
+
+        void LogExposedAPIInfo(HttpContext context, TimeSpan elapsed);
 
         void LogExternalAPIAccess(Guid requestId, string service, string operation,
                                   ServiceConsumptionOptions options, object response,

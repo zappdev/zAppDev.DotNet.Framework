@@ -9,11 +9,15 @@ using System.Threading.Tasks;
 #if NETFRAMEWORK
 using System.Web.Http;
 using System.Web.Http.Controllers;
+using System.Web.Http.Filters;
+#else
+using Microsoft.AspNetCore.Http;
 #endif
 using zAppDev.DotNet.Framework.Services;
 using log4net;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
+
 
 namespace zAppDev.DotNet.Framework.Logging
 {
@@ -224,6 +228,12 @@ namespace zAppDev.DotNet.Framework.Logging
             _connection?.Dispose();
             _channel?.Dispose();
         }
+
+        public void LogExposedAPIInfo(HttpActionExecutedContext context, TimeSpan elapsed)
+        {
+            throw new NotImplementedException();
+        }
+
 #else
         public void LogExposedAPIAccess(string controller, string action, Guid requestId, TimeSpan processingTime, bool cacheHit)
         {
@@ -231,6 +241,10 @@ namespace zAppDev.DotNet.Framework.Logging
         }
 
         public void LogExternalAPIAccess(Guid requestId, string service, string operation, ServiceConsumptionOptions options, object response, HttpStatusCode status, TimeSpan processingTime, bool throwOnError = false, bool cachedResponse = false)
+        {
+            throw new NotImplementedException();
+        }
+        public void LogExposedAPIInfo(HttpContext context, TimeSpan elapsed)
         {
             throw new NotImplementedException();
         }

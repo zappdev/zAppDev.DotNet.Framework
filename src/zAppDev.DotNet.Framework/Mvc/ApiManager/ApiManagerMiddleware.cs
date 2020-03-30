@@ -59,6 +59,7 @@ namespace zAppDev.DotNet.Framework.Middleware
             if (!(bool)context.Items[HttpContextItemKeys.RequestIsLogged])
             {
                 _logger?.LogExposedAPIAccess(context.GetController(), context.GetAction(), id, _elapsed, false);
+                _logger.LogExposedAPIInfo(context, _elapsed);
                 context.Items[HttpContextItemKeys.RequestIsLogged] = true;
             }
         }
