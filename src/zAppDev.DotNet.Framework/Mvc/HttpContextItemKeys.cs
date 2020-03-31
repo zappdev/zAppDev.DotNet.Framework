@@ -7,6 +7,8 @@ namespace zAppDev.DotNet.Framework.Mvc.API
     {
         public static string LogTimer = "logtimer";
 
+        public static string RequestStartedOn = "RequestStartedOn";
+
         public static string RequestIsLogged = "requestIsLogged";
 
         public static string ExposedServiceRequestId = "exposed-service-requestId";

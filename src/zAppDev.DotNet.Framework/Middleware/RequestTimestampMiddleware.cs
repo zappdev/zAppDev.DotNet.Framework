@@ -6,6 +6,7 @@ using System;
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
+using zAppDev.DotNet.Framework.Mvc.API;
 
 namespace zAppDev.DotNet.Framework.Middleware
 {
@@ -20,7 +21,7 @@ namespace zAppDev.DotNet.Framework.Middleware
 
         public Task Invoke(HttpContext context)
         {
-            context.Items.Add("RequestStartedOn", DateTime.UtcNow);
+            context.Items.Add(HttpContextItemKeys.RequestStartedOn, DateTime.UtcNow);
 
             // Call the next delegate/middleware in the pipeline
             return this._next(context);

@@ -56,10 +56,12 @@ namespace zAppDev.DotNet.Framework.Middleware
             //    filterContext.Exception == null,
             //    filterContext.Exception?.Message);
 
+            var metadataStruct = new ExposedServiceMetadataStruct(context, _elapsed);
+
             if (!(bool)context.Items[HttpContextItemKeys.RequestIsLogged])
             {
                 _logger?.LogExposedAPIAccess(context.GetController(), context.GetAction(), id, _elapsed, false);
-                _logger.LogExposedAPIInfo(context, _elapsed);
+                _logger?.LogExposedAPIMetadata(metadataStruct);
                 context.Items[HttpContextItemKeys.RequestIsLogged] = true;
             }
         }

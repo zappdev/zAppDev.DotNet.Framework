@@ -26,34 +26,9 @@ namespace zAppDev.DotNet.Framework.Logging
             _logger.LogInformation($"{controller},{action},{requestId},{processingTime},{cacheHit}");
         }
 
-        public void LogExposedAPIInfo(HttpContext context, TimeSpan _elapsed)
+        public void LogExposedAPIMetadata(ExposedServiceMetadataStruct metadata)
         {
-            var url = context.Request.Path.Value;
-            var method = context.Request.Method;
-
-            string request = string.Empty;
-            if (context.Request.ContentLength != null)
-            {
-                context.Request.Body.Seek(0, SeekOrigin.Begin);
-                request = new StreamReader(context.Request.Body).ReadToEnd();
-                context.Request.Body.Seek(0, SeekOrigin.Begin);
-            }
-
-            context.Response.Body.Seek(0, SeekOrigin.Begin);
-            string response = new StreamReader(context.Response.Body).ReadToEnd();
-            context.Response.Body.Seek(0, SeekOrigin.Begin);
-
-            var timeInms = _elapsed.TotalMilliseconds;
-
-            _logger.LogInformation($@"
-            {{
-                url: ""{url}"",
-                method: ""{method}"",
-                reqBody: ""{request}"",
-                resp: ""{response}"",
-                time: ""{timeInms} ms""
-            }}
-            ");
+            _logger.LogInformation(Newtonsoft.Json.JsonConvert.SerializeObject(metadata));
         }
 
         public void LogExternalAPIAccess(Guid requestId, string service, string operation, ServiceConsumptionOptions options, object response, HttpStatusCode status, TimeSpan processingTime, bool throwOnError = false, bool cachedResponse = false)

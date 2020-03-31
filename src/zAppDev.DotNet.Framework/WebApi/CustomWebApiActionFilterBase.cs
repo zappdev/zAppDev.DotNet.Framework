@@ -25,7 +25,8 @@ namespace zAppDev.DotNet.Framework.WebApi
     {
         protected IAPILogger APILogger =>
             GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(IAPILogger)) as IAPILogger;
-
+        protected IExposedServiceLogger ExposedServiceLogger =>
+            GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(IExposedServiceLogger)) as IExposedServiceLogger;
         protected readonly Guid _id = Guid.NewGuid();
         protected TimeSpan _elapsed;
 

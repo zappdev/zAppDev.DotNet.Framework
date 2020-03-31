@@ -32,7 +32,7 @@ namespace zAppDev.DotNet.Framework.Logging
 #else
         void LogExposedAPIAccess(string controller, string action, Guid requestId, TimeSpan processingTime, bool cacheHit);
 
-        void LogExposedAPIInfo(HttpContext context, TimeSpan elapsed);
+        void LogExposedAPIMetadata(ExposedServiceMetadataStruct metadata);
 
         void LogExternalAPIAccess(Guid requestId, string service, string operation,
                                   ServiceConsumptionOptions options, object response,

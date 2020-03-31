@@ -244,7 +244,7 @@ namespace zAppDev.DotNet.Framework.Logging
         {
             throw new NotImplementedException();
         }
-        public void LogExposedAPIInfo(HttpContext context, TimeSpan elapsed)
+        public void LogExposedAPIMetadata(ExposedServiceMetadataStruct metadata)
         {
             throw new NotImplementedException();
         }
