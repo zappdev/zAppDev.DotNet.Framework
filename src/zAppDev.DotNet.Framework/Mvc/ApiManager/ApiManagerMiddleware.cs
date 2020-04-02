@@ -56,14 +56,20 @@ namespace zAppDev.DotNet.Framework.Middleware
             //    filterContext.Exception == null,
             //    filterContext.Exception?.Message);
 
+            var logTimer = Stopwatch.StartNew();
+
             var metadataStruct = new ExposedServiceMetadataStruct(context, _elapsed);
 
             if (!(bool)context.Items[HttpContextItemKeys.RequestIsLogged])
             {
-                _logger?.LogExposedAPIAccess(context.GetController(), context.GetAction(), id, _elapsed, false);
+                //_logger?.LogExposedAPIAccess(context.GetController(), context.GetAction(), id, _elapsed, false);
                 _logger?.LogExposedAPIMetadata(metadataStruct);
                 context.Items[HttpContextItemKeys.RequestIsLogged] = true;
             }
+
+            logTimer.Stop();
+            var logger = log4net.LogManager.GetLogger(typeof(ApiManagerMiddleware));
+            logger.Info($"Logging time took : {logTimer.ElapsedMilliseconds} ms");
         }
 
         private void CreateByVariableTypeDtoResponse(HttpContext context)
