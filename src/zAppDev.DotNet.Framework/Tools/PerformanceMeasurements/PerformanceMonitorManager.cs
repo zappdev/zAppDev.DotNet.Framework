@@ -1,6 +1,5 @@
 // Copyright (c) 2017 CLMS. All rights reserved.
 // Licensed under the AGPL-3.0 license. See LICENSE file in the project root for full license information.
-#if NETFRAMEWORK
 
 using zAppDev.DotNet.Framework.Data;
 using zAppDev.DotNet.Framework.Data.DAL;
@@ -114,6 +113,14 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements
 
         public static bool? IsEnabledByApplicationSetting()
         {
+            var setting = Identity.Model.ApplicationSetting.GetValue(_key);
+            if (setting == null)
+            {
+                return null;
+            }
+            return ((string.Compare(setting, "true", true) == 0) || (string.Compare(setting, "1", true) == 0));
+            //queen
+            /*
             using (var manager = new MiniSessionManager())
             {
                 manager.OpenSessionWithTransaction();
@@ -125,6 +132,7 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements
                 }
                 return ((string.Compare(setting.Value, "true", true) == 0) || (string.Compare(setting.Value, "1", true) == 0));
             }
+            */
         } //end IsEnabledByApplicationSetting()
 
         public static bool IsEnabled()
@@ -136,4 +144,3 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements
         }
     }
 }
-#endif

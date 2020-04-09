@@ -1,24 +1,19 @@
 ﻿// Copyright (c) 2017 CLMS. All rights reserved.
 // Licensed under the AGPL-3.0 license. See LICENSE file in the project root for full license information.
 #if NETFRAMEWORK
-using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
 {
-    #region Base Classes
+#region Base Classes
     public class Enabled_Attribute : ConfigurationElement
     {
         [ConfigurationProperty("enabled", IsRequired = false, DefaultValue = false)]
         public bool? Enabled => this["enabled"] as bool?;
     }
-    #endregion
+#endregion
 
-    #region Common Attributes, linked together
+#region Common Attributes, linked together
 
     public class MinimumMilliseconds_Enabled_Attribute : Enabled_Attribute
     {
@@ -37,10 +32,10 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
         [ConfigurationProperty("minimumBytes", IsRequired = false)]
         public long? MinimumBytes => this["minimumBytes"] as long?;
     }
-    #endregion
+#endregion
 
 
-    #region Simple Elements
+#region Simple Elements
     public class FrontEndElement: Enabled_Attribute { }
     public class SizeElement : MinimumBytes_Enabled_Attribute { }
     public class TimeElement : MinimumMilliseconds_Enabled_Attribute { }
@@ -72,9 +67,9 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
         [ConfigurationProperty("samplingIntervalMilliseconds", IsRequired = false, DefaultValue = 1000)]
         public int? IntervalMilliseconds => this["samplingIntervalMilliseconds"] as int?;
     }
-    #endregion
+#endregion
 
-    #region Complex Elements
+#region Complex Elements
     public class DatabaseElement : Enabled_Attribute
     {
         [ConfigurationProperty("session", IsRequired = false)]
@@ -162,7 +157,7 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
         public Model2DTOElement Model2DTO => this["Model2DTO"] as Model2DTOElement;
     }
 
-    #endregion
+#endregion
 
     public class PerformanceMonitorConfigurationReader : ConfigurationSection
     {
@@ -183,5 +178,148 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
 
 }
 
+
+#else
+
+
+namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
+{
+    #region Base Classes
+    public class Enabled_Attribute
+    {
+        public bool? Enabled { get; set; }
+    }
+    #endregion
+
+    #region Common Attributes, linked together
+
+    public class MinimumMilliseconds_Enabled_Attribute : Enabled_Attribute
+    {
+        public long? MinimumMilliseconds { get; set; }
+    }
+
+    public class IgnoreNulls_Enabled_Attribute : Enabled_Attribute
+    {
+        public bool? IgnoreNulls { get; set; }
+    }
+
+    public class MinimumBytes_Enabled_Attribute : Enabled_Attribute
+    {
+        public long? MinimumBytes { get; set; }
+    }
+    #endregion
+
+
+    #region Simple Elements
+    public class FrontEndElement : Enabled_Attribute { }
+    public class SizeElement : MinimumBytes_Enabled_Attribute { }
+    public class TimeElement : MinimumMilliseconds_Enabled_Attribute { }
+    public class RAMElement : MinimumBytes_Enabled_Attribute
+    {
+        public int? IntervalMilliseconds { get; set; }
+    }
+
+    public class SessionElement : IgnoreNulls_Enabled_Attribute {
+        public string MonitoredStatistics { get; set; }
+    }
+
+    public class EntitiesElement : IgnoreNulls_Enabled_Attribute {
+        public string MonitoredStatistics { get; set; }
+
+        public string MonitoredEntities { get; set; }
+    }
+
+
+    public class CPUElement : Enabled_Attribute
+    {
+        public float? MinimumPercentage { get; set; }
+
+        public int? IntervalMilliseconds { get; set; }
+    }
+    #endregion
+
+    #region Complex Elements
+    public class DatabaseElement : Enabled_Attribute
+    {
+        public SessionElement Session { get; set; }
+
+        public EntitiesElement Entities { get; set; }
+    }
+
+    public class ClientDataElement : Enabled_Attribute
+    {
+        public SizeElement Size { get; set; }
+
+        public TimeElement Time { get; set; }
+    }
+
+    public class DBFlushElement : Enabled_Attribute
+    {
+        public TimeElement Time { get; set; }
+
+        public DatabaseElement Database { get; set; }
+    }
+
+    public class ControllerActionElement : Enabled_Attribute
+    {
+        public FrontEndElement FrontEnd { get; set; }
+
+        public TimeElement Time { get; set; }
+
+        public CPUElement CPU { get; set; }
+
+        public RAMElement RAM { get; set; }
+
+        public DatabaseElement Database { get; set; }
+    }
+
+    public class DTO2ViewModelElement : Enabled_Attribute
+    {
+        public SizeElement Size { get; set; }
+
+        public TimeElement Time { get; set; }
+
+        public DatabaseElement Database { get; set; }
+    }
+
+    public class Model2DTOElement : Enabled_Attribute
+    {
+        public SizeElement Size { get; set; }
+
+        public TimeElement Time { get; set; }
+    }
+
+    public class ConversionsElement : Enabled_Attribute
+    {
+        public DTO2ViewModelElement DTO2ViewModel { get; set; }
+
+        public Model2DTOElement Model2DTO { get; set; }
+    }
+
+    public class DataElement : Enabled_Attribute
+    {
+        public ClientDataElement ClientData { get; set; }
+
+        public DTO2ViewModelElement DTO2ViewModel { get; set; }
+
+        public Model2DTOElement Model2DTO { get; set; }
+    }
+
+    #endregion
+
+    public class PerformanceMonitorConfigurationReader
+    {
+        public const string SectionName = "performanceMonitor";
+
+        public bool? Enabled { get; set; }
+
+        public ControllerActionElement ControllerAction { get; set; }
+
+        public DataElement DataElement { get; set; }
+
+        public DBFlushElement DBFlush { get; set; }
+    }
+
+}
 
 #endif

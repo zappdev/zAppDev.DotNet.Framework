@@ -212,7 +212,7 @@ namespace zAppDev.DotNet.Framework.Mvc
                 var timezoneInfo = TimeZoneInfo.FindSystemTimeZoneById(ProfileHelper.GetCurrentTimezoneId());
                 return timezoneInfo;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return TimeZoneInfo.Utc;
             }

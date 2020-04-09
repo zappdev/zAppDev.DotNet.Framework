@@ -1,6 +1,5 @@
 ﻿// Copyright (c) 2017 CLMS. All rights reserved.
 // Licensed under the AGPL-3.0 license. See LICENSE file in the project root for full license information.
-#if NETFRAMEWORK
 using log4net;
 using System;
 using System.Collections.Generic;
@@ -15,13 +14,17 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
         
         public ILog GetLogger(bool specific = true, Type @for = null)
         {
+#if NETFRAMEWORK //queen
             if (specific || @for == null) return LogManager.GetLogger(PerformanceMonitorConfiguration.LoggerName);
+#else
+            if (specific || @for == null) return LogManager.GetLogger(typeof(PerformanceMonitor));
+#endif
             return LogManager.GetLogger(typeof(Type));
         }
     }
-    #endregion
+#endregion
 
-    #region Common Attributes, linked together
+#region Common Attributes, linked together
 
     public class MinimumMilliseconds_Enabled_Configuration : Enabled_Configuration
     {
@@ -37,10 +40,10 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
     {
         public long MinimumBytes { get; set; }
     }
-    #endregion
+#endregion
 
 
-    #region Simple Configurations
+#region Simple Configurations
     public class FrontEndConfiguration : Enabled_Configuration { }
     public class SizeConfiguration : MinimumBytes_Enabled_Configuration { }
     public class TimeConfiguration : MinimumMilliseconds_Enabled_Configuration { }
@@ -74,9 +77,9 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
 
         public int IntervalMilliseconds { get; set; }
     }
-    #endregion
+#endregion
 
-    #region Complex Configurations
+#region Complex Configurations
     public class DatabaseConfiguration : Enabled_Configuration
     {
         public SessionConfiguration Session { get; set; }
@@ -210,7 +213,7 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
         }
     }
 
-    #endregion
+#endregion
 
     public class PerformanceMonitorConfiguration: Enabled_Configuration
     {
@@ -407,4 +410,3 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
         }
     }
 }
-#endif

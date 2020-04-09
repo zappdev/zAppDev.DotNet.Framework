@@ -1,12 +1,13 @@
 ﻿// Copyright (c) 2017 CLMS. All rights reserved.
 // Licensed under the AGPL-3.0 license. See LICENSE file in the project root for full license information.
-#if NETFRAMEWORK
+
 using zAppDev.DotNet.Framework.Data;
 using zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration;
 using zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Contracts;
 using log4net;
 using System;
 using System.Diagnostics;
+using NHibernate;
 
 namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Components
 {
@@ -33,7 +34,7 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Components
             Data = data;
         }
 
-        public DataMonitor(string element, DataItemConfiguration configuration,  ILog log = null)
+        public DataMonitor(string element, DataItemConfiguration configuration, ISession session, ILog log = null)
         {
 
             MonitorStatus = MonitorStatus.None;
@@ -52,7 +53,7 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Components
 
                 if((configuration.Database?.Enabled == true) && ((configuration.Database?.Entities?.Enabled == true) || (configuration.Database?.Session?.Enabled == true)) )
                 {
-                    _nhMonitor = new NHMonitor(configuration.Database, MiniSessionManager.Instance.Session);
+                    _nhMonitor = new NHMonitor(configuration.Database, session);
                 }
             }
             catch (Exception e)
@@ -116,4 +117,3 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Components
         }//end Get()
     }
 }
-#endif

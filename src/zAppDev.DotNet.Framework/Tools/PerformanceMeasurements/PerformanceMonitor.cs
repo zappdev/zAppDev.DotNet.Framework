@@ -1,6 +1,6 @@
 ﻿// Copyright (c) 2017 CLMS. All rights reserved.
 // Licensed under the AGPL-3.0 license. See LICENSE file in the project root for full license information.
-#if NETFRAMEWORK
+
 using zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Components;
 using zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration;
 using zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Contracts;
@@ -55,24 +55,24 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements
                     {
                         if (configuration.DataConfiguration.ClientData.Enabled)
                         {
-                            RequestMonitor = new DataMonitor("Request Data", configuration.DataConfiguration.ClientData);
+                            RequestMonitor = new DataMonitor("Request Data", configuration.DataConfiguration.ClientData, session);
                         }
 
                         if (configuration.DataConfiguration.Model2DTO.Enabled)
                         {
-                            ResponseMonitorPreAction = new DataMonitor("Response Data Pre Action", _configuration.DataConfiguration.Model2DTO);
-                            ResponseMonitorPostAction = new DataMonitor("Response Data Post Action", _configuration.DataConfiguration.Model2DTO);
+                            ResponseMonitorPreAction = new DataMonitor("Response Data Pre Action", _configuration.DataConfiguration.Model2DTO, session);
+                            ResponseMonitorPostAction = new DataMonitor("Response Data Post Action", _configuration.DataConfiguration.Model2DTO, session);
                         }
 
                         if (configuration.DataConfiguration.DTO2ViewModel.Enabled)
                         {
-                            ConversionMonitor = new DataMonitor("DTO to ViewModel Conversion", _configuration.DataConfiguration.DTO2ViewModel);
+                            ConversionMonitor = new DataMonitor("DTO to ViewModel Conversion", _configuration.DataConfiguration.DTO2ViewModel, session);
                         }
                     }
 
                     if (configuration.DBFlush.Enabled)
                     {
-                        DatabaseFlushMonitor = new DataMonitor("Database Flush Monitor", configuration.DBFlush);
+                        DatabaseFlushMonitor = new DataMonitor("Database Flush Monitor", configuration.DBFlush, session);
                     }
                 }
             }
@@ -158,4 +158,3 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements
         }//end Log()
     }
 }
-#endif

@@ -1,6 +1,5 @@
 ﻿// Copyright (c) 2017 CLMS. All rights reserved.
 // Licensed under the AGPL-3.0 license. See LICENSE file in the project root for full license information.
-#if NETFRAMEWORK
 using zAppDev.DotNet.Framework.Data;
 using zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration;
 using zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Contracts;
@@ -49,7 +48,7 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Components
 
                 if (measureDatabase)
                 {
-                    _nhMonitor = new NHMonitor(_configuration.Database, MiniSessionManager.Instance.Session);
+                    _nhMonitor = new NHMonitor(_configuration.Database, session);
                 }
             }
             catch (Exception e)
@@ -130,4 +129,3 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Components
         }//end Get()
     }
 }
-#endif
