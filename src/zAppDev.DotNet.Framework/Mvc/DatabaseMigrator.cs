@@ -24,12 +24,29 @@ namespace zAppDev.DotNet.Framework.Mvc
 
         public bool ShouldRun { get; private set; }
 
+        public static string MigrationsFolder => "App_Data/Migrations";
 
         public DatabaseMigrator()
         {
             _migrationFiles = new List<string>();
             _logger = LogManager.GetLogger(this.GetType());
             LoadMigrations();
+        }
+
+        private static string _migrationsDirectory = null;
+        public static string MigrationsDirectory
+        {
+            get
+            {
+                if (_migrationsDirectory != null) return _migrationsDirectory;
+
+#if NETFRAMEWORK
+                _migrationsDirectory = HttpContext.Current.Server.MapPath($"~/{MigrationsFolder}");
+#else
+                _migrationsDirectory = Web.MapPath($"~/{MigrationsFolder}");
+#endif
+                return _migrationsDirectory;
+            }
         }
 
         public bool CanConnectToDatabase()
@@ -71,19 +88,13 @@ namespace zAppDev.DotNet.Framework.Mvc
             ShouldRun = !skipDatabaseMigration;
             if (!ShouldRun) return;
 
-#if NETFRAMEWORK
-            var _migrationsDirectory = HttpContext.Current.Server.MapPath("~/App_Data/Migrations");
-#else
-            var _migrationsDirectory = Web.MapPath("~/App_Data/Migrations");
-#endif
-
-            if (!Directory.Exists(_migrationsDirectory))
+            if (!Directory.Exists(MigrationsDirectory))
             {
                 ShouldRun = false;
                 return;
             }
 
-            var migrationFiles = Directory.GetFiles(_migrationsDirectory, "*.sql", SearchOption.TopDirectoryOnly).ToList();
+            var migrationFiles = Directory.GetFiles(MigrationsDirectory, "*.sql", SearchOption.TopDirectoryOnly).ToList();
 
             if (!migrationFiles.Any())
             {
