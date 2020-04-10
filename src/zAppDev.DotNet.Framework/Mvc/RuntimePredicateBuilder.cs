@@ -275,7 +275,6 @@ namespace zAppDev.DotNet.Framework.Mvc
 
                 case "DateTime":
                     return DateTime.TryParseExact(val, DefaultDateTimeFormat, null, System.Globalization.DateTimeStyles.None, out _);
-
                 default:
                     return false;
             }
@@ -384,14 +383,44 @@ namespace zAppDev.DotNet.Framework.Mvc
                     predicateCode += CreateFilterExpression(filter.Operator, filter.Column, varName, pathToProp);
                 }
                 else
-                {
-                    predicateCode += "false";
+                {                    
+                    predicateCode += BuildEnumeratorsPredicate(filter, type);
                 }
             }
 
             return $"public static Expression<Func<{TypeName(type)}, bool>> GetFilterPredicate() {{ {variableDefinitionsCode} return q => {predicateCode}; }}";
         }
 
+
+        private static string BuildEnumeratorsPredicate(FilterInfo info, Type type)
+        {
+            var assemblyEnums = type.Assembly.GetTypes().Where(a => a.IsEnum).ToList();
+            var filterEnum = assemblyEnums.Where(a => a.Name == info.Column.MambaDataType).FirstOrDefault();
+            if (filterEnum == null) return "false";
+
+            var enumValues = new List<FieldInfo>();
+            switch (info.Operator)
+            {
+                case FilterOperator.LIKE:
+                    enumValues.AddRange(filterEnum.GetFields()
+                        .Where(c => !string.IsNullOrEmpty(c.Name) && c.Name.ToLower().Contains(info.Value.ToString().ToLower()))
+                        .ToList());
+                    break;
+                case FilterOperator.EQUAL_TO:
+                    var value = filterEnum.GetFields()
+                                    .Where(c => !string.IsNullOrEmpty(c.Name) && c.Name == info.Value.ToString())
+                                    .FirstOrDefault();
+                    if (value != null) enumValues.Add(value);
+                    break;
+            }
+
+            var clause = new List<string>();
+            foreach (var enumval in enumValues) 
+            {
+                clause.Add($"q.{info.Column.Name} == {filterEnum.FullName}.{enumval.Name}");
+            }
+            return clause.Count == 0  ? "false"  : string.Join("||", clause);
+        }
         private static string GenerateOrderByCode<T>(List<OrderByInfo> orderBy)
         {
             var type = typeof(T);
