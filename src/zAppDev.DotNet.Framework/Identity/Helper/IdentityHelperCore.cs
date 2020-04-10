@@ -257,6 +257,7 @@ namespace zAppDev.DotNet.Framework.Identity
                 result = manager.AddLoginAsync(user, externalLoginInfo).Result;
                 if (result.Succeeded)
                 {
+                    ServiceLocator.Current.GetInstance<IMiniSessionService>().CommitChanges();
                     SignIn(externalLoginInfo, isPersistent: false);
                     // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=320771
                     // var code = manager.GenerateEmailConfirmationToken(user.Id);
@@ -742,7 +743,39 @@ namespace zAppDev.DotNet.Framework.Identity
 
         public static ApplicationUserExternalProfile GetExternalProfile()
         {
-            return null;
+            var profile = new ApplicationUserExternalProfile();
+            var loginInfo = GetSignInManager().GetExternalLoginInfoAsync();
+            var claims = new List<Claim>();
+            if (loginInfo != null && loginInfo.Result != null)
+            {
+                var info = loginInfo.Result;
+                claims = info.Principal?.Claims?.ToList();
+                profile.Provider = info.LoginProvider;
+                profile.Email = info.Principal.FindFirst(System.Security.Claims.ClaimTypes.Email).Value;
+            }
+            else
+            {
+                claims = Web.GetContext().User?.Claims?.ToList();
+            }
+            if (claims == null || !claims.Any())
+            {
+                return null;
+            }
+            profile.Name = claims.FirstOrDefault(x => x.Type == System.Security.Claims.ClaimTypes.Name)?.Value;
+            profile.Surname = claims.FirstOrDefault(x => x.Type == System.Security.Claims.ClaimTypes.Surname)?.Value;
+            profile.DisplayName = claims.FirstOrDefault(x => x.Type == System.Security.Claims.ClaimTypes.GivenName)?.Value;
+            var gender = claims.FirstOrDefault(x => x.Type == System.Security.Claims.ClaimTypes.Gender)?.Value;
+            if (string.IsNullOrWhiteSpace(gender))
+                profile.Gender = "";
+            else if (string.Compare(gender, "male", true) == 0)
+                profile.Gender = "Male";
+            else if (string.Compare(gender, "female", true) == 0)
+                profile.Gender = "Female";
+            else
+                profile.Gender = "Other";
+            if (string.IsNullOrWhiteSpace(profile.Provider)) profile.Provider = claims.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x.Issuer))?.Issuer;
+            if (string.IsNullOrWhiteSpace(profile.Email)) profile.Email = claims.FirstOrDefault(x => x.Type == System.Security.Claims.ClaimTypes.Email)?.Value;
+            return profile;
         }
 
         #endregion
