@@ -85,6 +85,8 @@ namespace zAppDev.DotNet.Framework.Data
 
             var factory = _config.BuildSessionFactory();
 
+            ServiceLocator.Current.GetInstance<IDatabaseManager>().ExportDBSchema(_config);
+
             //UpdateDatabaseSchema(_config);
 
             ObjectGraphWalker.Initialize(_config);

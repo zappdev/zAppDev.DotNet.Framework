@@ -15,6 +15,7 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
     {
         string ConnectionString { get; }
 
+        
         DatabaseServerType DatabaseServerType { get; }
 
         DbConnectionStringBuilder GetConnectionStringBuilder(string connectionString);
@@ -23,6 +24,7 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
         void RemoveSchemas(NHibernate.Cfg.Configuration configuration);
         void UpdateApplicationSettingsTable();
         void CreateSchemas();
+        void ExportDBSchema(NHibernate.Cfg.Configuration nHibernateConfiguration);
 
         DatabaseServerType GetDatabaseServerType();
 

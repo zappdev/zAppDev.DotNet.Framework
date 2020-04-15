@@ -17,7 +17,7 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
             ConnectionString = CommonUtilities.GetConnectionString();
         }
 #else
-        private readonly IConfiguration _configuration;
+        protected readonly IConfiguration _configuration;
 
         public DBManager(IConfiguration configuration)
         {
@@ -38,6 +38,8 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
         public virtual void RemoveSchemas(NHibernate.Cfg.Configuration configuration) { }
 
         public virtual void CreateSchemas() { }
+
+        //public virtual void ExportDBCreationSchema() { }
 
         public List<Dictionary<string, object>> RunSqlQuery(string query, Dictionary<string, object> parameters, string connectionString)
         {
@@ -167,6 +169,11 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
         public DatabaseServerType GetDatabaseServerType()
         {
             return DatabaseServerType;
+        }
+
+        public virtual void ExportDBSchema(NHibernate.Cfg.Configuration nHibernateConfiguration)
+        {
+            return;
         }
     }//end MSSQLManager
 }
