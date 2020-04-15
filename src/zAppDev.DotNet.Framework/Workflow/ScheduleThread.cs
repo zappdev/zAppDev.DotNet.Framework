@@ -8,6 +8,7 @@ using System.Web;
 using System.Net;
 using NHibernate;
 using zAppDev.DotNet.Framework.Utilities;
+using Microsoft.Extensions.Configuration;
 
 #if NETFRAMEWORK
 using System.Net.Http;
@@ -172,7 +173,7 @@ namespace zAppDev.DotNet.Framework.Workflow
                     _httpRuntimeUrl = httpContext.Request.Url.GetLeftPart(UriPartial.Authority)
                                       + httpContext.Request.ApplicationPath + "/favicon.ico";
 #else
-                    _httpRuntimeUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/favicon.ico";
+                    _httpRuntimeUrl = Manager.httpRuntimeURL + "/favicon.ico";//$"{httpContext.Request.Scheme}://{httpContext.Request.Host}{httpContext.Request.PathBase}/favicon.ico";
 #endif
                     if (_scheduleThreadAnalyticDebugOn)
                     {
@@ -185,12 +186,15 @@ namespace zAppDev.DotNet.Framework.Workflow
             }
         }
 
-        private static void GetConfigParams()
+        private static void GetConfigParams(IConfiguration configuration = null)
         {
             try
             {
-                _scheduleThreadAnalyticDebugOn =
-                    Convert.ToBoolean((ConfigurationManager.AppSettings["ScheduleThreadAnalyticDebugOn"]));
+#if NETFRAMEWORK
+                _scheduleThreadAnalyticDebugOn = Convert.ToBoolean((ConfigurationManager.AppSettings["ScheduleThreadAnalyticDebugOn"]));
+#else
+                _scheduleThreadAnalyticDebugOn = configuration.GetValue<bool>("configuration:appSettings:add:ScheduleThreadAnalyticDebugOn:value");
+#endif
             }
             catch (Exception)
             {
@@ -198,8 +202,11 @@ namespace zAppDev.DotNet.Framework.Workflow
             }
             try
             {
-                _scheduleThreadHttpRequestTimeOutMin =
-                    Convert.ToInt32((ConfigurationManager.AppSettings["ScheduleThreadHttpRequestTimeOutMin"]));
+#if NETFRAMEWORK
+                _scheduleThreadHttpRequestTimeOutMin = Convert.ToInt32((ConfigurationManager.AppSettings["ScheduleThreadHttpRequestTimeOutMin"]));
+#else
+                _scheduleThreadHttpRequestTimeOutMin = configuration.GetValue<int>("configuration:appSettings:add:ScheduleThreadHttpRequestTimeOutMin:value");
+#endif
             }
             catch (Exception)
             {
@@ -207,7 +214,11 @@ namespace zAppDev.DotNet.Framework.Workflow
             }
             try
             {
+#if NETFRAMEWORK
                 _scheduleThreadEnabled = Convert.ToBoolean((ConfigurationManager.AppSettings["ScheduleThreadEnabled"]));
+#else
+                _scheduleThreadEnabled = configuration.GetValue<bool>("configuration:appSettings:add:ScheduleThreadEnabled:value");
+#endif
             }
             catch (Exception)
             {
@@ -215,8 +226,11 @@ namespace zAppDev.DotNet.Framework.Workflow
             }
             try
             {
-                _scheduleThreadWorkIntervalInMsec =
-                    Convert.ToInt32((ConfigurationManager.AppSettings["ScheduleThreadWorkIntervalInMsec"]));
+#if NETFRAMEWORK
+                _scheduleThreadWorkIntervalInMsec = Convert.ToInt32((ConfigurationManager.AppSettings["ScheduleThreadWorkIntervalInMsec"]));
+#else
+                _scheduleThreadWorkIntervalInMsec = configuration.GetValue<int>("configuration:appSettings:add:ScheduleThreadWorkIntervalInMsec:value");
+#endif
             }
             catch (Exception)
             {
@@ -224,17 +238,14 @@ namespace zAppDev.DotNet.Framework.Workflow
             }
         }
 
-        public static void StartScheduleThread(HttpContext httpContext)
+        public static void StartScheduleThread(HttpContext httpContext, IConfiguration configuration = null)
         {
             try
             {
-                GetConfigParams();
+                GetConfigParams(configuration);
                 SetHttpRuntimeUrl(httpContext);
                 if (_scheduleThreadAnalyticDebugOn)
-                    ScheduleLog.Debug("Enter StartScheduleThread() with User: [" + httpContext?.User +
-                                      "], Enabled: [" + _scheduleThreadEnabled + "], " +
-                                      "WorkIntervalInMsec: [" + _scheduleThreadWorkIntervalInMsec + "], " +
-                                      "HttpRequestTimeOutMin: [" + _scheduleThreadHttpRequestTimeOutMin + "]"
+                    ScheduleLog.Debug($"Enter StartScheduleThread() with User: [{httpContext?.User}], Enabled: [{_scheduleThreadEnabled}], WorkIntervalInMsec: [{_scheduleThreadWorkIntervalInMsec}], HttpRequestTimeOutMin: [{_scheduleThreadHttpRequestTimeOutMin}]"
                                      );
                 //_log.DebugFormat("Found {0} Active Schedules.", schedules.Count);
                 if (!_scheduleThreadEnabled)
@@ -255,8 +266,15 @@ namespace zAppDev.DotNet.Framework.Workflow
                 {
 #if NETFRAMEWORK
                     HttpContext.Current = lHttpContext;
-#endif
                     _scheduleWorker.DoWork();
+#else
+
+                    using (var scope = Manager.CreateThreadServiceScope())
+                    {
+                        ServiceLocator.SetLocatorProvider(scope.ServiceProvider);
+                        _scheduleWorker.DoWork();
+                    }
+#endif
                 }));
                 _scheduleThread.Start();
                 while (!_scheduleThread.IsAlive)

@@ -4,6 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using log4net;
+#if NETFRAMEWORK
+#else
+using Microsoft.AspNetCore.Builder;
+#endif
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using zAppDev.DotNet.Framework.Data;
 using zAppDev.DotNet.Framework.Data.DAL;
 using zAppDev.DotNet.Framework.Utilities;
@@ -15,11 +21,17 @@ namespace zAppDev.DotNet.Framework.Workflow
         private IRepositoryBuilder Builder { get; set; }
 
         private readonly ILog _log;
+#if NETFRAMEWORK
+#else
+        private IApplicationBuilder _app;
+#endif
+        public string httpRuntimeURL { get; set; }
 
-        public ScheduleManager(IRepositoryBuilder builder = null)
+        public ScheduleManager(IRepositoryBuilder builder = null, IConfiguration configuration = null)
         {
             _log = LogManager.GetLogger(typeof(ScheduleManager));
             Builder = builder ?? ServiceLocator.Current.GetInstance<IRepositoryBuilder>();
+            httpRuntimeURL = configuration?.GetValue<string>("urls");
         }
 
         public void ProcessSchedules()
@@ -184,5 +196,17 @@ namespace zAppDev.DotNet.Framework.Workflow
                 }
             }
         }
+#if NETFRAMEWORK
+#else
+        public void Inject(IApplicationBuilder app)
+        {
+            _app = app;
+        }
+
+        internal IServiceScope CreateThreadServiceScope()
+        {
+            return _app.ApplicationServices.CreateScope();
+        }
+#endif
     }
 }
