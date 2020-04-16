@@ -89,22 +89,29 @@ namespace zAppDev.DotNet.Framework.Utilities
                 
                 return friendlyMessageDTO;
             }
-
-            foreach (var frame in stackTrace.GetFrames().Where(f => !string.IsNullOrEmpty(f.GetFileName())).Reverse())
+            if(e.GetType().Name.ToLower() == "staleobjectstateexception" && !string.IsNullOrWhiteSpace(friendlyMessageDTO.OriginalExceptionMessage))
             {
-                var exceptionHelper = new ExceptionHelper(frame.GetFileName(), frame.GetFileLineNumber());
-                exceptionHelpers.Add(exceptionHelper);
-                originalMaps.AddRange(Maps.AsParallel().Where(m => m.SourceFilePath.Contains(exceptionHelper.filePath) &&
-                    (m.Border.Start.Line <= exceptionHelper.lineNo && m.Border.End.Line >= exceptionHelper.lineNo)).ToList());
+                var friendlyMessageEntry = new FriendlyMessageEntryDTO($"{friendlyMessageDTO.OriginalExceptionMessage}", AppDevSemantic.None.ToString());
+                friendlyMessageDTO.Entries.Add(friendlyMessageEntry);
+            }
+            else
+            {
+                foreach (var frame in stackTrace.GetFrames().Where(f => !string.IsNullOrEmpty(f.GetFileName())).Reverse())
+                {
+                    var exceptionHelper = new ExceptionHelper(frame.GetFileName(), frame.GetFileLineNumber());
+                    exceptionHelpers.Add(exceptionHelper);
+                    originalMaps.AddRange(Maps.AsParallel().Where(m => m.SourceFilePath.Contains(exceptionHelper.filePath) &&
+                        (m.Border.Start.Line <= exceptionHelper.lineNo && m.Border.End.Line >= exceptionHelper.lineNo)).ToList());
+                }
+
+                foreach (var map in originalMaps.Distinct())
+                {
+                    var FriendlyMessageEntry = new FriendlyMessageEntryDTO(map.AppDevIdentifier, map.AppDevSemantic.ToString());
+
+                    friendlyMessageDTO.Entries.Add(FriendlyMessageEntry);
+                }
             }
 
-            foreach (var map in originalMaps.Distinct())
-            {
-                var FriendlyMessageEntry = new FriendlyMessageEntryDTO(map.AppDevIdentifier, map.AppDevSemantic.ToString());
-
-                friendlyMessageDTO.Entries.Add(FriendlyMessageEntry);
-            }
-           
             return friendlyMessageDTO;
         }
 
