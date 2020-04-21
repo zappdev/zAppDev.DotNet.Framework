@@ -226,6 +226,21 @@
     <PackageReference Include="ExcelDataReader" Version="3.6.0" />
     <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="4.0.1" />
+
+
+	  <PackageReference Include="AspNetCore.HealthChecks.System" Version="2.2.1" />
+	  <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="2.2.1" />
+	  <PackageReference Include="AspNetCore.HealthChecks.UI" Version="2.2.2" />
+
+	  <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="2.2.1" />
+	  <PackageReference Include="AspNetCore.HealthChecks.RabbitMQ" Version="2.2.1" />
+
+	  <!--<PackageReference Include="AspNetCore.HealthChecks.MySql" Version="2.2.0" />-->
+	  <PackageReference Include="AspNetCore.HealthChecks.SqLite" Version="2.2.0" />
+	  <PackageReference Include="AspNetCore.HealthChecks.Network" Version="2.2.1" />
+	  <PackageReference Include="AspNetCore.HealthChecks.Uris" Version="2.2.1" />
+	  <PackageReference Include="AspNetCore.HealthChecks.SignalR" Version="2.2.0" />
+
   </ItemGroup>
 
   <ItemGroup>

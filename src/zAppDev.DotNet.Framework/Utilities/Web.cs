@@ -8,6 +8,7 @@ using System.Configuration;
 using System.IO;
 using System.Web;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Configuration;
 #if NETFRAMEWORK
 using System.Net.Http;
 #else
@@ -391,12 +392,16 @@ namespace zAppDev.DotNet.Framework.Utilities
         public static ServerRole CurrentServerRole =>
             _serverRole == ServerRole.None ? GetCurrentServerRole() : _serverRole;
 
-        private static ServerRole GetCurrentServerRole()
+        public static ServerRole GetCurrentServerRole(IConfiguration configuration = null)
         {
             try
             {
+#if NETFRAMEWORK
                 var role = ConfigurationManager.AppSettings["ServerRole"];
-
+#else
+                var config = configuration ?? ServiceLocator.Current.GetInstance<IConfiguration>();
+                var role = config["configuration:appSettings:add:ServerRole:value"];
+#endif
                 _serverRole = string.IsNullOrWhiteSpace(role)
                     ? ServerRole.Combined
                     : (ServerRole) Enum.Parse(typeof(ServerRole), role);

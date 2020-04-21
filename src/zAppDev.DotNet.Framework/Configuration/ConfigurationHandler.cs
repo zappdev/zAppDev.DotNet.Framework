@@ -5,9 +5,11 @@ using System.Linq;
 using System.Xml;
 using zAppDev.DotNet.Framework.Utilities;
 using Microsoft.Extensions.Configuration;
+using System;
+using static zAppDev.DotNet.Framework.Utilities.Web;
 
 namespace zAppDev.DotNet.Framework.Configuration
-{   
+{
     public class ConfigurationHandler
     {
 
@@ -26,9 +28,9 @@ namespace zAppDev.DotNet.Framework.Configuration
                 .Build();
         }
 
-        public static MailSettings GetSmtpSettings()
+        public static MailSettings GetSmtpSettings(IConfiguration configuration = null)
         {
-            var config = ServiceLocator.Current.GetInstance<IConfiguration>();
+            var config = configuration == null ? ServiceLocator.Current.GetInstance<IConfiguration>() : configuration;
 
             int.TryParse(config?[$"configuration:system.net:mailSettings:smtp:network:port"], out var port);
 
@@ -48,9 +50,78 @@ namespace zAppDev.DotNet.Framework.Configuration
             };
         }
 
-        public static ImapConfiguration GetImapSettings()
+        public static Uri GetOtherTierURL(IConfiguration configuration = null, ServerRole role = ServerRole.None)
         {
-            var config = ServiceLocator.Current.GetInstance<IConfiguration>();
+            var config = configuration == null ? ServiceLocator.Current.GetInstance<IConfiguration>() : configuration;
+
+            var serverRole = role == ServerRole.None ? Web.GetCurrentServerRole(configuration) : role;
+
+            var appSetting = "";
+
+            switch (serverRole)
+            {
+                case Web.ServerRole.Application:
+                    appSetting = "WebServerUrl";
+                    break;
+                case Web.ServerRole.Web:
+                    appSetting = "AppServerUrl";
+                    break;
+                default:
+                    return null;
+            }
+
+            var baseUri = config[$"configuration:appSettings:add:{appSetting}:value"];
+            if (!string.IsNullOrWhiteSpace(baseUri))
+            {
+                if (Uri.TryCreate(baseUri, UriKind.Absolute, out Uri result)) return result;
+            }
+
+            return null;
+        }
+
+        public static Uri GetBaseUri(IConfiguration configuration = null)
+        {
+            var config = configuration == null ? ServiceLocator.Current.GetInstance<IConfiguration>() : configuration;
+
+            var serverRole = Web.GetCurrentServerRole(configuration);
+            var appSetting = "";
+
+            switch (serverRole)
+            {
+                case Web.ServerRole.Combined:
+                    appSetting = "WebServerUrl";
+                    break;
+                case Web.ServerRole.Application:
+                    appSetting = "AppServerUrl";
+                    break;
+                case Web.ServerRole.Web:
+                    appSetting = "WebServerUrl";
+                    break;
+                default:
+                    return null;
+            }
+
+            var baseUri = config[$"configuration:appSettings:add:{appSetting}:value"];
+            if (!string.IsNullOrWhiteSpace(baseUri))
+            {
+                if (Uri.TryCreate(baseUri, UriKind.Absolute, out Uri result)) return result;
+            }
+
+            var urlsString = config.GetValue<string>("urls");
+            var splitter = new char[] { ';' };
+            var urls = urlsString.Split(splitter, options: StringSplitOptions.RemoveEmptyEntries);
+            var firstURL = urls?.FirstOrDefault();
+            if (!string.IsNullOrWhiteSpace(firstURL))
+            {
+                if (Uri.TryCreate(firstURL, UriKind.Absolute, out Uri result)) return result;
+            }
+
+            return null;
+        }
+
+        public static ImapConfiguration GetImapSettings(IConfiguration configuration = null)
+        {
+            var config = configuration == null ? ServiceLocator.Current.GetInstance<IConfiguration>() : configuration;
 
             var status = bool.TryParse(config?[$"configuration:appSettings:add:host:value"], out var enableSsl);
             enableSsl = status ? enableSsl : false;

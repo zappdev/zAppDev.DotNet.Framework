@@ -50,7 +50,7 @@ namespace zAppDev.DotNet.Framework.Tests.Sockets
             {
                 SocketClient.CreateConnection("GoogleDNS Bad", "8.8.8.8", 80);
             } 
-            catch (Exception ex)
+            catch (Exception)
             {
                 
             }

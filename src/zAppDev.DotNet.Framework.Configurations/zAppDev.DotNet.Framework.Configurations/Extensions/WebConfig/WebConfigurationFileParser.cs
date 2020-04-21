@@ -105,7 +105,8 @@ namespace zAppDev.DotNet.Framework.Extensions.WebConfig
                 var path = (string.IsNullOrEmpty(key))
                     ? $"{GetCurrentPath()}:{value.Key}"
                     : $"{GetCurrentPath()}:{key}:{value.Key}";
-                _data.Add(path, value.Value);
+                if(!_data.ContainsKey(path))
+                    _data.Add(path, value.Value);
             }
 
             return key;

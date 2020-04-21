@@ -12,28 +12,56 @@ using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 #else
 using Microsoft.AspNetCore.Http;
+using zAppDev.DotNet.Framework.Utilities;
 #endif
 using zAppDev.DotNet.Framework.Services;
 using log4net;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
-
+using Microsoft.Extensions.Configuration;
 
 namespace zAppDev.DotNet.Framework.Logging
 {
     public class RabbitMQMessagingLogger : IAPILogger, IDisposable
     {
-#if NETFRAMEWORK
-        private IConnection _connection;
-        private IModel _channel;
-        private readonly string _exchange;
-        private bool _initialized;
-        private ConnectionFactory _connectionFactory;
 
-        public RabbitMQMessagingLogger(string host, int port, string vhost, string username, string password, string exchange = "")
+        public static ConnectionFactory GetConnectionFactory(IConfiguration configuration = null)
         {
-            _exchange = exchange;
-            _connectionFactory = new ConnectionFactory
+#if NETFRAMEWORK
+            var host = ConfigurationManager.AppSettings["rabbitmq:host"];
+            var portRaw = ConfigurationManager.AppSettings["rabbitmq:port"];
+            int port;
+            if (!int.TryParse(portRaw, out port))
+            {
+                port = 5672;
+            }
+            var vhost = ConfigurationManager.AppSettings["rabbitmq:vhost"];
+            if (string.IsNullOrWhiteSpace(vhost))
+            {
+                vhost = "/";
+            }
+            var username = ConfigurationManager.AppSettings["rabbitmq:username"];
+            var password = ConfigurationManager.AppSettings["rabbitmq:password"];
+#else
+
+            var config = configuration ?? ServiceLocator.Current.GetInstance<IConfiguration>();
+
+            var host = config["configuration:appSettings:add:rabbitmq:host:value"];
+            var portRaw = config["configuration:appSettings:add:rabbitmq:port:value"];
+            int port;
+            if (!int.TryParse(portRaw, out port))
+            {
+                port = 5672;
+            }
+            var vhost = config["configuration:appSettings:add:rabbitmq:vhost:value"]; 
+            if (string.IsNullOrWhiteSpace(vhost))
+            {
+                vhost = "/";
+            }
+            var username = config["configuration:appSettings:add:rabbitmq:username:value"];
+            var password = config["configuration:appSettings:add:rabbitmq:password:value"];
+#endif
+            var connectionFactory = new ConnectionFactory
             {
                 HostName = host,
                 Port = port,
@@ -42,6 +70,22 @@ namespace zAppDev.DotNet.Framework.Logging
                 Password = password,
                 AutomaticRecoveryEnabled = true
             };
+
+            return connectionFactory;
+        }
+
+
+#if NETFRAMEWORK
+        private IConnection _connection;
+        private IModel _channel;
+        private readonly string _exchange;
+        private bool _initialized;
+        private ConnectionFactory _connectionFactory;
+
+        public RabbitMQMessagingLogger(ConnectionFactory connectionFactory, string exchange = "")
+        {
+            _exchange = exchange;
+            _connectionFactory = connectionFactory;
             Initialize();
         }
 
@@ -105,24 +149,12 @@ namespace zAppDev.DotNet.Framework.Logging
             }
         }
 
+
+
         public static IAPILogger FromConfiguration()
         {
-            var host = ConfigurationManager.AppSettings["rabbitmq:host"];
-            var portRaw = ConfigurationManager.AppSettings["rabbitmq:port"];
-            int port;
-            if (!int.TryParse(portRaw, out port))
-            {
-                port = 5672;
-            }
-            var vhost = ConfigurationManager.AppSettings["rabbitmq:vhost"];
-            if (string.IsNullOrWhiteSpace(vhost))
-            {
-                vhost = "/";
-            }
-            var username = ConfigurationManager.AppSettings["rabbitmq:username"];
-            var password = ConfigurationManager.AppSettings["rabbitmq:password"];
             var exchange = ConfigurationManager.AppSettings["rabbitmq:exchange"];
-            return new RabbitMQMessagingLogger(host, port, vhost, username, password, exchange);
+            return new RabbitMQMessagingLogger(GetConnectionFactory(), exchange);
         }
 
         public void Log(string apiType, string apiTitle, LogMessage message, bool throwOnError)
@@ -254,5 +286,5 @@ namespace zAppDev.DotNet.Framework.Logging
         }
 #endif
 
-    }
+        }
 }
