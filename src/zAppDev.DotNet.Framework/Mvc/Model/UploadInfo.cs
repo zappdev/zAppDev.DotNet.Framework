@@ -141,22 +141,45 @@ namespace zAppDev.DotNet.Framework.Mvc
             }
 #endif
 
+            private readonly object _fileLock = new object();
             private void StoreOldCopyOfFile(string relativePath)
             {
                 var absolutePath = Path.Combine(UploadsAbsolutePhysicalPath, relativePath);
-                var parentFolderInfo = new FileInfo(absolutePath).Directory;
 
-                if (parentFolderInfo != null && !parentFolderInfo.Exists) return;
+                lock (_fileLock)
+                {
+                    var parentFolderInfo = new FileInfo(absolutePath).Directory;
 
-                var fileName = Path.GetFileName(relativePath);
-                var oldFile = parentFolderInfo?.GetFiles(fileName).FirstOrDefault();
+                    if (parentFolderInfo != null && !parentFolderInfo.Exists) return;
 
-                if (oldFile == null) return;
+                    var fileName = Path.GetFileName(relativePath);
 
-                var oldFileWriteTime = oldFile.LastWriteTimeUtc;
-                var timeString = oldFileWriteTime.ToString("dd-MM-yyyy-HH-mm-ss-fff", CultureInfo.InvariantCulture);
+                    var oldFile = parentFolderInfo?.GetFiles(fileName).FirstOrDefault();
 
-                oldFile.MoveTo(absolutePath + "_Old_" + timeString + "_" + Guid.NewGuid() + oldFile.Extension);
+                    if (oldFile == null) return;
+
+                    var oldFileWriteTime = oldFile.LastWriteTimeUtc;
+                    var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(relativePath);
+
+                    int backupNumber = 0;
+
+                    var previousBackups = parentFolderInfo?.GetFiles($"{fileNameWithoutExtension}.old_*{oldFile.Extension}");
+                    if (previousBackups.Any())
+                    {
+                        var lastBackupNumberString =
+                            previousBackups
+                            ?.Select(x => x.Name?.Replace(fileNameWithoutExtension, "")?.Replace(oldFile.Extension, "")?.Replace(".old_", ""))
+                            ?.OrderByDescending(x => x)
+                            ?.FirstOrDefault();
+                        if (int.TryParse(lastBackupNumberString, out int lastBackupNumberInt))
+                            backupNumber = lastBackupNumberInt;
+                    }
+
+                    backupNumber++;
+
+                    var newFileName = Path.Combine(parentFolderInfo.FullName, $"{fileNameWithoutExtension}.old_{backupNumber}{oldFile.Extension}");
+                    oldFile.MoveTo(newFileName);
+                }
             }
 
             private void TryToDeleteTempFile()
