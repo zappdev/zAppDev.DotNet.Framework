@@ -92,6 +92,14 @@ namespace zAppDev.DotNet.Framework.Workflow
                     newSchedule.Active = true;
                     Builder.CreateCreateRepository(manager).Save(newSchedule);
                 }
+                //update existing
+                foreach (var schedule in schedules.Where(s => allScheduleNames.Contains(s.Workflow)))
+                {
+                    var  existingSchedule = Builder.CreateRetrieveRepository(manager).Get<WorkflowSchedule>(a => a.Workflow == schedule.Workflow).First();
+                    existingSchedule.Active = schedule.Active;
+                    existingSchedule.CronExpression = schedule.CronExpression;
+                    Builder.CreateCreateRepository(manager).Save(existingSchedule);
+                }
             });
         }
 
