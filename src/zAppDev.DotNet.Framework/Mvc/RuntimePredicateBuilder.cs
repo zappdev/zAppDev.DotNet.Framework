@@ -542,6 +542,12 @@ namespace zAppDev.DotNet.Framework.Mvc
                 if (string.IsNullOrEmpty(entry.Column.Name)) break;
 
                 var dataType = MambaDataTypeToCSharp(entry.Column.MambaDataType);
+                if(dataType == entry.Column.MambaDataType)
+                {
+                    var assemblyEnums = type.Assembly.GetTypes().Where(a => a.IsEnum).ToList();
+                    var filterEnum = assemblyEnums.Where(a => a.Name == entry.Column.MambaDataType).FirstOrDefault();
+                    if (filterEnum != null) dataType = filterEnum.FullName + "?";
+                }
                 var defaultValue = GetColumnDefaultValue(entry.Column);
 
                 code += $@"groups.Add(new zAppDev.DotNet.Framework.LinqRuntimeTypeBuilder.FieldDefinition<{TypeName(type)}>
@@ -859,7 +865,7 @@ $@"public static System.Dynamic.ExpandoObject {methodName}({TypeName(type)} inpu
             }
             return methodInfo;
         }
-        private static Assembly BuildAssembly(string code, bool withCSharp = false)
+        public static Assembly BuildAssembly(string code, bool withCSharp = false)
         {
 #if NETFRAMEWORK
             var provider = new CSharpCodeProvider();

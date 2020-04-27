@@ -101,7 +101,7 @@ namespace zAppDev.DotNet.Framework.Mvc
             foreach (var group in firstLevelGroups)
             {
                 var groupItems = group.ToList();
-                var subGroup = new GroupTree<T>(group.Key,
+                var subGroup = new GroupTree<T>(group.Key == null? NullString : group.Key,
                                                 groupBy[0].Column,
                                                 groupBy[0].Expanded ? GroupState.EXPANDED : GroupState.COLLAPSED);
 

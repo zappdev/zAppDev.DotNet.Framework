@@ -12,6 +12,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading;
+using zAppDev.DotNet.Framework.Mvc;
 
 #if NETFRAMEWORK
 using Microsoft.CSharp;
@@ -49,6 +50,14 @@ namespace zAppDev.DotNet.Framework.LinqRuntimeTypeBuilder
                     return builtTypes;
                 #endif
             }
+            set
+            {
+                #if NETFRAMEWORK
+                #else
+                    var cacheManager = ServiceLocator.Current.GetInstance<ICacheWrapperService>();
+                    cacheManager.Set("BuiltTypes", value);
+                #endif
+            }
         }
 
 		/*
@@ -73,11 +82,11 @@ namespace zAppDev.DotNet.Framework.LinqRuntimeTypeBuilder
             //TODO: optimize the type caching -- if fields are simply reordered, that doesn't mean that they're actually different types, so this needs to be smarter
             var key = CSharpName(type, false) + "_";
             foreach (var field in fields)
-                key += SanitizeCSharpIdentifier(field.Key) + "_" + CSharpName(field.Value, false) + "_";
+                key += $"{SanitizeCSharpIdentifier(field.Key)}_{CSharpName(field.Value, false)}_";
 
             if(selectFields != null)
                 foreach (var field in selectFields)
-                    key += SanitizeCSharpIdentifier(field.Key) + "_" + CSharpName(field.Value, false) + "_";
+                    key += $"{SanitizeCSharpIdentifier(field.Key)}_{CSharpName(field.Value, false)}_";
 
             return key;
         }
@@ -97,7 +106,7 @@ namespace zAppDev.DotNet.Framework.LinqRuntimeTypeBuilder
             return className.Replace(" ", replacementChar);
         }
 
-        public static string CSharpName(this Type type, bool forDeclaration = true)
+        public static string CSharpName(this Type type, bool forDeclaration = true, bool forField = false)
         {
             if (type == null)
             {
@@ -106,11 +115,16 @@ namespace zAppDev.DotNet.Framework.LinqRuntimeTypeBuilder
 
             var sb = new StringBuilder();
             var name = type.Name;
-            if (!type.IsGenericType) return name;
+            if (!type.IsGenericType)
+            {
+                if (type.IsEnum && forField) return type.FullName;
+                return name;
+            }
+
             sb.Append(name.Substring(0, name.IndexOf('`')));
             sb.Append("<");
             sb.Append(string.Join(", ", type.GetGenericArguments()
-                                            .Select(t => t.CSharpName())));
+                                            .Select(t => t.CSharpName(forField: forField))));
             sb.Append(">");
 
             return forDeclaration ? sb.ToString() : sb.ToString().Replace("<", "").Replace(">", "").Replace(",", "").Replace(" ", "");
@@ -154,10 +168,10 @@ namespace zAppDev.DotNet.Framework.LinqRuntimeTypeBuilder
                 public class {groupClassName}
                 {{
                     {
-                        string.Join("\r\n", groupFields.Select(a => "public " + CSharpName(a.Value) + " " + SanitizeCSharpIdentifier(a.Key) + ";").ToArray())
+                        string.Join("\r\n", groupFields.Select(a => "public " + CSharpName(a.Value,forField: true) + " " + SanitizeCSharpIdentifier(a.Key) + ";").ToArray())
                     }
 
-                    public {groupClassName}({ string.Join(", ", groupFields.Select(a=> CSharpName(a.Value) + " _" + SanitizeCSharpIdentifier(a.Key)).ToArray()) })
+                    public {groupClassName}({ string.Join(", ", groupFields.Select(a=> CSharpName(a.Value, forField: true) + " _" + SanitizeCSharpIdentifier(a.Key)).ToArray()) })
                     {{
                         {
                             string.Join("\r\n", groupFields.Select(a => SanitizeCSharpIdentifier(a.Key) + " = _" + SanitizeCSharpIdentifier(a.Key) + ";").ToArray())
@@ -215,8 +229,16 @@ namespace zAppDev.DotNet.Framework.LinqRuntimeTypeBuilder
             }}
 ";
                 var dummyAssembly = BuildAssembly(code);
+#if NETFRAMEWORK
                 BuiltTypes[groupClassName] = dummyAssembly.GetType("DummyAssembly." + groupClassName);
                 BuiltTypes[selectClassName] = dummyAssembly.GetType("DummyAssembly." + selectClassName);
+#else
+                var values = BuiltTypes;
+                values[groupClassName] = dummyAssembly.GetType("DummyAssembly." + groupClassName);
+                values[selectClassName] = dummyAssembly.GetType("DummyAssembly." + selectClassName);
+                BuiltTypes = values;
+#endif
+
 
                 selectFields["Key"] = BuiltTypes[groupClassName];
 
@@ -310,79 +332,12 @@ namespace zAppDev.DotNet.Framework.LinqRuntimeTypeBuilder
         }
 
         private static Assembly BuildAssembly(string codeToCompile)
-        {
-#if NETFRAMEWORK
-            var provider = new CSharpCodeProvider();
-            var compilerParameters = new CompilerParameters
-            {
-                GenerateExecutable = false,
-                GenerateInMemory = true
-            };
-            compilerParameters.ReferencedAssemblies.Add("System.Core.dll");
-
-            var results = provider.CompileAssemblyFromSource(compilerParameters, codeToCompile);
-            if (!results.Errors.HasErrors) return results.CompiledAssembly;
-
-            var errors = new StringBuilder("Compiler Errors :\r\n");
-            foreach (CompilerError error in results.Errors)
-            {
-                errors.AppendFormat("Line {0},{1}\t: {2}\n",
-                    error.Line, error.Column, error.ErrorText);
-            }
-
-            throw new ApplicationException(errors.ToString());
-#else
-            var syntaxTree = CSharpSyntaxTree.ParseText(codeToCompile);
-
-            var assemblyName = Path.GetRandomFileName();
-
-            var runtimeDirectory = Directory.GetParent(typeof(object).GetTypeInfo().Assembly.Location).FullName;
-
-            var references = new MetadataReference[]
-            {
-                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Linq.dll")),
-                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Private.CoreLib.dll")),
-                MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Linq.Expressions.dll"))
-            };
-
-            var compilation = CSharpCompilation.Create(
-                assemblyName,
-                syntaxTrees: new[] { syntaxTree },
-                references: references,
-                options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-
-            using (var ms = new MemoryStream())
-            {
-                var result = compilation.Emit(ms);
-
-                if (!result.Success)
-                {
-                    var errors = new StringBuilder("Compiler Errors :\r\n");
-                    var failures = result.Diagnostics.Where(diagnostic =>
-                        diagnostic.IsWarningAsError ||
-                        diagnostic.Severity == DiagnosticSeverity.Error);
-
-                    foreach (var error in failures)
-                    {
-                        errors.AppendFormat("Error {0}: {1}\n",
-                            error.Id, error.GetMessage());
-                    }
-
-                    throw new ApplicationException(errors.ToString());
-                }
-
-                ms.Seek(0, SeekOrigin.Begin);
-                return AssemblyLoadContext.Default.LoadFromStream(ms);
-            }
-#endif
-        }
+            => RuntimePredicateBuilder.BuildAssembly(codeToCompile);
 
         private static Type GetNullableType(Type type)
         {
-            if (type == null)
-            {
-                return null;
-            }
+            if (type == null) return null;
+            
 
             var isStruct = type.IsValueType && !type.IsEnum;
             var isNullable = Nullable.GetUnderlyingType(type) != null;
