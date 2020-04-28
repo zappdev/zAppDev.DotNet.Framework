@@ -23,5 +23,6 @@ Licensed under the AGPL-3.0 license. See LICENSE file in the project root for fu
         <property name="LastExecutionMessage" column="`LastExecutionMessage`" type="String" not-null="false" length="4001" />
         <property name="IsLastExecutionSuccess" column="`IsLastExecutionSuccess`" type="System.Boolean" not-null="false" />
         <property name="Active" column="`Active`" type="System.Boolean" not-null="false" />
+      <property name="CronExpressionTimezone" column="`CronExpressionTimezone`" type="String" not-null="false" length="255" />
     </class>
 </hibernate-mapping>

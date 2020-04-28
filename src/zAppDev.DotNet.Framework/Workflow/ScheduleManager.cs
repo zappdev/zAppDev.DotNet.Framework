@@ -97,8 +97,24 @@ namespace zAppDev.DotNet.Framework.Workflow
                 {
                     var  existingSchedule = Builder.CreateRetrieveRepository(manager).Get<WorkflowSchedule>(a => a.Workflow == schedule.Workflow).First();
                     existingSchedule.Active = schedule.Active;
+                    existingSchedule.StartDateTime = schedule.StartDateTime;
+                    existingSchedule.ExpireOn = schedule.ExpireOn;
                     existingSchedule.CronExpression = schedule.CronExpression;
+                    existingSchedule.CronExpressionTimezone = schedule.CronExpressionTimezone;
                     Builder.CreateCreateRepository(manager).Save(existingSchedule);
+                }
+            });
+        }
+
+        public void DeleteSchedules()
+        {
+            MiniSessionManager
+            .ExecuteInUoW(manager =>
+            {
+                var allSchedules = Builder.CreateRetrieveRepository(manager).GetAll<WorkflowSchedule>().ToList();
+                foreach (var schedule in allSchedules)
+                {
+                    Builder.CreateDeleteRepository(manager).Delete(schedule);
                 }
             });
         }
@@ -108,7 +124,16 @@ namespace zAppDev.DotNet.Framework.Workflow
             if (!schedule.Active) return DateTime.MinValue; // Inactive
             if (schedule.ExpireOn <= DateTime.UtcNow) return DateTime.MinValue; // Expired
             var baseTime = schedule.StartDateTime == null || schedule.StartDateTime <= DateTime.UtcNow ? schedule.LastExecution : schedule.StartDateTime;
-            return baseTime == null ? DateTime.UtcNow : Utilities.Common.GetNextExecutionTime(schedule.CronExpression, baseTime);
+            if(baseTime == null)
+            {
+                return DateTime.UtcNow;
+            }
+            if (baseTime.Value.Kind == DateTimeKind.Unspecified)
+            {
+                baseTime = DateTime.SpecifyKind(baseTime.Value, DateTimeKind.Utc);
+            }
+            baseTime = TimeZoneInfo.ConvertTime(baseTime.Value, GetScheduleTimezone(schedule.CronExpressionTimezone));
+            return Utilities.Common.GetNextExecutionTime(schedule.CronExpression, baseTime);
         }
 
         internal List<WorkflowSchedule> GetSchedules(bool onlyactive = true)
@@ -172,7 +197,8 @@ namespace zAppDev.DotNet.Framework.Workflow
             {
                 try
                 {
-                    if (schedule.ExpireOn <= DateTime.UtcNow)
+                    var expireDateTime = schedule.ExpireOn.HasValue ? schedule.ExpireOn.Value : DateTime.MaxValue;
+                    if (IsTimeInPastInSpesificTimezone(expireDateTime, schedule.CronExpressionTimezone))
                     {
                         // Schedule has Expired but it is still active
                         // Mark as Inactive and update the database
@@ -186,7 +212,7 @@ namespace zAppDev.DotNet.Framework.Workflow
                     }
                     // Should be evaluated?
                     var nextExecTime = GetNextExecutionTime(schedule);
-                    if (nextExecTime != DateTime.MinValue && nextExecTime <= DateTime.UtcNow)
+                    if (nextExecTime != DateTime.MinValue && IsTimeInPastInSpesificTimezone(nextExecTime,schedule.CronExpressionTimezone))
                     {
                         // Execute
                         ExecuteSchedule(schedule);
@@ -203,6 +229,26 @@ namespace zAppDev.DotNet.Framework.Workflow
                     _log.Error($"Error processing Scheduled Activity: {schedule.Workflow} - {schedule.Workflow}", ex);
                 }
             }
+        }
+        private TimeZoneInfo GetScheduleTimezone(string timezoneId)
+        {
+            TimeZoneInfo timeZone = TimeZoneInfo.Utc;
+            try
+            {
+                timeZone = TimeZoneInfo.FindSystemTimeZoneById(timezoneId);
+            }
+            catch (InvalidTimeZoneException e)
+            {
+                _log.Debug(e);
+                _log.Debug($"Time timezone {timezoneId} is not a valid timezone");
+            }
+            return timeZone;
+        }
+
+        private bool IsTimeInPastInSpesificTimezone(DateTime date, string timezoneId)
+        {
+            var timezone = GetScheduleTimezone(timezoneId);
+            return TimeZoneInfo.ConvertTime(date, timezone) <= TimeZoneInfo.ConvertTime(DateTime.UtcNow, timezone);
         }
 #if NETFRAMEWORK
 #else

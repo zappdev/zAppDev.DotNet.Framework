@@ -61,6 +61,8 @@ namespace zAppDev.DotNet.Framework.Workflow
         protected string humanReadableExpression;
         [DataMember(Name = "NextExecutionTime")]
         protected DateTime? nextExecutionTime;
+        [DataMember(Name = "CronExpressionTimezone")]
+        protected string cronExpressionTimezone;
         #endregion
         #region WorkflowSchedule's Properties
         /// <summary>
@@ -240,6 +242,22 @@ namespace zAppDev.DotNet.Framework.Workflow
             set
             {
                 nextExecutionTime = value;
+            }
+        }
+        /// <summary>
+        /// The NextExecutionTime property
+        ///
+        /// </summary>
+        ///
+        public virtual string CronExpressionTimezone
+        {
+            get
+            {
+                return cronExpressionTimezone;
+            }
+            set
+            {
+                cronExpressionTimezone = value;
             }
         }
         #endregion
