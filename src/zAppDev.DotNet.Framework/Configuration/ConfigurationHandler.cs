@@ -84,8 +84,8 @@ namespace zAppDev.DotNet.Framework.Configuration
             var config = configuration == null ? ServiceLocator.Current.GetInstance<IConfiguration>() : configuration;
 
             var serverRole = Web.GetCurrentServerRole(configuration);
-            var appSetting = "";
 
+            var appSetting = "";
             switch (serverRole)
             {
                 case Web.ServerRole.Combined:
@@ -104,11 +104,14 @@ namespace zAppDev.DotNet.Framework.Configuration
             var baseUri = config[$"configuration:appSettings:add:{appSetting}:value"];
             if (!string.IsNullOrWhiteSpace(baseUri))
             {
+
                 if (Uri.TryCreate(baseUri, UriKind.Absolute, out Uri result)) return result;
             }
-
             var urlsString = config.GetValue<string>("urls");
+            if (string.IsNullOrWhiteSpace(urlsString)) return null;
+
             var splitter = new char[] { ';' };
+
             var urls = urlsString.Split(splitter, options: StringSplitOptions.RemoveEmptyEntries);
             var firstURL = urls?.FirstOrDefault();
             if (!string.IsNullOrWhiteSpace(firstURL))

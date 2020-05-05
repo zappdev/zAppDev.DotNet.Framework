@@ -63,8 +63,9 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
 #if NETFRAMEWORK
                 var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 #else
-                var baseDirectory = Environment.GetEnvironmentVariable("ASPNETCORE_CONTENTROOT");
+                var baseDirectory = Directory.GetCurrentDirectory();
 #endif
+
                 var destination = Path.Combine(baseDirectory, Mvc.DatabaseMigrator.MigrationsFolder, "MariaDB");
                 if (!Directory.Exists(destination)) Directory.CreateDirectory(destination);
                 if (Directory.Exists(destination))
