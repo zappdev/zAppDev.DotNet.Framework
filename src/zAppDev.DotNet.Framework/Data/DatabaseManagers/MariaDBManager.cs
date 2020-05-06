@@ -1,9 +1,12 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using log4net;
+using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using NHibernate.Tool.hbm2ddl;
 using System;
 using System.Data.Common;
 using System.IO;
+using System.Management.Automation;
+using System.Reflection;
 using zAppDev.DotNet.Framework.Data.DatabaseManagers.AccessLogManager;
 
 namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
@@ -33,6 +36,10 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
                 }
                 else
                 {
+                    if (!string.IsNullOrWhiteSpace(exportMariaDBSchemaSetting))
+                    {
+                        LogManager.GetLogger(Assembly.GetEntryAssembly(), "MariaDB Manager").Warn("Invalid configuration of setting [ExportMariaDBSchema]. Skipping export.");
+                    }
                     _exportMariaDBSchema = false;
                 }
             }
@@ -50,28 +57,49 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
                     updateCode.AppendLine();
                 }
 
-                schemaUpdate.Execute(row =>
+                var step = "Preparing to export schema";
+                try
                 {
-                    if ((!string.IsNullOrWhiteSpace(row) && (!row.EndsWith(";"))))
+                    step = "Exporting Schema";
+
+                    schemaUpdate.Execute(row =>
                     {
-                        row += ";";
-                    }
-                    updateCode.AppendLine(row);
-                    updateCode.AppendLine();
-                }, false);
+                        if ((!string.IsNullOrWhiteSpace(row) && (!row.EndsWith(";"))))
+                        {
+                            row += ";";
+                        }
+                        updateCode.AppendLine(row);
+                        updateCode.AppendLine();
+                    }, false);
+
 
 #if NETFRAMEWORK
-                var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                    var baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 #else
-                var baseDirectory = Directory.GetCurrentDirectory();
+                    var baseDirectory = Directory.GetCurrentDirectory();
 #endif
+                    step = "Calculating target folder";
+                    var destination = Path.Combine(baseDirectory, Mvc.DatabaseMigrator.MigrationsFolder, "MariaDB");
 
-                var destination = Path.Combine(baseDirectory, Mvc.DatabaseMigrator.MigrationsFolder, "MariaDB");
-                if (!Directory.Exists(destination)) Directory.CreateDirectory(destination);
-                if (Directory.Exists(destination))
+                    if (!Directory.Exists(destination)) {
+                        step = "Creating target folder";
+                        Directory.CreateDirectory(destination);
+                    }
+
+                    if (Directory.Exists(destination))
+                    {
+                        step = "Saving exported schema's code";
+                        File.WriteAllText(Path.Combine(destination, $"DBSchema_{DateTime.Now.ToString("yyyymmdd_HHmmss")}.mysql"), updateCode.ToString());
+                        SchemaExported = true;
+                    }
+                    else
+                    {
+                        LogManager.GetLogger(Assembly.GetEntryAssembly(), "MariaDB Manager").Error($"Directory not found: [{destination}].");
+                    }
+                }
+                catch (Exception e)
                 {
-                    File.WriteAllText(Path.Combine(destination, $"DBSchema_{DateTime.Now.ToString("yyyymmdd_HHmmss")}.mysql"), updateCode.ToString());
-                    SchemaExported = true;
+                    LogManager.GetLogger(Assembly.GetEntryAssembly(), "MariaDB Manager").Error($@"Exception while Exporting Schema of MariaDB Database: {e.Message}. \r\nLast step passed: [{step}]. \r\nStackTrace: {e.StackTrace}");
                 }
             }
         }

@@ -4,6 +4,7 @@
 using HealthChecks.Network.Core;
 using HealthChecks.RabbitMQ;
 using HealthChecks.Uris;
+using log4net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -15,6 +16,7 @@ using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using zAppDev.DotNet.Framework.Configuration;
@@ -28,11 +30,16 @@ namespace zAppDev.DotNet.Framework.Profiling.HealthChecks
 {
     public static class HealthCheckExtensions
     {
+        private static ILog logger = LogManager.GetLogger(Assembly.GetEntryAssembly(), "HealthCheck Extensions");
+
         private static IHealthChecksBuilder AddImapHealthCheck(this IHealthChecksBuilder builder, IConfiguration configuration)
         {
             var imapSettings = ConfigurationHandler.GetImapSettings(configuration);
 
-            if (string.IsNullOrWhiteSpace(imapSettings.Host)) return builder;
+            if (string.IsNullOrWhiteSpace(imapSettings.Host)) {
+                logger.Info("IMAP Check: No valid Host found. Skipping check.");
+                return builder; 
+            }
 
             return builder.AddImapHealthCheck(setup =>
             {
@@ -47,7 +54,11 @@ namespace zAppDev.DotNet.Framework.Profiling.HealthChecks
         private static IHealthChecksBuilder AddRabbitMQCheck(this IHealthChecksBuilder builder, IConfiguration configuration)
         {
             var connectionFactory = RabbitMQMessagingLogger.GetConnectionFactory(configuration);
-            if (string.IsNullOrWhiteSpace(connectionFactory.HostName)) return builder;
+            if (string.IsNullOrWhiteSpace(connectionFactory.HostName)) {
+
+                logger.Info("RabbitMQ Check: No valid Host found. Skipping check.");
+                return builder; 
+            }
 
             return builder.AddRabbitMQ($"amqp://{connectionFactory.HostName}:{connectionFactory.Port}", sslOption: connectionFactory.Ssl);
         }
@@ -83,7 +94,10 @@ namespace zAppDev.DotNet.Framework.Profiling.HealthChecks
         private static IHealthChecksBuilder AddSMTPCheck(this IHealthChecksBuilder builder, IConfiguration configuration)
         {
             var smtpSettings = ConfigurationHandler.GetSmtpSettings(configuration);
-            if (string.IsNullOrWhiteSpace(smtpSettings?.Smtp?.Network?.Host)) return builder;
+            if (string.IsNullOrWhiteSpace(smtpSettings?.Smtp?.Network?.Host)) {
+                logger.Info("SMTP Check: No valid Host found. Skipping check.");
+                return builder; 
+            }
 
             var enableSSL = false;
             if (bool.TryParse(configuration[$"configuration:appSettings:EnableSSL:value"], out var parsedBool)) enableSSL = parsedBool;
@@ -103,12 +117,17 @@ namespace zAppDev.DotNet.Framework.Profiling.HealthChecks
         private static IHealthChecksBuilder AddServerExternalIPCheck(this IHealthChecksBuilder builder, IConfiguration configuration)
         {
             var uriString = configuration[$"configuration:appSettings:add:ServerExternalIP:value"];
-            if (string.IsNullOrEmpty(uriString)) return builder;
+            if (string.IsNullOrEmpty(uriString)) {
+                logger.Info("Server's External IP Check: No IP found. Skipping check.");
+                return builder; 
+            }
 
             if(Uri.TryCreate(uriString, UriKind.Absolute, out Uri url))
             {
                 builder.AddUrlGroup(url, "ServerExternalIP");
             }
+
+            logger.Warn("Server's External IP Check: No valid IP found. Skipping check.");
             return builder;
         }
 
@@ -116,7 +135,10 @@ namespace zAppDev.DotNet.Framework.Profiling.HealthChecks
         {
             var serverRole = Web.GetCurrentServerRole(configuration);
             var url = ConfigurationHandler.GetOtherTierURL(configuration, serverRole);
-            if (url == null) return builder;
+            if (url == null) {
+                logger.Info("Opposite's Tier (for N-Tier Architectures): URL of Opposite Tier not found. Skipping check");
+                return builder; 
+            }
 
             var testName = serverRole == Web.ServerRole.Web ? "Application" : "Web";
             builder.AddUrlGroup(url, name: testName);
@@ -151,7 +173,14 @@ namespace zAppDev.DotNet.Framework.Profiling.HealthChecks
                 var baseUrl = restService.GetProperty("BaseUrl")?.GetValue(null)?.ToString();
                 if (!string.IsNullOrWhiteSpace(baseUrl))
                 {
-                    builder.AddUrlGroup(new Uri(baseUrl), name: restService.Name);
+                    if(Uri.TryCreate(baseUrl, UriKind.Absolute, out Uri uri))
+                        builder.AddUrlGroup(new Uri(baseUrl), name: restService.Name);
+                    else
+                        logger.Warn($"REST Service Check: Invalid BaseUrl for Service[{restService.Name}]. Skipping check.");
+                }
+                else
+                {
+                    logger.Warn($"REST Service Check: No BaseUrl found for Service [{restService.Name}]");
                 }
             }
 
@@ -163,7 +192,10 @@ namespace zAppDev.DotNet.Framework.Profiling.HealthChecks
         private static IHealthChecksBuilder AddSignalRCheck(this IHealthChecksBuilder builder, IConfiguration configuration)
         {
             var baseUri = ConfigurationHandler.GetBaseUri(configuration);
-            if (baseUri == null) return builder;
+            if (baseUri == null) {
+                logger.Warn("SignalR Check: No valid BaseUrl found. Skipping check.");
+                return builder; 
+            }
 
             string absoluteUri = baseUri.AbsoluteUri;
             if (!absoluteUri.EndsWith("/"))
