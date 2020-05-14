@@ -96,6 +96,7 @@ namespace zAppDev.DotNet.Framework.Mvc
         DROPDOWN_REFRESH,
         CALENDAR_REFRESH,
         SET_DIRTY,
-        DOWNLOAD
+        DOWNLOAD,
+        ImageRefresh
     }
 }
