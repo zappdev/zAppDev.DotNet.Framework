@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 
 namespace zAppDev.DotNet.Framework.Mvc.API
 {
@@ -75,11 +76,11 @@ namespace zAppDev.DotNet.Framework.Mvc.API
 
                 context.Request.EnableRewind();
 
-                using (var stream = new StreamReader(context.Request.Body))
-                {
-                    postBody = stream.ReadToEnd();
-                    context.Request.Body.Seek(0, SeekOrigin.Begin);
-                }
+                 using (var stream = new StreamReader(context.Request.Body,encoding: Encoding.UTF8,detectEncodingFromByteOrderMarks: true, bufferSize: 1024, leaveOpen: true))
+                 {
+                     postBody = stream.ReadToEnd();
+                     context.Request.Body.Seek(0, SeekOrigin.Begin);
+                 }
             }
 
             return postBody;

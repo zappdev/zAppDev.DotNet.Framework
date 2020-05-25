@@ -86,7 +86,7 @@ namespace zAppDev.DotNet.Framework.Mvc.API
                 context.Result = new ContentResult()
                 {
                     Content = Encoding.UTF8.GetString(value.Body, 0, value.Body.Length),
-                    ContentType = value.Headers["Content-Type"]
+                    ContentType =  value.Headers.ContainsKey("Content-Type") ?  value.Headers["Content-Type"] : null
                 };
 
                 httpContext.Items[HttpContextItemKeys.HitCache] = true;
