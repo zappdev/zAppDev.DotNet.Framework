@@ -246,6 +246,7 @@ namespace zAppDev.DotNet.Framework.Identity
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => false;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
+                
             });
 
             services.AddCustomIdentity<Model.IdentityUser, IdentityRole>(options =>
@@ -345,7 +346,7 @@ namespace zAppDev.DotNet.Framework.Identity
                 o.ReturnUrlParameter = "returnUrl";
                 o.LogoutPath = new PathString("/Login/Logout");
                 o.AccessDeniedPath = new PathString("/Unauthorized/Render");
-                o.ExpireTimeSpan = TimeSpan.FromMinutes(15);
+                o.ExpireTimeSpan = TimeSpan.FromDays(1);
                 o.SlidingExpiration = true;
                 o.Events = new CookieAuthenticationEvents
                 {
@@ -356,7 +357,7 @@ namespace zAppDev.DotNet.Framework.Identity
             {
                 o.Cookie.Name = IdentityConstants.ExternalScheme;
                 o.SlidingExpiration = true;
-                o.ExpireTimeSpan = TimeSpan.FromMinutes(15);
+                o.ExpireTimeSpan = TimeSpan.FromDays(1);
             })
             .AddCookie(IdentityConstants.TwoFactorRememberMeScheme, o =>
             {
@@ -369,7 +370,7 @@ namespace zAppDev.DotNet.Framework.Identity
             .AddCookie(IdentityConstants.TwoFactorUserIdScheme, o =>
             {
                 o.Cookie.Name = IdentityConstants.TwoFactorUserIdScheme;
-                o.ExpireTimeSpan = TimeSpan.FromMinutes(15);
+                o.ExpireTimeSpan = TimeSpan.FromDays(1);
                 o.SlidingExpiration = true;
             });
 
