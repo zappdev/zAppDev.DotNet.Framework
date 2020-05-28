@@ -164,7 +164,7 @@ namespace zAppDev.DotNet.Framework.Mvc
         
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
-            log4net.LogManager.GetLogger(this.GetType()).Info("start: OnActionExecuting");
+            log4net.LogManager.GetLogger(this.GetType()).Debug("start: OnActionExecuting");
 
             if (actionContext == null) throw new ArgumentNullException("actionContext");
 
@@ -240,7 +240,7 @@ namespace zAppDev.DotNet.Framework.Mvc
 
             var cacheTime = CacheTimeQuery.Execute(DateTime.UtcNow);
             ApplyCacheHeaders(actionContext.Response, cacheTime);
-            log4net.LogManager.GetLogger(this.GetType()).Info("end: OnActionExecuting");
+            log4net.LogManager.GetLogger(this.GetType()).Debug("end: OnActionExecuting");
 
             // Log Api Access
             if (LogEnabled && !(bool)actionContext.Request.Properties["requestIsLogged"])
