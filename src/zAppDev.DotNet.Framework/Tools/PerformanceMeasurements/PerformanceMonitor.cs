@@ -16,6 +16,7 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements
     public class PerformanceMonitor
     {
         public readonly ControllerActionMonitor ControllerActionMonitor;
+        public readonly ExposedApiMonitor ExposedApiMonitor;
         public readonly DataMonitor RequestMonitor;
         public readonly DataMonitor ResponseMonitorPreAction;
         public readonly DataMonitor ResponseMonitorPostAction;
@@ -50,6 +51,9 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements
                 {
                     if (configuration.ControllerAction.Enabled)
                         ControllerActionMonitor = new ControllerActionMonitor(_configuration.ControllerAction, session);
+
+                    if (configuration.ExposedApi.Enabled)
+                        ExposedApiMonitor = new ExposedApiMonitor(_configuration.ExposedApi, session);
 
                     if (configuration.DataConfiguration.Enabled)
                     {

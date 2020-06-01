@@ -141,6 +141,23 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
         }
     }
 
+    public class ExposedApiConfiguration : Enabled_Configuration
+    { 
+        public TimeConfiguration Time { get; set; }
+        public CPUConfiguration CPU { get; set; }
+        public RAMConfiguration RAM { get; set; }
+        public DatabaseConfiguration Database { get; set; }
+
+        public ExposedApiConfiguration()
+        {
+            Time = new TimeConfiguration();
+            CPU = new CPUConfiguration();
+            RAM = new RAMConfiguration();
+            Database = new DatabaseConfiguration();
+        }
+    }
+
+
     public class DTO2ViewModelConfiguration : Enabled_Configuration
     {
         public SizeConfiguration Size { get; set; }
@@ -225,6 +242,8 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
 
         public DataItemConfiguration DBFlush { get; set; }
 
+        public ExposedApiConfiguration ExposedApi { get; set; }
+
         private List<string> SplitAndClear(string toSplit, string applicationName = null)
         {
             var result = new List<string>();
@@ -246,6 +265,7 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
             ControllerAction = new ControllerActionConfiguration();
             DBFlush = new DataItemConfiguration();
             DataConfiguration = new DataConfiguration();
+            ExposedApi = new ExposedApiConfiguration();
 
             if (configuration != null && configuration.Enabled == true)
             {
@@ -293,6 +313,51 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
 
                             ControllerAction.Database.Entities.MonitoredEntities = SplitAndClear(configuration.ControllerAction?.Database?.Entities?.MonitoredEntities, applicationName);
                             ControllerAction.Database.Entities.MonitoredStatistics = SplitAndClear(configuration.ControllerAction?.Database?.Entities?.MonitoredStatistics, null);
+                        }// end ControllerAction.Database.Entities
+                    }//end ControllerAction.Database
+                }//end ControllerAction
+
+                ExposedApi.Enabled = configuration.ExposedApi?.Enabled ?? false;
+                if (ExposedApi.Enabled)
+                {
+                    ExposedApi.Time.Enabled = configuration.ExposedApi?.Time?.Enabled ?? false;
+                    if (ExposedApi.Time.Enabled)
+                    {
+                        ExposedApi.Time.MinimumMilliseconds = configuration.ExposedApi?.Time?.MinimumMilliseconds ?? 0;
+                    }//end ControllerAction.Time
+
+                    ExposedApi.CPU.Enabled = configuration.ExposedApi?.CPU?.Enabled ?? false;
+                    if (ExposedApi.CPU.Enabled)
+                    {
+                        ExposedApi.CPU.IntervalMilliseconds = configuration.ExposedApi?.CPU?.IntervalMilliseconds ?? 1000;
+                        ExposedApi.CPU.MinimumPercentage = configuration.ExposedApi?.CPU?.MinimumPercentage ?? 0;
+                    }//end ControllerAction.CPU
+
+                    ExposedApi.RAM.Enabled = configuration.ExposedApi?.RAM?.Enabled ?? false;
+                    if (ExposedApi.RAM.Enabled)
+                    {
+                        ExposedApi.RAM.IntervalMilliseconds = configuration.ExposedApi?.RAM?.IntervalMilliseconds ?? 1000;
+                        ExposedApi.RAM.MinimumBytes = configuration.ExposedApi?.RAM?.MinimumBytes ?? 0;
+                    }//end ControllerAction.RAM
+
+                    ExposedApi.Database.Enabled = configuration.ExposedApi?.Database?.Enabled ?? false;
+                    if (ExposedApi.Database.Enabled)
+                    {
+                        ExposedApi.Database.Session.Enabled = configuration.ExposedApi?.Database?.Session?.Enabled ?? false;
+                        if (ExposedApi.Database.Session.Enabled)
+                        {
+                            ExposedApi.Database.Session.IgnoreNulls = configuration.ExposedApi?.Database?.Session?.IgnoreNulls ?? true;
+
+                            ExposedApi.Database.Session.MonitoredStatistics = SplitAndClear(configuration.ExposedApi?.Database?.Session?.MonitoredStatistics, null);
+                        }// end ControllerAction.Database.Session
+
+                        ExposedApi.Database.Entities.Enabled = configuration.ExposedApi?.Database?.Entities?.Enabled ?? false;
+                        if (ExposedApi.Database.Entities.Enabled)
+                        {
+                            ExposedApi.Database.Entities.IgnoreNulls = configuration.ExposedApi?.Database?.Entities?.IgnoreNulls ?? true;
+
+                            ExposedApi.Database.Entities.MonitoredEntities = SplitAndClear(configuration.ExposedApi?.Database?.Entities?.MonitoredEntities, applicationName);
+                            ExposedApi.Database.Entities.MonitoredStatistics = SplitAndClear(configuration.ExposedApi?.Database?.Entities?.MonitoredStatistics, null);
                         }// end ControllerAction.Database.Entities
                     }//end ControllerAction.Database
                 }//end ControllerAction
