@@ -236,7 +236,7 @@ namespace zAppDev.DotNet.Framework.Auditing
                         continue;
                     // Ignore collections
                     var property = auditableEntity.Properties[key];
-                    if (property.IsCollection || property.IsComplex)                        
+                    if (property.IsCollection )
                         continue;
                     // Ignore simple properties when CREATE
                     if (type == "CREATE" && !property.IsComplex)
