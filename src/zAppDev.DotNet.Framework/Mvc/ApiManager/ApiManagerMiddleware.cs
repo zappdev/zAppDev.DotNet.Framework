@@ -69,7 +69,7 @@ namespace zAppDev.DotNet.Framework.Middleware
 
             logTimer.Stop();
             var logger = log4net.LogManager.GetLogger(typeof(ApiManagerMiddleware));
-            logger.Info($"Logging time took : {logTimer.ElapsedMilliseconds} ms");
+            logger.Debug($"Logging time took : {logTimer.ElapsedMilliseconds} ms");
         }
 
         private void CreateByVariableTypeDtoResponse(HttpContext context)

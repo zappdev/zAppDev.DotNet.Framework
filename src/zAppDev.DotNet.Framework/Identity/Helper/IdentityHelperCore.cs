@@ -109,6 +109,22 @@ namespace zAppDev.DotNet.Framework.Identity
             return manager.FindById(identity.Name);
         }
 
+        public static Task<Model.IdentityUser> GetCurrentIdentityUserAsync()
+        {
+            var identity = Web.GetContext().User.Identity;
+
+            if (!identity.IsAuthenticated) return null;
+            var manager = GetUserManager();
+
+            return manager.FindByIdAsync(identity.Name);
+        }
+
+        public static async Task<ApplicationUser> GetCurrentApplicationUserAsync()
+        {
+            var identity = await GetCurrentIdentityUserAsync();
+            return identity?.User;
+        }
+
         public static ApplicationUser GetCurrentApplicationUser()
         {
             return GetCurrentIdentityUser()?.User;

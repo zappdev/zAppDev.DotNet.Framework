@@ -15,6 +15,8 @@ namespace zAppDev.DotNet.Framework.Mvc.API
 
         public bool AllowPartialResponse { get; set; }
 
+        public bool ReadOnly { get; set; }
+
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             base.OnActionExecuting(context);
@@ -26,7 +28,15 @@ namespace zAppDev.DotNet.Framework.Mvc.API
 
             // var manager = ServiceLocator.Current.GetInstance<IMiniSessionService>();
             var manager = context.HttpContext.RequestServices.GetRequiredService<IMiniSessionService>();
-            manager.OpenSessionWithTransaction();
+
+            if (ReadOnly)
+            {
+                manager.OpenSession();
+            }
+            else
+            {
+                manager.OpenSessionWithTransaction();
+            }
         }
 
         public override void OnActionExecuted(ActionExecutedContext context)
@@ -35,7 +45,14 @@ namespace zAppDev.DotNet.Framework.Mvc.API
             // var manager = ServiceLocator.Current.GetInstance<IMiniSessionService>();
             var manager = context.HttpContext.RequestServices.GetRequiredService<IMiniSessionService>();
 
-            manager.CommitChanges(context.Exception);
+            if (ReadOnly)
+            {
+                manager.CloseSession();
+            }
+            else
+            {
+                manager.CommitChanges(context.Exception);
+            }
         }
     }
 }

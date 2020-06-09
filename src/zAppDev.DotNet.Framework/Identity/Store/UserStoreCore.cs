@@ -67,16 +67,16 @@ namespace zAppDev.DotNet.Framework.Identity
             return user;
         }
 
-        private ApplicationUser RetrieveApplicationUser(string username, Expression<Func<ApplicationUser, bool>> filter = null)
+        private async Task<ApplicationUser> RetrieveApplicationUser(string username, Expression<Func<ApplicationUser, bool>> filter = null)
         {
             if (filter == null)
             {
                 filter = user => user.UserName == username;
                 //return GetCurrentSession().Get<BO.ApplicationUser>(username);
             }
-            return GetCurrentSession().Query<ApplicationUser>()
+            return await GetCurrentSession().Query<ApplicationUser>()
                 .WithOptions(options => options.SetCacheable(false))
-                .SingleOrDefault(filter);
+                .SingleOrDefaultAsync(filter);
         }
 
         public void Dispose()
@@ -126,13 +126,13 @@ namespace zAppDev.DotNet.Framework.Identity
             return Task.FromResult(IdentityResult.Success);
         }
 
-        public Task<Model.IdentityUser> FindByIdAsync(string userId, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Model.IdentityUser> FindByIdAsync(string userId, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
 
-            var appUser = RetrieveApplicationUser(userId);
-            return appUser != null ? Task.FromResult(new Model.IdentityUser(appUser)) : Task.FromResult<Model.IdentityUser>(null);
+            var appUser = await RetrieveApplicationUser(userId);
+            return appUser != null ? new Model.IdentityUser(appUser) : null;
         }
 
         public Task<Model.IdentityUser> FindByNameAsync(string userName, CancellationToken cancellationToken = default(CancellationToken))
@@ -172,7 +172,7 @@ namespace zAppDev.DotNet.Framework.Identity
             return Task.FromResult(string.IsNullOrWhiteSpace(user.User.PasswordHash));
         }
 
-        public Task<IList<Claim>> GetClaimsAsync(Model.IdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<IList<Claim>> GetClaimsAsync(Model.IdentityUser user, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -180,9 +180,9 @@ namespace zAppDev.DotNet.Framework.Identity
                 throw new ArgumentNullException(nameof(user));
 
             var result = (IList<Claim>)new List<Claim>();
-            var appUser = RetrieveApplicationUser(user.Id);
+            var appUser = await RetrieveApplicationUser(user.Id);
 
-            if (appUser == null) return Task.FromResult(result);
+            if (appUser == null) return result;
 
             foreach (var claim in appUser.Claims)
             {
@@ -199,7 +199,7 @@ namespace zAppDev.DotNet.Framework.Identity
                 result.Add(new Claim(System.Security.Claims.ClaimTypes.Role, role.Name));
             }
 
-            return Task.FromResult(result);
+            return result;
         }
 
         public Task SetSecurityStampAsync(Model.IdentityUser user, string stamp, CancellationToken cancellationToken = default(CancellationToken))
@@ -270,7 +270,7 @@ namespace zAppDev.DotNet.Framework.Identity
             return Task.FromResult(result);
         }
 
-        public Task<Model.IdentityUser> FindAsync(UserLoginInfo login, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Model.IdentityUser> FindAsync(UserLoginInfo login, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -278,9 +278,9 @@ namespace zAppDev.DotNet.Framework.Identity
             if (login == null)
                 throw new ArgumentNullException(nameof(login));
 
-            var appUser = RetrieveApplicationUser(string.Empty,
+            var appUser = await RetrieveApplicationUser(string.Empty,
                                                   user => user.Logins.Any(a => a.LoginProvider == login.LoginProvider && a.ProviderKey == login.ProviderKey));
-            return appUser != null ? Task.FromResult(new Model.IdentityUser(appUser)) : Task.FromResult<Model.IdentityUser>(null);
+            return appUser != null ? new Model.IdentityUser(appUser) : null;
         }
 
         public IQueryable<Model.IdentityUser> Users
@@ -438,14 +438,14 @@ namespace zAppDev.DotNet.Framework.Identity
             return Task.FromResult(0);
         }
 
-        public Task<Model.IdentityUser> FindByEmailAsync(string email, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<Model.IdentityUser> FindByEmailAsync(string email, CancellationToken cancellationToken = default(CancellationToken))
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
 
-            var appUser = RetrieveApplicationUser("", user => string.Equals(user.Email, email, StringComparison.CurrentCultureIgnoreCase));
+            var appUser = await RetrieveApplicationUser("", user => string.Equals(user.Email, email, StringComparison.CurrentCultureIgnoreCase));
 
-            return Task.FromResult(new Model.IdentityUser(appUser));
+            return new Model.IdentityUser(appUser);
         }
 
         public Task SetPhoneNumberAsync(Model.IdentityUser user, string phoneNumber, CancellationToken cancellationToken = default(CancellationToken))
