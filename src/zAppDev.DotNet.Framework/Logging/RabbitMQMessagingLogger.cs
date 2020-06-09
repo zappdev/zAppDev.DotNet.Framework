@@ -276,7 +276,7 @@ namespace zAppDev.DotNet.Framework.Logging
         {
             throw new NotImplementedException();
         }
-        public void LogExposedAPIMetadata(ExposedServiceMetadataStruct metadata)
+        public async Task LogExposedAPIMetadata(ExposedServiceMetadataStruct metadata)
         {
             throw new NotImplementedException();
         }

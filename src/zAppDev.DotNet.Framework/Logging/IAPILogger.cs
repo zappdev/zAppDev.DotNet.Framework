@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Http;
 #endif
 using zAppDev.DotNet.Framework.Services;
 using System.Net.Http;
-
+using System.Threading.Tasks;
 
 namespace zAppDev.DotNet.Framework.Logging
 {
@@ -32,7 +32,7 @@ namespace zAppDev.DotNet.Framework.Logging
 #else
         void LogExposedAPIAccess(string controller, string action, Guid requestId, TimeSpan processingTime, bool cacheHit);
 
-        void LogExposedAPIMetadata(ExposedServiceMetadataStruct metadata);
+        Task LogExposedAPIMetadata(ExposedServiceMetadataStruct metadata);
 
         void LogExternalAPIAccess(Guid requestId, string service, string operation,
                                   ServiceConsumptionOptions options, object response,
