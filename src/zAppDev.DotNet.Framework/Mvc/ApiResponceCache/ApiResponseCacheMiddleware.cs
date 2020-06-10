@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Net.Http.Headers;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
@@ -83,7 +84,14 @@ namespace zAppDev.DotNet.Framework.Middleware
 
         private void AddResponseToCache(HttpContext context, byte[] bytes)
         {
-            _cache.Set(context, new ApiCacheOutput(bytes, context.Response.Headers));
+            var headers = new Dictionary<string, string>();
+
+            foreach (string name in context.Response.Headers.Keys)
+            {
+                headers.Add(name, context.Response.Headers[name]);
+            }
+            var cacheOutput = new ApiCacheOutput(bytes, headers);
+            _cache.Set(context, cacheOutput);
         }
 
         private static void SetEtag(HttpContext context, string etag)
