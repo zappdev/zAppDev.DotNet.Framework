@@ -6,10 +6,11 @@ using zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Contracts;
 using log4net;
 using NHibernate;
 using System;
+using Newtonsoft.Json;
 
 namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Components
 {
-    public class ControllerActionMonitor: IPerformanceMonitor<ControllerActionStatistics>
+    public class ActionMonitor: IPerformanceMonitor<ActionStatistics>
     {
         public MonitorStatus MonitorStatus { get; private set; }
         public bool ContinueOnError { get; set; }
@@ -17,16 +18,16 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Components
         private readonly UsageMonitor _usageMonitor;
         private readonly NHMonitor _nhMonitor;
 
-        private readonly ControllerActionConfiguration _configuration;
+        private readonly ActionConfiguration _configuration;
 
         private readonly ILog _genericLog;
 
-        private string _nameOfThis => nameof(ControllerActionMonitor);
-        private Type _typeOfThis => typeof(ControllerActionMonitor);
+        private string _nameOfThis => nameof(ActionMonitor);
+        private Type _typeOfThis => typeof(ActionMonitor);
 
         private readonly bool _run;
 
-        public ControllerActionMonitor(ControllerActionConfiguration configuration, ISession session, ILog log = null)
+        public ActionMonitor(ActionConfiguration configuration, ISession session, ILog log = null)
         {
             MonitorStatus = MonitorStatus.None;
 
@@ -97,11 +98,11 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Components
             }
         }//end Stop()
 
-        public ControllerActionStatistics Get()
+        public ActionStatistics Get()
         {
             if (!_run) return null;
 
-            var result = new ControllerActionStatistics();
+            var result = new ActionStatistics();
             try
             {
                 if (MonitorStatus == MonitorStatus.None)
@@ -127,5 +128,36 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Components
                 return null;
             }
         }//end Get()
+
+        public void LogExposedAPIStatistics(string api, string operation)
+        {
+            try
+            {
+                var statistics = Get();
+                if (statistics == null) return;
+                if (!statistics.IsInteresting(_configuration)) return;
+
+                statistics.API = api;
+                statistics.Operation = operation;
+                statistics.DateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss,fff");
+
+                var logText = JsonConvert.SerializeObject(statistics, new JsonSerializerSettings
+                {
+                    NullValueHandling = NullValueHandling.Ignore,
+                    Formatting = Formatting.Indented
+                });
+
+                var _monitorLog = _configuration.GetLogger();
+                _monitorLog.Info(logText);
+            }
+            catch (Exception e)
+            {
+                _genericLog.Error($"{_nameOfThis} - Exception while Logging Back-End Statistics: {e.Message}");
+                _genericLog.Debug($"{_nameOfThis} - Exception while Logging Back-End Statistics: {e.StackTrace}");
+                if (!ContinueOnError) throw;
+            }
+        }//end Log()
+
+
     }
 }

@@ -119,44 +119,36 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
         }
     }
 
-    public class ControllerActionConfiguration : Enabled_Configuration
+    public class ActionConfiguration : Enabled_Configuration
+    {
+        public TimeConfiguration Time { get; set; }
+
+        public CPUConfiguration CPU { get; set; }
+
+        public RAMConfiguration RAM { get; set; }
+
+        public DatabaseConfiguration Database { get; set; }
+
+        public ActionConfiguration()
+        {
+            Time = new TimeConfiguration();
+            CPU = new CPUConfiguration();
+            RAM = new RAMConfiguration();
+            Database = new DatabaseConfiguration();
+        }
+    }
+
+    public class ControllerActionConfiguration : ActionConfiguration
     {
         public FrontEndConfiguration FrontEnd { get; set; }
 
-        public TimeConfiguration Time { get; set; }
-
-        public CPUConfiguration CPU { get; set; }
-
-        public RAMConfiguration RAM { get; set; }
-
-        public DatabaseConfiguration Database { get; set; }
-
-        public ControllerActionConfiguration()
+        public ControllerActionConfiguration():base()
         {
             FrontEnd = new FrontEndConfiguration();
-            Time = new TimeConfiguration();
-            CPU = new CPUConfiguration();
-            RAM = new RAMConfiguration();
-            Database = new DatabaseConfiguration();
         }
     }
 
-    public class ExposedApiConfiguration : Enabled_Configuration
-    { 
-        public TimeConfiguration Time { get; set; }
-        public CPUConfiguration CPU { get; set; }
-        public RAMConfiguration RAM { get; set; }
-        public DatabaseConfiguration Database { get; set; }
-
-        public ExposedApiConfiguration()
-        {
-            Time = new TimeConfiguration();
-            CPU = new CPUConfiguration();
-            RAM = new RAMConfiguration();
-            Database = new DatabaseConfiguration();
-        }
-    }
-
+    public class ExposedAPIConfiguration : ActionConfiguration { }
 
     public class DTO2ViewModelConfiguration : Enabled_Configuration
     {
@@ -242,7 +234,7 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
 
         public DataItemConfiguration DBFlush { get; set; }
 
-        public ExposedApiConfiguration ExposedApi { get; set; }
+        public ExposedAPIConfiguration ExposedAPI { get; set; }
 
         private List<string> SplitAndClear(string toSplit, string applicationName = null)
         {
@@ -265,7 +257,7 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
             ControllerAction = new ControllerActionConfiguration();
             DBFlush = new DataItemConfiguration();
             DataConfiguration = new DataConfiguration();
-            ExposedApi = new ExposedApiConfiguration();
+            ExposedAPI = new ExposedAPIConfiguration();
 
             if (configuration != null && configuration.Enabled == true)
             {
@@ -317,50 +309,51 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
                     }//end ControllerAction.Database
                 }//end ControllerAction
 
-                ExposedApi.Enabled = configuration.ExposedApi?.Enabled ?? false;
-                if (ExposedApi.Enabled)
+                
+                ExposedAPI.Enabled = configuration.ExposedAPI?.Enabled ?? false;
+                if (ExposedAPI.Enabled)
                 {
-                    ExposedApi.Time.Enabled = configuration.ExposedApi?.Time?.Enabled ?? false;
-                    if (ExposedApi.Time.Enabled)
+                    ExposedAPI.Time.Enabled = configuration.ExposedAPI?.Time?.Enabled ?? false;
+                    if (ExposedAPI.Time.Enabled)
                     {
-                        ExposedApi.Time.MinimumMilliseconds = configuration.ExposedApi?.Time?.MinimumMilliseconds ?? 0;
+                        ExposedAPI.Time.MinimumMilliseconds = configuration.ExposedAPI?.Time?.MinimumMilliseconds ?? 0;
                     }//end ControllerAction.Time
 
-                    ExposedApi.CPU.Enabled = configuration.ExposedApi?.CPU?.Enabled ?? false;
-                    if (ExposedApi.CPU.Enabled)
+                    ExposedAPI.CPU.Enabled = configuration.ExposedAPI?.CPU?.Enabled ?? false;
+                    if (ExposedAPI.CPU.Enabled)
                     {
-                        ExposedApi.CPU.IntervalMilliseconds = configuration.ExposedApi?.CPU?.IntervalMilliseconds ?? 1000;
-                        ExposedApi.CPU.MinimumPercentage = configuration.ExposedApi?.CPU?.MinimumPercentage ?? 0;
+                        ExposedAPI.CPU.IntervalMilliseconds = configuration.ExposedAPI?.CPU?.IntervalMilliseconds ?? 1000;
+                        ExposedAPI.CPU.MinimumPercentage = configuration.ExposedAPI?.CPU?.MinimumPercentage ?? 0;
                     }//end ControllerAction.CPU
 
-                    ExposedApi.RAM.Enabled = configuration.ExposedApi?.RAM?.Enabled ?? false;
-                    if (ExposedApi.RAM.Enabled)
+                    ExposedAPI.RAM.Enabled = configuration.ExposedAPI?.RAM?.Enabled ?? false;
+                    if (ExposedAPI.RAM.Enabled)
                     {
-                        ExposedApi.RAM.IntervalMilliseconds = configuration.ExposedApi?.RAM?.IntervalMilliseconds ?? 1000;
-                        ExposedApi.RAM.MinimumBytes = configuration.ExposedApi?.RAM?.MinimumBytes ?? 0;
+                        ExposedAPI.RAM.IntervalMilliseconds = configuration.ExposedAPI?.RAM?.IntervalMilliseconds ?? 1000;
+                        ExposedAPI.RAM.MinimumBytes = configuration.ExposedAPI?.RAM?.MinimumBytes ?? 0;
                     }//end ControllerAction.RAM
 
-                    ExposedApi.Database.Enabled = configuration.ExposedApi?.Database?.Enabled ?? false;
-                    if (ExposedApi.Database.Enabled)
+                    ExposedAPI.Database.Enabled = configuration.ExposedAPI?.Database?.Enabled ?? false;
+                    if (ExposedAPI.Database.Enabled)
                     {
-                        ExposedApi.Database.Session.Enabled = configuration.ExposedApi?.Database?.Session?.Enabled ?? false;
-                        if (ExposedApi.Database.Session.Enabled)
+                        ExposedAPI.Database.Session.Enabled = configuration.ExposedAPI?.Database?.Session?.Enabled ?? false;
+                        if (ExposedAPI.Database.Session.Enabled)
                         {
-                            ExposedApi.Database.Session.IgnoreNulls = configuration.ExposedApi?.Database?.Session?.IgnoreNulls ?? true;
+                            ExposedAPI.Database.Session.IgnoreNulls = configuration.ExposedAPI?.Database?.Session?.IgnoreNulls ?? true;
 
-                            ExposedApi.Database.Session.MonitoredStatistics = SplitAndClear(configuration.ExposedApi?.Database?.Session?.MonitoredStatistics, null);
+                            ExposedAPI.Database.Session.MonitoredStatistics = SplitAndClear(configuration.ExposedAPI?.Database?.Session?.MonitoredStatistics, null);
                         }// end ControllerAction.Database.Session
 
-                        ExposedApi.Database.Entities.Enabled = configuration.ExposedApi?.Database?.Entities?.Enabled ?? false;
-                        if (ExposedApi.Database.Entities.Enabled)
+                        ExposedAPI.Database.Entities.Enabled = configuration.ExposedAPI?.Database?.Entities?.Enabled ?? false;
+                        if (ExposedAPI.Database.Entities.Enabled)
                         {
-                            ExposedApi.Database.Entities.IgnoreNulls = configuration.ExposedApi?.Database?.Entities?.IgnoreNulls ?? true;
+                            ExposedAPI.Database.Entities.IgnoreNulls = configuration.ExposedAPI?.Database?.Entities?.IgnoreNulls ?? true;
 
-                            ExposedApi.Database.Entities.MonitoredEntities = SplitAndClear(configuration.ExposedApi?.Database?.Entities?.MonitoredEntities, applicationName);
-                            ExposedApi.Database.Entities.MonitoredStatistics = SplitAndClear(configuration.ExposedApi?.Database?.Entities?.MonitoredStatistics, null);
-                        }// end ControllerAction.Database.Entities
-                    }//end ControllerAction.Database
-                }//end ControllerAction
+                            ExposedAPI.Database.Entities.MonitoredEntities = SplitAndClear(configuration.ExposedAPI?.Database?.Entities?.MonitoredEntities, applicationName);
+                            ExposedAPI.Database.Entities.MonitoredStatistics = SplitAndClear(configuration.ExposedAPI?.Database?.Entities?.MonitoredStatistics, null);
+                        }// end ExposedAPI.Database.Entities
+                    }//end ExposedAPI.Database
+                }//end ExposedAPI
 
                 DataConfiguration.Enabled = configuration.DataElement?.Enabled ?? false;
                 if (DataConfiguration.Enabled)

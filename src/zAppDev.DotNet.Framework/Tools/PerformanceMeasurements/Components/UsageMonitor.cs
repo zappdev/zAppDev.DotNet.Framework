@@ -27,7 +27,7 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Components
         private readonly Object _cpuLock;
         private readonly Object _ramLock;
 
-        private readonly ControllerActionConfiguration _configuration;
+        private readonly ActionConfiguration _configuration;
 
         private readonly ILog _genericLog;
 
@@ -41,7 +41,7 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Components
 
         private readonly Process _currentProcess;
 
-        public UsageMonitor(ControllerActionConfiguration configuration, ILog log = null)
+        public UsageMonitor(ActionConfiguration configuration, ILog log = null)
         {
             MonitorStatus = MonitorStatus.None;
             ContinueOnError = true;

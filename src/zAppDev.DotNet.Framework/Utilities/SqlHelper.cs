@@ -6,7 +6,7 @@ using zAppDev.DotNet.Framework.Data.DatabaseManagers.DatabaseUtilities;
 
 namespace zAppDev.DotNet.Framework.Utilities
 {
-    public class SqlHelper_
+    public class SqlHelper
     {
         public static string _GetConnectionString()
         {

@@ -4,7 +4,7 @@ using zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration;
 
 namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Contracts
 {
-    public class UsageStatistics : IPerformanceStatistic<ControllerActionConfiguration>
+    public class UsageStatistics : IPerformanceStatistic<ActionConfiguration>
     {
         public long? ElapsedMilliseconds { get; set; }
 
@@ -12,7 +12,7 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Contracts
 
         public float? AverageRAM { get; set; }
 
-        public bool IsInteresting(ControllerActionConfiguration configuration = null)
+        public bool IsInteresting(ActionConfiguration configuration = null)
         {
             if (configuration == null) return true;
             if (!configuration.Enabled) return false;

@@ -15,8 +15,8 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements
 {
     public class PerformanceMonitor
     {
-        public readonly ControllerActionMonitor ControllerActionMonitor;
-        public readonly ExposedApiMonitor ExposedApiMonitor;
+        public readonly ActionMonitor ControllerActionMonitor;
+        public readonly ActionMonitor ExposedAPIMonitor;
         public readonly DataMonitor RequestMonitor;
         public readonly DataMonitor ResponseMonitorPreAction;
         public readonly DataMonitor ResponseMonitorPostAction;
@@ -50,10 +50,7 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements
                 if (_configuration?.Enabled == true)
                 {
                     if (configuration.ControllerAction.Enabled)
-                        ControllerActionMonitor = new ControllerActionMonitor(_configuration.ControllerAction, session);
-
-                    if (configuration.ExposedApi.Enabled)
-                        ExposedApiMonitor = new ExposedApiMonitor(_configuration.ExposedApi, session);
+                        ControllerActionMonitor = new ActionMonitor(_configuration.ControllerAction, session);
 
                     if (configuration.DataConfiguration.Enabled)
                     {
@@ -100,6 +97,7 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements
                 statistics.ResponseStatisticsPostAction = ResponseMonitorPostAction?.Get();
                 statistics.ConversionStatistics = ConversionMonitor?.Get();
                 statistics.DatabaseFlushStatistics = DatabaseFlushMonitor?.Get();
+                statistics.ExposedAPIStatistics = ExposedAPIMonitor?.Get();
 
                 return statistics;
             }

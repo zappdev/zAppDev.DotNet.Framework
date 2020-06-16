@@ -97,38 +97,27 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
         public DatabaseElement Database => this["database"] as DatabaseElement;
     }
 
-    public class ControllerActionElement : Enabled_Attribute
+    public class ActionElement: Enabled_Attribute
+    {
+        [ConfigurationProperty("time", IsRequired = false)]
+        public TimeElement Time => this["time"] as TimeElement;
+
+        [ConfigurationProperty("cpu", IsRequired = false)]
+        public CPUElement CPU => this["cpu"] as CPUElement;
+
+        [ConfigurationProperty("ram", IsRequired = false)]
+        public RAMElement RAM => this["ram"] as RAMElement;
+
+        [ConfigurationProperty("database", IsRequired = false)]
+        public DatabaseElement Database => this["database"] as DatabaseElement;
+    }
+    public class ControllerActionElement : ActionElement
     {
         [ConfigurationProperty("frontEnd", IsRequired = false)]
         public FrontEndElement FrontEnd => this["frontEnd"] as FrontEndElement;
-
-        [ConfigurationProperty("time", IsRequired = false)]
-        public TimeElement Time => this["time"] as TimeElement;
-
-        [ConfigurationProperty("cpu", IsRequired = false)]
-        public CPUElement CPU => this["cpu"] as CPUElement;
-
-        [ConfigurationProperty("ram", IsRequired = false)]
-        public RAMElement RAM => this["ram"] as RAMElement;
-
-        [ConfigurationProperty("database", IsRequired = false)]
-        public DatabaseElement Database => this["database"] as DatabaseElement;
     }
 
-    public class ExposedApiElement : Enabled_Attribute
-    {
-        [ConfigurationProperty("time", IsRequired = false)]
-        public TimeElement Time => this["time"] as TimeElement;
-
-        [ConfigurationProperty("cpu", IsRequired = false)]
-        public CPUElement CPU => this["cpu"] as CPUElement;
-
-        [ConfigurationProperty("ram", IsRequired = false)]
-        public RAMElement RAM => this["ram"] as RAMElement;
-
-        [ConfigurationProperty("database", IsRequired = false)]
-        public DatabaseElement Database => this["database"] as DatabaseElement;
-    }
+    public class ExposedAPIElement : ActionElement { }
 
     public class DTO2ViewModelElement : Enabled_Attribute
     {
@@ -184,8 +173,8 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
         [ConfigurationProperty("controllerAction", IsRequired = false)]
         public ControllerActionElement ControllerAction => this["controllerAction"] as ControllerActionElement;
 
-        [ConfigurationProperty("exposedApi", IsRequired = false)]
-        public ExposedApiElement ExposedApi => this["exposedApi"] as ExposedApiElement;
+        [ConfigurationProperty("ExposedAPI", IsRequired = false)]
+        public ExposedAPIElement ExposedAPI => this["ExposedAPI"] as ExposedAPIElement;
 
         [ConfigurationProperty("data", IsRequired = false)]
         public DataElement DataElement => this["data"] as DataElement;
@@ -278,29 +267,24 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
         public DatabaseElement Database { get; set; }
     }
 
-    public class ControllerActionElement : Enabled_Attribute
+
+    public class ActionElement : Enabled_Attribute
+    {
+        public TimeElement Time { get; set; }
+
+        public CPUElement CPU { get; set; }
+
+        public RAMElement RAM { get; set; }
+
+        public DatabaseElement Database { get; set; }
+    }
+
+    public class ControllerActionElement : ActionElement
     {
         public FrontEndElement FrontEnd { get; set; }
-
-        public TimeElement Time { get; set; }
-
-        public CPUElement CPU { get; set; }
-
-        public RAMElement RAM { get; set; }
-
-        public DatabaseElement Database { get; set; }
     }
 
-    public class ExposedApiElement : Enabled_Attribute
-    {
-        public TimeElement Time { get; set; }
-
-        public CPUElement CPU { get; set; }
-
-        public RAMElement RAM { get; set; }
-
-        public DatabaseElement Database { get; set; }
-    }
+    public class ExposedAPIElement : ActionElement { }
 
     public class DTO2ViewModelElement : Enabled_Attribute
     {
@@ -344,7 +328,7 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
 
         public ControllerActionElement ControllerAction { get; set; }
 
-        public ExposedApiElement ExposedApi { get; set; }
+        public ExposedAPIElement ExposedAPI { get; set; }
 
         public DataElement DataElement { get; set; }
 

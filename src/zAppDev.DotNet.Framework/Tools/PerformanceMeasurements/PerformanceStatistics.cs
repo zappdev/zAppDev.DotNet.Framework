@@ -6,30 +6,32 @@ using Newtonsoft.Json;
 
 namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements
 {
-    public class PerformanceStatistics: IPerformanceStatistic<PerformanceMonitorConfiguration>
+    public class PerformanceStatistics : IPerformanceStatistic<PerformanceMonitorConfiguration>
     {
         public string Controller;
         public string Action;
         public string UserHostAddress;
         public string DateTime;
 
-        public ControllerActionStatistics ControllerActionStatistics { get; set; }
+        public ActionStatistics ControllerActionStatistics { get; set; }
         public DataStatistics RequestStatistics { get; set; }
         public DataStatistics ResponseStatisticsPreAction { get; set; }
         public DataStatistics ResponseStatisticsPostAction { get; set; }
         public DataStatistics ConversionStatistics { get; set; }
         public DataStatistics DatabaseFlushStatistics { get; set; }
+        public ActionStatistics ExposedAPIStatistics { get; set; }
 
         private readonly PerformanceMonitorConfiguration _configuration;
         public PerformanceStatistics(PerformanceMonitorConfiguration configuration)
         {
             _configuration = configuration;
-            ControllerActionStatistics = new ControllerActionStatistics();
+            ControllerActionStatistics = new ActionStatistics();
             RequestStatistics = new DataStatistics();
             ResponseStatisticsPreAction = new DataStatistics();
             ResponseStatisticsPostAction = new DataStatistics();
             ConversionStatistics = new DataStatistics();
             DatabaseFlushStatistics = new DataStatistics();
+            ExposedAPIStatistics = new ActionStatistics();
         }
 
         public bool IsInteresting(PerformanceMonitorConfiguration configuration = null)
@@ -47,6 +49,8 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements
                     (ConversionStatistics != null)
                     ||
                     (DatabaseFlushStatistics != null)
+                    ||
+                    (ExposedAPIStatistics != null)
                 );
                 
             return isInteresting;
@@ -84,7 +88,12 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements
                 DatabaseFlushStatistics = null;
             }
 
-            if(ControllerActionStatistics == null && RequestStatistics == null && ResponseStatisticsPreAction == null && ResponseStatisticsPostAction == null && ConversionStatistics == null && DatabaseFlushStatistics == null)
+            if (ExposedAPIStatistics?.IsInteresting(_configuration.ExposedAPI) != true)
+            {
+                ExposedAPIStatistics = null;
+            }
+
+            if (ControllerActionStatistics == null && RequestStatistics == null && ResponseStatisticsPreAction == null && ResponseStatisticsPostAction == null && ConversionStatistics == null && DatabaseFlushStatistics == null && ExposedAPIStatistics == null)
             {
                 Controller = null;
                 Action = null;
