@@ -16,7 +16,6 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements
     public class PerformanceMonitor
     {
         public readonly ActionMonitor ControllerActionMonitor;
-        public readonly ActionMonitor ExposedAPIMonitor;
         public readonly DataMonitor RequestMonitor;
         public readonly DataMonitor ResponseMonitorPreAction;
         public readonly DataMonitor ResponseMonitorPostAction;
@@ -97,7 +96,6 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements
                 statistics.ResponseStatisticsPostAction = ResponseMonitorPostAction?.Get();
                 statistics.ConversionStatistics = ConversionMonitor?.Get();
                 statistics.DatabaseFlushStatistics = DatabaseFlushMonitor?.Get();
-                statistics.ExposedAPIStatistics = ExposedAPIMonitor?.Get();
 
                 return statistics;
             }

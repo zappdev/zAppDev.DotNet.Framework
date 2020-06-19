@@ -19,7 +19,6 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements
         public DataStatistics ResponseStatisticsPostAction { get; set; }
         public DataStatistics ConversionStatistics { get; set; }
         public DataStatistics DatabaseFlushStatistics { get; set; }
-        public ActionStatistics ExposedAPIStatistics { get; set; }
 
         private readonly PerformanceMonitorConfiguration _configuration;
         public PerformanceStatistics(PerformanceMonitorConfiguration configuration)
@@ -31,7 +30,6 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements
             ResponseStatisticsPostAction = new DataStatistics();
             ConversionStatistics = new DataStatistics();
             DatabaseFlushStatistics = new DataStatistics();
-            ExposedAPIStatistics = new ActionStatistics();
         }
 
         public bool IsInteresting(PerformanceMonitorConfiguration configuration = null)
@@ -49,8 +47,6 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements
                     (ConversionStatistics != null)
                     ||
                     (DatabaseFlushStatistics != null)
-                    ||
-                    (ExposedAPIStatistics != null)
                 );
                 
             return isInteresting;
@@ -88,12 +84,7 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements
                 DatabaseFlushStatistics = null;
             }
 
-            if (ExposedAPIStatistics?.IsInteresting(_configuration.ExposedAPI) != true)
-            {
-                ExposedAPIStatistics = null;
-            }
-
-            if (ControllerActionStatistics == null && RequestStatistics == null && ResponseStatisticsPreAction == null && ResponseStatisticsPostAction == null && ConversionStatistics == null && DatabaseFlushStatistics == null && ExposedAPIStatistics == null)
+            if (ControllerActionStatistics == null && RequestStatistics == null && ResponseStatisticsPreAction == null && ResponseStatisticsPostAction == null && ConversionStatistics == null && DatabaseFlushStatistics == null)
             {
                 Controller = null;
                 Action = null;

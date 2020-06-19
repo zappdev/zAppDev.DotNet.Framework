@@ -177,7 +177,7 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
         public ExposedAPIElement ExposedAPI => this["ExposedAPI"] as ExposedAPIElement;
 
         [ConfigurationProperty("data", IsRequired = false)]
-        public DataElement DataElement => this["data"] as DataElement;
+        public DataElement Data => this["data"] as DataElement;
 
         [ConfigurationProperty("dbFlush", IsRequired = false)]
         public DBFlushElement DBFlush => this["dbFlush"] as DBFlushElement;
@@ -330,7 +330,7 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
 
         public ExposedAPIElement ExposedAPI { get; set; }
 
-        public DataElement DataElement { get; set; }
+        public DataElement Data { get; set; }
 
         public DBFlushElement DBFlush { get; set; }
     }

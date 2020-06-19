@@ -355,77 +355,77 @@ namespace zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration
                     }//end ExposedAPI.Database
                 }//end ExposedAPI
 
-                DataConfiguration.Enabled = configuration.DataElement?.Enabled ?? false;
+                DataConfiguration.Enabled = configuration.Data?.Enabled ?? false;
                 if (DataConfiguration.Enabled)
                 {
-                    DataConfiguration.ClientData.Enabled = configuration.DataElement.ClientData?.Enabled ?? false;
+                    DataConfiguration.ClientData.Enabled = configuration.Data.ClientData?.Enabled ?? false;
                     if (DataConfiguration.ClientData.Enabled)
                     {
-                        DataConfiguration.ClientData.Size.Enabled = configuration.DataElement.ClientData?.Size?.Enabled ?? false;
+                        DataConfiguration.ClientData.Size.Enabled = configuration.Data.ClientData?.Size?.Enabled ?? false;
                         if (DataConfiguration.ClientData.Size.Enabled)
                         {
-                            DataConfiguration.ClientData.Size.MinimumBytes = configuration.DataElement.ClientData?.Size?.MinimumBytes ?? 0;
+                            DataConfiguration.ClientData.Size.MinimumBytes = configuration.Data.ClientData?.Size?.MinimumBytes ?? 0;
                         }//end DataConfiguration.ClientData.Size
 
-                        DataConfiguration.ClientData.Time.Enabled = configuration.DataElement.ClientData?.Time?.Enabled ?? false;
+                        DataConfiguration.ClientData.Time.Enabled = configuration.Data.ClientData?.Time?.Enabled ?? false;
                         if (DataConfiguration.ClientData.Time.Enabled)
                         {
-                            DataConfiguration.ClientData.Time.MinimumMilliseconds = configuration.DataElement.ClientData?.Time?.MinimumMilliseconds ?? 0;
+                            DataConfiguration.ClientData.Time.MinimumMilliseconds = configuration.Data.ClientData?.Time?.MinimumMilliseconds ?? 0;
                         }//end ClientData.Time
 
                         DataConfiguration.ClientData.Database = null;
                     }//end DataConfiguration.ClientData
 
-                    DataConfiguration.Model2DTO.Enabled = configuration.DataElement.Model2DTO?.Enabled ?? false;
+                    DataConfiguration.Model2DTO.Enabled = configuration.Data.Model2DTO?.Enabled ?? false;
                     if (DataConfiguration.Model2DTO.Enabled)
                     {
-                        DataConfiguration.Model2DTO.Size.Enabled = configuration.DataElement.Model2DTO?.Size?.Enabled ?? false;
+                        DataConfiguration.Model2DTO.Size.Enabled = configuration.Data.Model2DTO?.Size?.Enabled ?? false;
                         if (DataConfiguration.Model2DTO.Size.Enabled)
                         {
-                            DataConfiguration.Model2DTO.Size.MinimumBytes = configuration.DataElement.Model2DTO?.Size?.MinimumBytes ?? 0;
+                            DataConfiguration.Model2DTO.Size.MinimumBytes = configuration.Data.Model2DTO?.Size?.MinimumBytes ?? 0;
                         }//end DataConfiguration.Model2DTO.Size
 
-                        DataConfiguration.Model2DTO.Time.Enabled = configuration.DataElement.Model2DTO?.Time?.Enabled ?? false;
+                        DataConfiguration.Model2DTO.Time.Enabled = configuration.Data.Model2DTO?.Time?.Enabled ?? false;
                         if (DataConfiguration.Model2DTO.Time.Enabled)
                         {
-                            DataConfiguration.Model2DTO.Time.MinimumMilliseconds = configuration.DataElement.Model2DTO?.Time?.MinimumMilliseconds ?? 0;
+                            DataConfiguration.Model2DTO.Time.MinimumMilliseconds = configuration.Data.Model2DTO?.Time?.MinimumMilliseconds ?? 0;
                         }//end Model2DTO.Time
 
                         DataConfiguration.Model2DTO.Database = null;
                     }//end DataConfiguration.Model2DTO
 
-                    DataConfiguration.DTO2ViewModel.Enabled = configuration.DataElement.DTO2ViewModel?.Enabled ?? false;
+                    DataConfiguration.DTO2ViewModel.Enabled = configuration.Data.DTO2ViewModel?.Enabled ?? false;
                     if (DataConfiguration.DTO2ViewModel.Enabled)
                     {
-                        DataConfiguration.DTO2ViewModel.Size.Enabled = configuration.DataElement.DTO2ViewModel?.Size?.Enabled ?? false;
+                        DataConfiguration.DTO2ViewModel.Size.Enabled = configuration.Data.DTO2ViewModel?.Size?.Enabled ?? false;
                         if (DataConfiguration.DTO2ViewModel.Size.Enabled)
                         {
-                            DataConfiguration.DTO2ViewModel.Size.MinimumBytes = configuration.DataElement.DTO2ViewModel?.Size?.MinimumBytes ?? 0;
+                            DataConfiguration.DTO2ViewModel.Size.MinimumBytes = configuration.Data.DTO2ViewModel?.Size?.MinimumBytes ?? 0;
                         }//end DataConfiguration.DTO2ViewModel.Size
 
-                        DataConfiguration.DTO2ViewModel.Time.Enabled = configuration.DataElement.DTO2ViewModel?.Time?.Enabled ?? false;
+                        DataConfiguration.DTO2ViewModel.Time.Enabled = configuration.Data.DTO2ViewModel?.Time?.Enabled ?? false;
                         if (DataConfiguration.DTO2ViewModel.Time.Enabled)
                         {
-                            DataConfiguration.DTO2ViewModel.Time.MinimumMilliseconds = configuration.DataElement.DTO2ViewModel?.Time?.MinimumMilliseconds ?? 0;
+                            DataConfiguration.DTO2ViewModel.Time.MinimumMilliseconds = configuration.Data.DTO2ViewModel?.Time?.MinimumMilliseconds ?? 0;
                         }//end DataConfiguration.DTO2ViewModel.Time
 
-                        DataConfiguration.DTO2ViewModel.Database.Enabled = configuration.DataElement?.DTO2ViewModel?.Database?.Enabled ?? false;
+                        DataConfiguration.DTO2ViewModel.Database.Enabled = configuration.Data?.DTO2ViewModel?.Database?.Enabled ?? false;
                         if (DataConfiguration.DTO2ViewModel.Database.Enabled)
                         {
-                            DataConfiguration.DTO2ViewModel.Database.Session.Enabled = configuration.DataElement?.DTO2ViewModel?.Database?.Session?.Enabled ?? false;
+                            DataConfiguration.DTO2ViewModel.Database.Session.Enabled = configuration.Data?.DTO2ViewModel?.Database?.Session?.Enabled ?? false;
                             if (DataConfiguration.DTO2ViewModel.Database.Session.Enabled)
                             {
-                                DataConfiguration.DTO2ViewModel.Database.Session.IgnoreNulls = configuration.DataElement?.DTO2ViewModel?.Database?.Session?.IgnoreNulls ?? true;
-                                DataConfiguration.DTO2ViewModel.Database.Session.MonitoredStatistics = SplitAndClear(configuration.DataElement?.DTO2ViewModel?.Database?.Session?.MonitoredStatistics, null);
+                                DataConfiguration.DTO2ViewModel.Database.Session.IgnoreNulls = configuration.Data?.DTO2ViewModel?.Database?.Session?.IgnoreNulls ?? true;
+                                DataConfiguration.DTO2ViewModel.Database.Session.MonitoredStatistics = SplitAndClear(configuration.Data?.DTO2ViewModel?.Database?.Session?.MonitoredStatistics, null);
                             }// end Conversions.DTO2ViewModel.Database.Session
 
-                            DataConfiguration.DTO2ViewModel.Database.Entities.Enabled = configuration.DataElement?.DTO2ViewModel?.Database?.Entities?.Enabled ?? false;
+                            DataConfiguration.DTO2ViewModel.Database.Entities.Enabled = configuration.Data?.DTO2ViewModel?.Database?.Entities?.Enabled ?? false;
                             if (DataConfiguration.DTO2ViewModel.Database.Entities.Enabled)
                             {
-                                DataConfiguration.DTO2ViewModel.Database.Entities.IgnoreNulls = configuration.DataElement?.DTO2ViewModel?.Database?.Entities?.IgnoreNulls ?? true;
+                                DataConfiguration.DTO2ViewModel.Database.Entities.IgnoreNulls = configuration.Data?.DTO2ViewModel?.Database?.Entities?.IgnoreNulls ?? true;
 
-                                DataConfiguration.DTO2ViewModel.Database.Entities.MonitoredEntities =   SplitAndClear(configuration.DataElement?.DTO2ViewModel?.Database?.Entities?.MonitoredEntities, applicationName);
-                                DataConfiguration.DTO2ViewModel.Database.Entities.MonitoredStatistics = SplitAndClear(configuration.DataElement?.DTO2ViewModel?.Database?.Entities?.MonitoredStatistics, null);
+                                DataConfiguration.DTO2ViewModel.Database.Entities.MonitoredEntities =   SplitAndClear(configuration.Data?.DTO2ViewModel?.Database?.Entities?.MonitoredEntities, applicationName);
+                                DataConfiguration.DTO2ViewModel.Database.Entities.MonitoredStatistics = SplitAndClear(configuration.Data?.DTO2ViewModel?.Database?.Entities?.MonitoredStatistics, null);
                             }// end DataConfiguration.DTO2ViewModel.Database.Entities
                         }//end Conversions.DTO2ViewModel.Database
                     }//end DataConfiguration.DTO2ViewModel
