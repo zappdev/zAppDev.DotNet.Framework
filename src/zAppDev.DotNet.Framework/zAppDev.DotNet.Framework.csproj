@@ -67,10 +67,10 @@
     <None Remove="Identity\MappingFiles\ProfileSetting.hbm.xml" />
     <None Remove="Workflow\WorkflowContextBase.hbm.xml" />
     <None Remove="Workflow\WorkflowSchedule.hbm.xml" />
-    <Compile Include="..\zAppDev.DotNet.Framework.Configurations\zAppDev.DotNet.Framework.Configurations\Extensions\WebConfig\WebConfigurationExtensions.cs" Link="Extensions\WebConfig\WebConfigurationExtensions.cs" />
-    <Compile Include="..\zAppDev.DotNet.Framework.Configurations\zAppDev.DotNet.Framework.Configurations\Extensions\WebConfig\WebConfigurationFileParser.cs" Link="Extensions\WebConfig\WebConfigurationFileParser.cs" />
-    <Compile Include="..\zAppDev.DotNet.Framework.Configurations\zAppDev.DotNet.Framework.Configurations\Extensions\WebConfig\WebConfigurationProvider.cs" Link="Extensions\WebConfig\WebConfigurationProvider.cs" />
-    <Compile Include="..\zAppDev.DotNet.Framework.Configurations\zAppDev.DotNet.Framework.Configurations\Extensions\WebConfig\WebConfigurationSource.cs" Link="Extensions\WebConfig\WebConfigurationSource.cs" />
+    <Compile Include="..\zAppDev.DotNet.Framework.Configurations\Extensions\WebConfig\WebConfigurationExtensions.cs" Link="Extensions\WebConfig\WebConfigurationExtensions.cs" />
+    <Compile Include="..\zAppDev.DotNet.Framework.Configurations\Extensions\WebConfig\WebConfigurationFileParser.cs" Link="Extensions\WebConfig\WebConfigurationFileParser.cs" />
+    <Compile Include="..\zAppDev.DotNet.Framework.Configurations\Extensions\WebConfig\WebConfigurationProvider.cs" Link="Extensions\WebConfig\WebConfigurationProvider.cs" />
+    <Compile Include="..\zAppDev.DotNet.Framework.Configurations\Extensions\WebConfig\WebConfigurationSource.cs" Link="Extensions\WebConfig\WebConfigurationSource.cs" />
     <None Include="..\..\LICENSE">
       <Pack>True</Pack>
       <PackagePath></PackagePath>

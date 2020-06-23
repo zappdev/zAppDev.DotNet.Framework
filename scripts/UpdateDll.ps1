@@ -1,5 +1,5 @@
-$srcBasePath = "D:\Work\CLMS\zAppDev.DotNet.Framework\src\zAppDev.DotNet.Framework\bin\Release"
-$dstBasePath = "D:\Work\zAppDev.CodingFacility.CSharp.MVP\CLMS.CodingFacility.CS.Resources\Libraries"
+$srcBasePath = "..\..\src\zAppDev.DotNet.Framework\bin\Release"
+$dstBasePath = "..\..\..\zAppDev.CodingFacility.CSharp.MVP\CLMS.CodingFacility.CS.Resources\Libraries"
 
 Set-Location ..\src\zAppDev.DotNet.Framework
 
@@ -14,7 +14,7 @@ if ($null -ne $res)
     Copy-Item -Force -Confirm:$false "$srcBasePath\netcoreapp2.2\zAppDev.DotNet.Framework.dll" "$dstBasePath\Core"
 
     Write-Host "Update netstandard2.0"
-    Copy-Item -Force -Confirm:$false "$srcBasePath\netstandard2.0\zAppDev.DotNet.Framework.dll" "$dstBasePath\Standard"    
+    Copy-Item -Force -Confirm:$false "$srcBasePath\netstandard2.0\zAppDev.DotNet.Framework.dll" "$dstBasePath\Standard"
 }
 
 Set-Location ..\..\scripts
