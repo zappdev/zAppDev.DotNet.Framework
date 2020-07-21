@@ -2,6 +2,7 @@
 // Licensed under the AGPL-3.0 license. See LICENSE file in the project root for full license information.
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using log4net;
 #if NETFRAMEWORK
@@ -31,7 +32,11 @@ namespace zAppDev.DotNet.Framework.Workflow
         {
             _log = LogManager.GetLogger(typeof(ScheduleManager));
             Builder = builder ?? ServiceLocator.Current.GetInstance<IRepositoryBuilder>();
-            httpRuntimeURL = configuration?.GetValue<string>("urls");
+#if NETFRAMEWORK
+            httpRuntimeURL = ConfigurationManager.AppSettings["WebServerUrl"];
+#else
+            httpRuntimeURL = configuration?.GetValue<string>("configuration:appSettings:add:WebServerUrl:value");
+#endif
         }
 
         public void ProcessSchedules()
