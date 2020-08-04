@@ -160,7 +160,7 @@ namespace zAppDev.DotNet.Framework.Mvc
         
         public static byte[] GetStoredFileContents(Func<object, int[], string> relativePathFunc, object viewModel, int[] indexes)
         {
-            var file = GetFileByEvaluatedFileNameExpression(relativePathFunc, viewModel, indexes);
+            var file = GetFileByEvaluatedFileNameExpression(relativePathFunc, viewModel, indexes, true);
             return File.ReadAllBytes(file.FullName);
         }
 
@@ -178,7 +178,7 @@ namespace zAppDev.DotNet.Framework.Mvc
             var absolutePath = Path.Combine(UploadsAbsolutePhysicalPath, relativePath);
             var parentFolderInfo = new FileInfo(absolutePath).Directory;
             var fileName = Path.GetFileName(absolutePath);
-            var file = parentFolderInfo?.GetFiles(fileName).FirstOrDefault();
+            var file = string.IsNullOrEmpty(fileName) ? null : parentFolderInfo?.GetFiles(fileName).FirstOrDefault();
 
             if (file == null)
             {
