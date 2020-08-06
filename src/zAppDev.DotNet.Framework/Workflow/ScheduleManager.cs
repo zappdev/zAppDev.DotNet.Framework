@@ -247,6 +247,11 @@ namespace zAppDev.DotNet.Framework.Workflow
                 _log.Debug(e);
                 _log.Debug($"Time timezone {timezoneId} is not a valid timezone");
             }
+            catch (TimeZoneNotFoundException e)
+            {
+                _log.Debug(e);
+                _log.Debug($"Time timezone {timezoneId} not found on the local computer");
+            }
             return timeZone;
         }
 
