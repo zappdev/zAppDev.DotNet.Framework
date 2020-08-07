@@ -129,16 +129,16 @@ namespace zAppDev.DotNet.Framework.Workflow
             if (!schedule.Active) return DateTime.MinValue; // Inactive
             if (schedule.ExpireOn <= DateTime.UtcNow) return DateTime.MinValue; // Expired
             var baseTime = schedule.StartDateTime == null || schedule.StartDateTime <= DateTime.UtcNow ? schedule.LastExecution : schedule.StartDateTime;
-            if(baseTime == null)
-            {
-                return DateTime.UtcNow;
-            }
-            if (baseTime.Value.Kind == DateTimeKind.Unspecified)
-            {
-                baseTime = DateTime.SpecifyKind(baseTime.Value, DateTimeKind.Utc);
-            }
-            baseTime = TimeZoneInfo.ConvertTime(baseTime.Value, GetScheduleTimezone(schedule.CronExpressionTimezone));
-            return Utilities.Common.GetNextExecutionTime(schedule.CronExpression, baseTime);
+            //if(baseTime == null)
+            //{
+            //    return DateTime.UtcNow;
+            //}
+            //if (baseTime.Value.Kind == DateTimeKind.Unspecified)
+            //{
+            //    baseTime = DateTime.SpecifyKind(baseTime.Value, DateTimeKind.Utc);
+            //}
+            //baseTime = TimeZoneInfo.ConvertTime(baseTime.Value, GetScheduleTimezone(schedule.CronExpressionTimezone));
+            return baseTime == null ? DateTime.UtcNow : Utilities.Common.GetNextExecutionTime(schedule.CronExpression, baseTime);
         }
 
         internal List<WorkflowSchedule> GetSchedules(bool onlyactive = true)
@@ -203,7 +203,7 @@ namespace zAppDev.DotNet.Framework.Workflow
                 try
                 {
                     var expireDateTime = schedule.ExpireOn.HasValue ? schedule.ExpireOn.Value : DateTime.MaxValue;
-                    if (IsTimeInPastInSpesificTimezone(expireDateTime, schedule.CronExpressionTimezone))
+                    if (expireDateTime <=  DateTime.UtcNow)
                     {
                         // Schedule has Expired but it is still active
                         // Mark as Inactive and update the database
@@ -217,7 +217,7 @@ namespace zAppDev.DotNet.Framework.Workflow
                     }
                     // Should be evaluated?
                     var nextExecTime = GetNextExecutionTime(schedule);
-                    if (nextExecTime != DateTime.MinValue && IsTimeInPastInSpesificTimezone(nextExecTime,schedule.CronExpressionTimezone))
+                    if (nextExecTime != DateTime.MinValue && nextExecTime <= DateTime.UtcNow)
                     {
                         // Execute
                         ExecuteSchedule(schedule);
@@ -253,12 +253,6 @@ namespace zAppDev.DotNet.Framework.Workflow
                 _log.Debug($"Time timezone {timezoneId} not found on the local computer");
             }
             return timeZone;
-        }
-
-        private bool IsTimeInPastInSpesificTimezone(DateTime date, string timezoneId)
-        {
-            var timezone = GetScheduleTimezone(timezoneId);
-            return TimeZoneInfo.ConvertTime(date, timezone) <= TimeZoneInfo.ConvertTime(DateTime.UtcNow, timezone);
         }
 #if NETFRAMEWORK
 #else
