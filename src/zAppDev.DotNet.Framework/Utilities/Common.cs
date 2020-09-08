@@ -1048,6 +1048,40 @@ namespace zAppDev.DotNet.Framework.Utilities
             }
         }
 
+        public static string GetSHA1Hash(string value)
+        {
+            using (var sha1Hash = System.Security.Cryptography.SHA1.Create())
+            {
+                var sBuilder = new StringBuilder();
+
+                var data = Encoding.UTF8.GetBytes(value);
+                var hashData = sha1Hash.ComputeHash(data);
+                
+                foreach (var b in hashData)
+                {
+                    sBuilder.Append(b.ToString("x2"));
+                }
+                return sBuilder.ToString();
+            }
+        }
+
+        public static string GetSHA256Hash(string value)
+        {
+            using (var sha256Hash = System.Security.Cryptography.SHA256.Create())
+            {
+                var sBuilder = new StringBuilder();
+
+                var data = Encoding.UTF8.GetBytes(value);
+                var hashData = sha256Hash.ComputeHash(data);
+                
+                foreach (var b in hashData)
+                {
+                    sBuilder.Append(b.ToString("x2"));
+                }
+                return sBuilder.ToString();
+            }
+        }
+
         public static Type GetTypeAsNonNullable(Type type)
         {
             return Nullable.GetUnderlyingType(type) == null
@@ -1239,5 +1273,7 @@ namespace zAppDev.DotNet.Framework.Utilities
             // Return char and concat substring.  
             return char.ToUpper(s[0]) + s.Substring(1);
         }
+
+        
     }
 }
