@@ -39,6 +39,9 @@ namespace zAppDev.DotNet.Framework.Workflow
 #endif
         }
 
+
+#if NETFRAMEWORK
+
         public void ProcessSchedules()
         {
             try
@@ -78,12 +81,164 @@ namespace zAppDev.DotNet.Framework.Workflow
             schedule.LastExecution = DateTime.UtcNow;
             MiniSessionManager.ExecuteInUoW(manager =>
             {
-                Builder.CreateCreateRepository(manager).Save(schedule);
+                Builder.CreateCreateRepository().Save(schedule);
             });
             _log.DebugFormat("Finished Executing Scheduled Activity: {0} - {1}", schedule.Workflow, schedule.Workflow);
             _log.Debug("------------------------------------------------------");
             return result;
         }
+
+        internal List<WorkflowSchedule> GetSchedules(bool onlyactive = true)
+        {
+            return MiniSessionManager
+                   .ExecuteInUoW(manager =>
+                   {
+                       var data = Builder.CreateRetrieveRepository(manager).GetAsQueryable<WorkflowSchedule>();
+                       if (onlyactive)
+                       {
+                           data = data.Where(s => s.Active);
+                       }
+                       return data.ToList();
+                   });
+        }
+
+        private void ProcessAutoStartSchedules()
+        {
+            var schedules = GetSchedules();
+            _log.DebugFormat("Found {0} Active Schedules.", schedules.Count);
+            foreach (var schedule in schedules.Where(a => a.Active))
+            {
+                try
+                {
+                    var expireDateTime = schedule.ExpireOn.HasValue ? schedule.ExpireOn.Value : DateTime.MaxValue;
+                    if (expireDateTime <= DateTime.UtcNow)
+                    {
+                        // Schedule has Expired but it is still active
+                        // Mark as Inactive and update the database
+                        schedule.Active = false;
+                        MiniSessionManager
+                        .ExecuteInUoW(manager =>
+                        {
+                            Builder.CreateCreateRepository(manager).Save(schedule);
+                        });
+                        continue;
+                    }
+                    // Should be evaluated?
+                    var nextExecTime = GetNextExecutionTime(schedule);
+                    if (nextExecTime != DateTime.MinValue && nextExecTime <= DateTime.UtcNow)
+                    {
+                        // Execute
+                        ExecuteSchedule(schedule);
+                    }
+                    else
+                    {
+                        _log.DebugFormat("Scheduled Activity: {0} - {1} will be executed on: {2}", schedule.Workflow,
+                                         schedule.Workflow,
+                                         nextExecTime);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _log.Error($"Error processing Scheduled Activity: {schedule.Workflow} - {schedule.Workflow}", ex);
+                }
+            }
+        }
+
+#else
+        public void ProcessSchedules()
+        {
+            try
+            {
+                ProcessExpiredAndDelayedPendingJobs();
+                ProcessAutoStartSchedules();
+            }
+            catch (Exception ex)
+            {
+                _log.Error("Error processing schedules.", ex);
+                throw;
+            }
+        }
+        public IWorkflowExecutionResult ExecuteSchedule(WorkflowSchedule schedule)
+        {
+            _log.Debug("------------------------------------------------------");
+            _log.DebugFormat("Executing Scheduled Activity: {0} - {1}", schedule.Workflow, schedule.Workflow);
+            IWorkflowExecutionResult result = null;
+            try
+            {
+                var mngr = ServiceLocator.Current.GetInstance<IMiniSessionService>();
+                mngr.OpenSession();
+                result = WorkflowManager.Current.ExecuteWorkflow(schedule.Workflow);
+                mngr.Session.Flush();
+                schedule.IsLastExecutionSuccess = true;
+                schedule.LastExecutionMessage = "Executed Successfully";
+            }
+            catch (Exception ex)
+            {
+                _log.Error($"Error executing Scheduled Activity: {schedule.Workflow}", ex);
+                schedule.IsLastExecutionSuccess = false;
+                schedule.LastExecutionMessage = $"{ex.Message} - {ex.StackTrace}";
+                result = new WorkflowExecutionResult { Status = WorkflowStatus.Failed };
+            }
+            schedule.LastExecution = DateTime.UtcNow;
+            Builder.CreateCreateRepository().Save(schedule);
+            ServiceLocator.Current.GetInstance<IMiniSessionService>().Session.Flush();
+            _log.DebugFormat("Finished Executing Scheduled Activity: {0} - {1}", schedule.Workflow, schedule.Workflow);
+            _log.Debug("------------------------------------------------------");
+            return result;
+        }
+
+        internal List<WorkflowSchedule> GetSchedules(bool onlyactive = true)
+        {
+            var data = Builder.CreateRetrieveRepository().GetAsQueryable<WorkflowSchedule>();
+            if (onlyactive)
+            {
+                data = data.Where(s => s.Active);
+            }
+            return data.ToList();
+        }
+
+        private void ProcessAutoStartSchedules()
+        {
+            var schedules = GetSchedules();
+            _log.DebugFormat("Found {0} Active Schedules.", schedules.Count);
+            foreach (var schedule in schedules.Where(a => a.Active))
+            {
+                try
+                {
+                    var expireDateTime = schedule.ExpireOn.HasValue ? schedule.ExpireOn.Value : DateTime.MaxValue;
+                    if (expireDateTime <= DateTime.UtcNow)
+                    {
+                        // Schedule has Expired but it is still active
+                        // Mark as Inactive and update the database
+                        schedule.Active = false;
+                        var mngr = ServiceLocator.Current.GetInstance<IMiniSessionService>();
+                        mngr.OpenSession();
+                        Builder.CreateCreateRepository().Save(schedule);
+                        mngr.Session.Flush();
+                        continue;
+                    }
+                    // Should be evaluated?
+                    var nextExecTime = GetNextExecutionTime(schedule);
+                    if (nextExecTime != DateTime.MinValue && nextExecTime <= DateTime.UtcNow)
+                    {
+                        // Execute
+                        ExecuteSchedule(schedule);
+                    }
+                    else
+                    {
+                        _log.DebugFormat("Scheduled Activity: {0} - {1} will be executed on: {2}", schedule.Workflow,
+                                         schedule.Workflow,
+                                         nextExecTime);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _log.Error($"Error processing Scheduled Activity: {schedule.Workflow} - {schedule.Workflow}", ex);
+                }
+            }
+        }
+#endif
+
 
         public void SetSchedules(List<WorkflowSchedule> schedules)
         {
@@ -100,7 +255,7 @@ namespace zAppDev.DotNet.Framework.Workflow
                 //update existing
                 foreach (var schedule in schedules.Where(s => allScheduleNames.Contains(s.Workflow)))
                 {
-                    var  existingSchedule = Builder.CreateRetrieveRepository(manager).Get<WorkflowSchedule>(a => a.Workflow == schedule.Workflow).First();
+                    var existingSchedule = Builder.CreateRetrieveRepository(manager).Get<WorkflowSchedule>(a => a.Workflow == schedule.Workflow).First();
                     existingSchedule.Active = schedule.Active;
                     existingSchedule.StartDateTime = schedule.StartDateTime;
                     existingSchedule.ExpireOn = schedule.ExpireOn;
@@ -141,20 +296,6 @@ namespace zAppDev.DotNet.Framework.Workflow
             return baseTime == null ? DateTime.UtcNow : Utilities.Common.GetNextExecutionTime(schedule.CronExpression, baseTime);
         }
 
-        internal List<WorkflowSchedule> GetSchedules(bool onlyactive = true)
-        {
-            return MiniSessionManager
-                   .ExecuteInUoW(manager =>
-            {
-                var data = Builder.CreateRetrieveRepository(manager).GetAsQueryable<WorkflowSchedule>();
-                if (onlyactive)
-                {
-                    data = data.Where(s => s.Active);
-                }
-                return data.ToList();
-            });
-        }
-
         private void ProcessExpiredAndDelayedPendingJobs()
         {
             var pendingJobs = GetExpiredAndDelayedPendingJobs();
@@ -185,6 +326,7 @@ namespace zAppDev.DotNet.Framework.Workflow
 
         private List<WorkflowContextBase> GetExpiredAndDelayedPendingJobs()
         {
+#if NETFRAMEWORK
             return MiniSessionManager.ExecuteInUoW(manager =>
             {
                 var expiredAndDelayedPendingJobs = Builder.CreateRetrieveRepository(manager).GetAsQueryable<WorkflowContextBase>()
@@ -192,49 +334,16 @@ namespace zAppDev.DotNet.Framework.Workflow
                 .ToList();
                 return expiredAndDelayedPendingJobs;
             });
+#else
+            var expiredAndDelayedPendingJobs = Builder.CreateRetrieveRepository().GetAsQueryable<WorkflowContextBase>()
+            .Where(p => p.Expires && p.ExpirationDateTime <= DateTime.UtcNow)
+            .ToList();
+            return expiredAndDelayedPendingJobs;
+#endif
+
         }
 
-        private void ProcessAutoStartSchedules()
-        {
-            var schedules = GetSchedules();
-            _log.DebugFormat("Found {0} Active Schedules.", schedules.Count);
-            foreach (var schedule in schedules.Where(a => a.Active))
-            {
-                try
-                {
-                    var expireDateTime = schedule.ExpireOn.HasValue ? schedule.ExpireOn.Value : DateTime.MaxValue;
-                    if (expireDateTime <=  DateTime.UtcNow)
-                    {
-                        // Schedule has Expired but it is still active
-                        // Mark as Inactive and update the database
-                        schedule.Active = false;
-                        MiniSessionManager
-                        .ExecuteInUoW(manager =>
-                        {
-                            Builder.CreateCreateRepository(manager).Save(schedule);
-                        });
-                        continue;
-                    }
-                    // Should be evaluated?
-                    var nextExecTime = GetNextExecutionTime(schedule);
-                    if (nextExecTime != DateTime.MinValue && nextExecTime <= DateTime.UtcNow)
-                    {
-                        // Execute
-                        ExecuteSchedule(schedule);
-                    }
-                    else
-                    {
-                        _log.DebugFormat("Scheduled Activity: {0} - {1} will be executed on: {2}", schedule.Workflow,
-                                         schedule.Workflow,
-                                         nextExecTime);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _log.Error($"Error processing Scheduled Activity: {schedule.Workflow} - {schedule.Workflow}", ex);
-                }
-            }
-        }
+
         private TimeZoneInfo GetScheduleTimezone(string timezoneId)
         {
             TimeZoneInfo timeZone = TimeZoneInfo.Utc;

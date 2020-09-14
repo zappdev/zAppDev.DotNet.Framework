@@ -5,6 +5,7 @@ using NHibernate.Persister.Entity;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using zAppDev.DotNet.Framework.Utilities;
 
 namespace zAppDev.DotNet.Framework.Data
@@ -37,11 +38,30 @@ namespace zAppDev.DotNet.Framework.Data
         }
 
         private static ConcurrentDictionary<string, EntityInfo> entityInfos = new ConcurrentDictionary<string, EntityInfo>();
+        private static List<string> excludeFromConcurencyControlList = new List<string>();
+
+        public static void ExcludeFromConcurencyControl(List<string> domainModelClasses)
+        {
+            excludeFromConcurencyControlList = domainModelClasses;
+        }
+
+        public static void IncludeToConcurencyControl(List<string> domainModelClasses)
+        {
+            foreach( var cls in domainModelClasses)
+            {
+                if(excludeFromConcurencyControlList.Contains(cls))
+                {
+                    excludeFromConcurencyControlList.Remove(cls);
+                }
+            }
+        }            
+
 
         private static bool MustCheck(Domain.IDomainModelClass cls)
         {
             var domainModelClassTypeFullName = cls.GetType().FullName;
-            if (entityInfos.ContainsKey(domainModelClassTypeFullName) && !entityInfos[domainModelClassTypeFullName].IsVersioned)
+            var name = cls.GetType().Name;
+            if (excludeFromConcurencyControlList.Contains(name) || (entityInfos.ContainsKey(domainModelClassTypeFullName) && !entityInfos[domainModelClassTypeFullName].IsVersioned))
             {
                 return false;
             }
