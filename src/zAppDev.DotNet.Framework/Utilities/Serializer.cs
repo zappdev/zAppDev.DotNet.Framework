@@ -82,6 +82,11 @@ namespace zAppDev.DotNet.Framework.Utilities
             return (T)Convert.ChangeType(Enum.Parse(typeof(T), data), typeof(T));
         }
 
+        public string EnumToString(T instance)
+        {
+            return instance.ToString();
+        }
+
         public static List<string> ValidateXmlAgainstXsd(string xmlContent, string xsdPath)
         {
             var errors = new List<string>();
