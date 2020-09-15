@@ -38,14 +38,14 @@ namespace zAppDev.DotNet.Framework.Data
         }
 
         private static ConcurrentDictionary<string, EntityInfo> entityInfos = new ConcurrentDictionary<string, EntityInfo>();
-        private static List<string> excludeFromConcurencyControlList = new List<string>();
+        private static List<System.Type> excludeFromConcurencyControlList = new List<System.Type>();
 
-        public static void ExcludeFromConcurencyControl(List<string> domainModelClasses)
+        public static void ExcludeFromConcurencyControl(List<System.Type> domainModelClasses)
         {
             excludeFromConcurencyControlList = domainModelClasses;
         }
 
-        public static void IncludeToConcurencyControl(List<string> domainModelClasses)
+        public static void IncludeToConcurencyControl(List<System.Type> domainModelClasses)
         {
             foreach( var cls in domainModelClasses)
             {
@@ -60,8 +60,8 @@ namespace zAppDev.DotNet.Framework.Data
         private static bool MustCheck(Domain.IDomainModelClass cls)
         {
             var domainModelClassTypeFullName = cls.GetType().FullName;
-            var name = cls.GetType().Name;
-            if (excludeFromConcurencyControlList.Contains(name) || (entityInfos.ContainsKey(domainModelClassTypeFullName) && !entityInfos[domainModelClassTypeFullName].IsVersioned))
+            
+            if (excludeFromConcurencyControlList.Contains(cls.GetType()) || (entityInfos.ContainsKey(domainModelClassTypeFullName) && !entityInfos[domainModelClassTypeFullName].IsVersioned))
             {
                 return false;
             }
