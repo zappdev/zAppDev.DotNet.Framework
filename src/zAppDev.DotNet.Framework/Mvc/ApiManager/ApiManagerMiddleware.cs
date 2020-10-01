@@ -3,6 +3,7 @@
 #if NETFRAMEWORK
 #else
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -20,14 +21,18 @@ namespace zAppDev.DotNet.Framework.Middleware
 
         private readonly IServiceProvider _serviceProvider;
 
+        private readonly IConfiguration _configuration;
+      
         public ApiManagerMiddleware(
             RequestDelegate next,
             IAPILogger logger,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider,
+            IConfiguration configuration)
         {
             _next = next;
             _logger = logger;
             _serviceProvider = serviceProvider;
+            _configuration = configuration;
         } 
 
         public async Task Invoke(HttpContext context)
@@ -48,7 +53,15 @@ namespace zAppDev.DotNet.Framework.Middleware
             var timer = (Stopwatch)context.Items[HttpContextItemKeys.LogTimer];
             timer.Stop();
             var _elapsed = timer.Elapsed;
-            if (!context.IsLogEnabled()) return;
+            
+            var pathValue = context.Request.Path.Value;
+            var confValue = _configuration?.GetValue<string>($"configuration:apiLogSettings:add:{pathValue}:value");
+            bool logEnabled = true;
+            if (bool.TryParse(confValue, out bool _logEnabled))
+            {
+                logEnabled = _logEnabled;
+            }
+            if (!context.IsLogEnabled() || !logEnabled) return;
 
             //IdentityHelper.LogAction(
             //    filterContext.ActionContext.ActionDescriptor.ControllerDescriptor.ControllerName,
