@@ -84,11 +84,11 @@ namespace zAppDev.DotNet.Framework.Data
             return Session.BeginTransaction(IsolationLevel.ReadCommitted);
         }
         
-        public void CommitChanges(Exception exception = null, Action postAction = null)
+        public void CommitChanges(Exception exception = null, Action postAction = null, bool? forceRollback = null)
         {
             try
             {
-                if (exception != null)
+                if (exception != null || forceRollback == true)
                     Rollback();
                 else
                     Commit();

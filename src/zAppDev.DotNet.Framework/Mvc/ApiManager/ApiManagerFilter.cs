@@ -68,7 +68,9 @@ namespace zAppDev.DotNet.Framework.Mvc.API
             }
             else
             {
-                manager.CommitChanges(context.Exception);
+                context.HttpContext.Items.TryGetValue("ForceRollback", out var value);
+                bool _forceRollback = value == null ? false : (bool)value;
+                manager.CommitChanges(context.Exception, forceRollback: _forceRollback);
             }
 
             ExposedAPIMonitor?.Stop();

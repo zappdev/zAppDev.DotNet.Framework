@@ -21,7 +21,7 @@ namespace zAppDev.DotNet.Framework.Data
         void Dispose();
         ISession OpenTransaction();
 
-        void CommitChanges(Exception exception = null, Action postAction = null);
+        void CommitChanges(Exception exception = null, Action postAction = null, bool? forceRollback = null);
 
         T ExecuteInTransaction<T>(Func<T> func);
 
