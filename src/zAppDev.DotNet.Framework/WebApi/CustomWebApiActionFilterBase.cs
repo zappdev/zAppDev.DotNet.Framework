@@ -18,6 +18,8 @@ using zAppDev.DotNet.Framework.Data;
 using zAppDev.DotNet.Framework.Logging;
 using log4net;
 using zAppDev.DotNet.Framework.Identity;
+using System.Threading;
+using System.Globalization;
 
 namespace zAppDev.DotNet.Framework.WebApi
 {
@@ -49,6 +51,8 @@ namespace zAppDev.DotNet.Framework.WebApi
             context.Request.Properties["requestIsLogged"] = false;
             context.Request.Properties["exposed-service-requestId"] = _id;
             MiniSessionManager.Instance.OpenSessionWithTransaction();
+            var id = ProfileHelper.GetCurrentLocale().Id;
+            if (id != null) Thread.CurrentThread.CurrentCulture = new CultureInfo(id.Value);
             base.OnActionExecuting(context);
         }
 

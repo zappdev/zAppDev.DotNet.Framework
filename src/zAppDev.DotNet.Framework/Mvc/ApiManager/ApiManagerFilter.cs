@@ -8,7 +8,8 @@ using zAppDev.DotNet.Framework.Data;
 using zAppDev.DotNet.Framework.Utilities;
 using zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Components;
 using zAppDev.DotNet.Framework.Tools.PerformanceMeasurements.Configuration;
-
+using System.Globalization;
+using System.Threading;
 
 namespace zAppDev.DotNet.Framework.Mvc.API
 {
@@ -47,6 +48,10 @@ namespace zAppDev.DotNet.Framework.Mvc.API
             {
                 manager.OpenSessionWithTransaction();
             }
+            var culture = Identity.ProfileHelper.GetCurrentLocale();
+            var id = culture.Id;
+            var cultureInfo = new CultureInfo(id.Value);
+            Thread.CurrentThread.CurrentCulture = cultureInfo;
             ExposedAPIMonitor = new ActionMonitor(ExposedAPIMonitorConfiguration, manager.Session, null);
             ExposedAPIMonitor?.Start();
 
