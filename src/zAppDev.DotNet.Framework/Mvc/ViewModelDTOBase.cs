@@ -23,19 +23,11 @@ namespace zAppDev.DotNet.Framework.Mvc
         public ViewModelDTOBase() { }
 
         public object _clientKey { get; set; }
-        public Dictionary<string, bool> _clientPostedProps;
-        protected Dictionary<string, bool> _dirtyState;
         protected bool _parentIsDirty;
-        public List<string> _updatedProperties
-        {
-            get
-            {
-                return _dirtyState == null ? null : _dirtyState.Select(kv => kv.Key).ToList();
-            }
-        }
         
         public virtual object _key { get; }
 		public virtual string _originalTypeClassName { get; set; }
+        [JsonIgnore]
         public virtual List<string> _baseClasses { get; set; }
         public virtual object _typeHash => GetType().Name.GetHashCode();
 
