@@ -19,6 +19,9 @@ using NHibernate;
 
 using zAppDev.DotNet.Framework.Identity.Model;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.Extensions.Configuration;
 
 namespace zAppDev.DotNet.Framework.Identity
 {
@@ -80,6 +83,40 @@ namespace zAppDev.DotNet.Framework.Identity
             }
 
             await GetSignInManager().SignOutAsync();
+        }
+
+        public static TokenInfo GetToken(string username)
+        {
+            var _jwtKey = ServiceLocator.Current.GetInstance<IConfiguration>().GetValue("configuration:appSettings:add:JWTKey:value",
+                "MIksRlTn0KG6nmjW*fzq*FYTY0RifkNQE%QTqdfS81CgNEGtUmMCY5XEgPTSL&28");
+            var _jwtExpirationTime = DateTime.UtcNow.AddSeconds(ServiceLocator.Current.GetInstance<IConfiguration>().GetValue("configuration:appSettings:add:JWTExpirationTime:value", 7200));
+
+            return GenerateToken(username, _jwtKey, _jwtExpirationTime);
+        }
+
+        public static TokenInfo GenerateToken(string username, string _jwtKey, DateTime _jwtExpirationTime)
+        {
+            var userInfo = GetApplicationUserByName(username);
+
+            var claims = userInfo.Permissions.Select(p => new Claim(Model.ClaimTypes.Permission, p.Name)).ToList();
+            claims.Add(new Claim(System.Security.Claims.ClaimTypes.Name, userInfo.UserName));
+            if (!string.IsNullOrWhiteSpace(userInfo.Email))
+            {
+                claims.Add(new Claim(Model.ClaimTypes.Email, userInfo.Email));
+            }
+            var userRoles = userInfo.Roles.Select(r => new Claim(System.Security.Claims.ClaimTypes.Role, r.Name));
+            claims.AddRange(userRoles);
+
+            var key = EncodingUtilities.StringToByteArray(_jwtKey, "ascii");
+            var signingCredential = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature);
+            var tokenDescriptor = new JwtSecurityToken(null, null, claims, expires: _jwtExpirationTime, signingCredentials: signingCredential);
+            var token = new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+
+            var result = new TokenInfo();
+            result.Token = token;
+            result.ExpiresIn = tokenDescriptor.ValidTo;
+
+            return result;
         }
 
         public static string GetUserProfile()
@@ -941,5 +978,7 @@ namespace zAppDev.DotNet.Framework.Identity
             set;
         }
     }
+
+    
 }
 #endif

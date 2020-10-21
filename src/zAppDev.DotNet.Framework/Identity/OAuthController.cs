@@ -56,30 +56,14 @@ namespace zAppDev.DotNet.Framework.Identity
 
                 if (success == true)
                 {
-                    var userInfo = IdentityHelper.GetApplicationUserByName(authRequest.Username);
-
-                    var claims = userInfo.Permissions.Select(p => new Claim(Model.ClaimTypes.Permission, p.Name)).ToList();
-                    claims.Add(new Claim(ClaimTypes.Name, userInfo.UserName));
-                    if (!string.IsNullOrWhiteSpace(userInfo.Email))
-                    {
-                        claims.Add(new Claim(Model.ClaimTypes.Email, userInfo.Email));
-                    }
-                    var userRoles = userInfo.Roles.Select(r => new Claim(ClaimTypes.Role, r.Name));
-                    claims.AddRange(userRoles);
-
-                    var key = EncodingUtilities.StringToByteArray(_jwtKey, "ascii");
-                    var signingCredential = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature);
-                    var tokenDescriptor = new JwtSecurityToken(null, null, claims, expires: _jwtExpirationTime, signingCredentials: signingCredential);
-                    var token = new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
-
+                    var tokenInfo = IdentityHelper.GenerateToken(authRequest.Username, _jwtKey, _jwtExpirationTime);
                     var result = new
                     {
-                        idToken = token,
-                        expiresIn = tokenDescriptor.ValidTo,
-                    };                    
+                        idToken = tokenInfo.Token,
+                        expiresIn = tokenInfo.ExpiresIn,
+                    };
                     response = Ok(result);
                 }
-
                 _manager.CloseSession();
                 return response;
             }
