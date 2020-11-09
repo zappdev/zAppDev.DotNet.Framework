@@ -17,5 +17,7 @@ namespace zAppDev.DotNet.Framework.Exceptions
         public BusinessException(string message, Exception inner) : base(message, inner)
         {
         }
+
+        public string CustomData { get; set; }
     }
 }
