@@ -18,6 +18,6 @@ namespace zAppDev.DotNet.Framework.Exceptions
         {
         }
 
-        public string CustomData { get; set; }
+        public object CustomData { get; set; }
     }
 }
