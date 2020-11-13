@@ -46,6 +46,19 @@ namespace zAppDev.DotNet.Framework.Identity
             return context.RequestServices.GetRequiredService<SignInManager<Model.IdentityUser>>();
         }
 
+        public static bool SignInOnlyWithUserName(string username)
+        {
+            if (string.IsNullOrWhiteSpace(username)
+                || string.IsNullOrWhiteSpace(username)) return false;
+
+            var signInManager = GetSignInManager();
+            var user = signInManager.UserManager.FindByNameAsync(username).Result; 
+            if (user == null) return false;
+
+            signInManager.SignInAsync(user, true).Wait();
+            return true;
+        }
+
         public static bool SignIn(string username, string password, bool isPersistent)
         {
             if (string.IsNullOrWhiteSpace(username)
