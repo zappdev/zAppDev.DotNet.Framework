@@ -387,6 +387,11 @@ namespace zAppDev.DotNet.Framework.Identity
             services.TryAddScoped<ISecurityStampValidator, SecurityStampValidator<TUser>>();
             services.TryAddScoped<ITwoFactorSecurityStampValidator, TwoFactorSecurityStampValidator<TUser>>();
             services.TryAddScoped<IUserClaimsPrincipalFactory<TUser>, UserClaimsPrincipalFactory<TUser, TRole>>();
+
+#if NETCOREAPP3_1
+            services.TryAddScoped<IUserConfirmation<TUser>, DefaultUserConfirmation<TUser>>(); //queen
+#endif
+
             services.TryAddScoped<UserManager<TUser>>();
             services.TryAddScoped<SignInManager<TUser>>();
             services.TryAddScoped<RoleManager<TRole>>();

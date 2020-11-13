@@ -87,7 +87,7 @@ namespace zAppDev.DotNet.Framework.Mvc
             {
                 using (var reader = new StreamReader(request.Body))
                 {
-                    json = reader.ReadToEnd();
+                    json = reader.ReadToEndAsync().Result;
                 }
             }
             return JObject.Parse(json);
