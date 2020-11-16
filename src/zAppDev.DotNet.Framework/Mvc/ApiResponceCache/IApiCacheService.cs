@@ -13,6 +13,8 @@ namespace zAppDev.DotNet.Framework.Mvc.API
         void Clear();
 
         void InvalidateApiCache(string api, string username = null);
+
+        void InvalidateOperationCache(string api, string operation, string username = null);
     }
 }
 #endif

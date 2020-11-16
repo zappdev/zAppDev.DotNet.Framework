@@ -78,6 +78,23 @@ namespace zAppDev.DotNet.Framework.Mvc.API
                 Keys.Remove(key);
             }
         }
+
+        public void InvalidateOperationCache(string api, string operation, string username = null)
+        {
+            var keysToRemove = Keys.Where(k =>
+            {
+                var keySemantics = ServiceLocator.Current.GetInstance<ICacheKeyHasher>().SplitToObject(k);
+
+                return keySemantics.ApiName.Equals(api) &&
+                       keySemantics.Operation.Equals(operation) &&
+                       (username == null || keySemantics.UserName.Equals(username));
+            }).ToList();
+
+            foreach (var key in keysToRemove)
+            {
+                Remove(key);
+            }
+        }
     }
 }
 #endif
