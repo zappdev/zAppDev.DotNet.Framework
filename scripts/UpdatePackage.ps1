@@ -1,6 +1,3 @@
-$dstBasePath = "../NugetLocalFeed"
-$ideNugetLocalFeed = "../../zAppDev.new/NugetLocalFeed"
-$cfNugetLocalFeed = "../../zAppDev.CodingFacility.CSharp.MVP/NugetLocalFeed"
 $version = $args[0]
 
 $libraries = @(
@@ -14,18 +11,18 @@ Write-Host "Pack libraries"
 foreach ($library in $libraries) {
     Push-Location "$library"
     Write-Host "Pack $library"
-    Remove-Item "$dstBasePath/$library*"
-    dotnet pack --no-restore --nologo  -c Release -o "$dstBasePath" -p:PackageVersion=$version
+    Remove-Item "../../NugetLocalFeed/$library*"
+    dotnet pack --no-restore --nologo  -c Release -o "../../NugetLocalFeed" -p:PackageVersion=$version
     Pop-Location
 }
 
 Write-Host "Sync libraries"
 foreach ($library in $libraries) {
   Write-Host "Update $library"
-  Remove-Item "$ideNugetLocalFeed/$library*"
-  Copy-Item -Force -Confirm:$false "$dstBasePath\$library.$version.nupkg" "$ideNugetLocalFeed\"
-  Remove-Item "$cfNugetLocalFeed/$library*"
-  Copy-Item -Force -Confirm:$false "$dstBasePath\$library.$version.nupkg" "$cfNugetLocalFeed\"
+  Remove-Item "../../zAppDev.new/NugetLocalFeed/$library*"
+  Copy-Item -Force -Confirm:$false "../NugetLocalFeed/$library.$version.nupkg" "../../zAppDev.new/NugetLocalFeed/"
+  Remove-Item "../../zAppDev.CodingFacility.CSharp.MVP/NugetLocalFeed/$library*"
+  Copy-Item -Force -Confirm:$false "../NugetLocalFeed/$library.$version.nupkg" "../../zAppDev.CodingFacility.CSharp.MVP/NugetLocalFeed/"
 }
 
 Pop-Location
