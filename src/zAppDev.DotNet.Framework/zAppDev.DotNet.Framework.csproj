@@ -23,15 +23,13 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageIconUrl>https://raw.githubusercontent.com/zappdev/zAppDev.DotNet.Framework/develop/assets/icon.png</PackageIconUrl>
   </PropertyGroup>
-
-  <!-- QUEEN -->
   
   <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
     <DefineConstants>$(DefineConstants);NETCOREAPP3_1</DefineConstants>
+    <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
   </PropertyGroup>
-  
-  
-    <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.2'"> 
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp2.2'"> 
     <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
   </PropertyGroup>
 
@@ -117,35 +115,34 @@
     <PackageReference Include="CacheManager.Serialization.Json" Version="1.2.0" />
     <PackageReference Include="CacheManager.StackExchange.Redis" Version="1.2.0" />
     <PackageReference Include="EPPlus" Version="4.5.2.1" />    
-    <PackageReference Include="Ubiety.Dns.Core" Version="2.3.0" />
-    <PackageReference Include="ncrontab" Version="3.3.0" />
-    
-
     <PackageReference Include="MQTTnet" Version="3.0.8" />
+    <PackageReference Include="ncrontab" Version="3.3.0" />   
     <PackageReference Include="RabbitMQ.Client" Version="5.1.0" />
-    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.1" />
+    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta0007" />    
     <PackageReference Include="System.DirectoryServices" Version="4.5.0" />
     <PackageReference Include="System.DirectoryServices.AccountManagement" Version="4.5.0" />
-    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta0007" />
-    
     <PackageReference Include="System.ServiceModel.Duplex" Version="4.5.3" />
     <PackageReference Include="System.ServiceModel.Http" Version="4.5.3" />
     <PackageReference Include="System.ServiceModel.NetTcp" Version="4.5.3" />
     <PackageReference Include="System.ServiceModel.Primitives" Version="4.5.3" />
     <PackageReference Include="System.ServiceModel.Security" Version="4.5.3" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.5.1" />
+    <PackageReference Include="Ubiety.Dns.Core" Version="2.3.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
     <PackageReference Include="Autofac" Version="4.5.0" />
     <PackageReference Include="Autofac.Extras.CommonServiceLocator" Version="5.0.0" />
-    <PackageReference Include="DotNetZip" Version="1.12.0" />
     <PackageReference Include="CacheManager.SystemRuntimeCaching" Version="1.2.0" />
     <PackageReference Include="CSharpVerbalExpressions" Version="0.1.0" />
+    <PackageReference Include="DotNetZip" Version="1.12.0" />
+    <PackageReference Include="ExcelDataReader" Version="3.6.0" />
+    <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
     <PackageReference Include="Glimpse" Version="1.8.6" />
-    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.3" />
     <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
-    <PackageReference Include="Microsoft.AspNet.Web.Optimization" Version="1.1.0" />
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.3" />
     <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.3.0" />
+    <PackageReference Include="Microsoft.AspNet.Web.Optimization" Version="1.1.0" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.6" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.6" />
     <PackageReference Include="Microsoft.AspNet.WebApi.WebHost" Version="5.2.6" />
@@ -155,54 +152,51 @@
     <PackageReference Include="Microsoft.Owin.Security" Version="3.1.0" />
     <PackageReference Include="NLog" Version="4.5.11" />
     <PackageReference Include="Owin" Version="1.0" />
-    <PackageReference Include="Purplelight.Framework.Autofac.Integration.WebApi" Version="0.2.2" />
     <PackageReference Include="PDFsharp" Version="1.50.5147" />
     <PackageReference Include="PDFsharp-MigraDoc" Version="1.50.5147" />
+    <PackageReference Include="Purplelight.Framework.Autofac.Integration.WebApi" Version="0.2.2" />
     <PackageReference Include="S22.Imap" Version="3.6.0.0" />
-    <PackageReference Include="System.Runtime.Caching" Version="4.5.0" />
+    <PackageReference Include="SSH.NET" Version="2016.1.0" />
     <PackageReference Include="System.IO.Compression" Version="4.3.0" />
     <PackageReference Include="System.Management.Automation.dll" Version="10.0.10586" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
-    <PackageReference Include="SSH.NET" Version="2016.1.0" />
-    <PackageReference Include="ExcelDataReader" Version="3.6.0" />
-    <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
+    <PackageReference Include="System.Runtime.Caching" Version="4.5.0" />
   </ItemGroup>
 
   <!-- Any framework, but Core 3.1-->
   <ItemGroup Condition="'$(TargetFramework)' != 'netcoreapp3.1'">
-    <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.1.1" />
     <PackageReference Include="log4net" Version="2.0.8" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
-    <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="4.0.1" />
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.1.1" />
     <PackageReference Include="MySql.Data" Version="8.0.19" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="NHibernate" Version="5.2.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="4.0.1" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.5.0" />
   </ItemGroup>
 
   <!-- Only Core 3.1 -->
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
-    <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.1.1" />
     <PackageReference Include="log4net" Version="2.0.12" />
     <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="3.1.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.10" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.10" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.10" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.10" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Xml" Version="3.1.10" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.10" />
-    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="5.6.3" />
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.1.1" />
     <PackageReference Include="MySql.Data" Version="8.0.22" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NHibernate" Version="5.3.5" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="5.6.3" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.7.0" />
   </ItemGroup>
-
 
   <!-- Only Net Standard -->
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
@@ -210,7 +204,7 @@
   </ItemGroup>
 
   <!-- Only Core  -->
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1' or '$(TargetFramework)' == 'netcoreapp2.2'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
     <PackageReference Include="Microsoft.PowerShell.SDK" Version="6.1.5" />
     <PackageReference Include="Microsoft.PowerShell.Commands.Diagnostics" Version="6.1.5" />
     <PackageReference Include="Microsoft.WSMan.Management" Version="6.1.5" />
@@ -221,61 +215,58 @@
     <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="2.2.0" />
   </ItemGroup>
 
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1' or '$(TargetFramework)' == 'netstandard2.0' or '$(TargetFramework)' == 'netcoreapp2.2'">
+  <ItemGroup Condition="'$(TargetFramework)' != 'net472'">
     <PackageReference Include="Autofac" Version="4.9.1" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="5.0.0-rc2" />
     <PackageReference Include="Autofac.Extras.CommonServiceLocator" Version="5.0.0" />
     <PackageReference Include="DotNetZip.NetStandard" Version="1.12.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.0" />
+    <PackageReference Include="ExcelDataReader" Version="3.6.0" />
+    <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Twitter" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.CookiePolicy" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Hosting" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Owin" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.0.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Formatters.Json" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Formatters.Xml" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Owin" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Core" Version="1.0.4" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="2.2.0" />
     <PackageReference Include="MQTTnet.AspNetCore" Version="3.0.8" />
-    <PackageReference Include="WebApiContrib.Core" Version="2.2.1" />
+    <PackageReference Include="PdfSharp.MigraDoc.Standard" Version="1.51.*" />
+    <PackageReference Include="PDFSharp.Standard" Version="1.51.*" />
     <PackageReference Include="RSG.Promise.Core" Version="3.0.0" />
-    <PackageReference Include="PdfSharp.MigraDoc.Standard" Version="1.51.12" />
-    <PackageReference Include="PDFSharp.Standard" Version="1.51.12" />
     <PackageReference Include="S22.Imap.Core" Version="3.6.1" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />
+    <PackageReference Include="SSH.NET" Version="2016.1.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="5.6.3" />
     <PackageReference Include="System.CodeDom" Version="4.5.0" />
-    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />    
     <PackageReference Include="System.Data.SqlClient" Version="4.6.0" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <PackageReference Include="System.Runtime.Extensions" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />    
     <PackageReference Include="VerbalExpressions-netstandard16" Version="0.2.0" />
-    <PackageReference Include="SSH.NET" Version="2016.1.0" />
-    <PackageReference Include="ExcelDataReader" Version="3.6.0" />
-    <PackageReference Include="ExcelDataReader.DataSet" Version="3.6.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="5.6.3" />
+    <PackageReference Include="WebApiContrib.Core" Version="2.2.1" />
 
 
 	  <PackageReference Include="AspNetCore.HealthChecks.System" Version="2.2.1" />
 	  <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="2.2.1" />
 	  <PackageReference Include="AspNetCore.HealthChecks.UI" Version="2.2.2" />
-
 	  <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="2.2.1" />
 	  <PackageReference Include="AspNetCore.HealthChecks.RabbitMQ" Version="2.2.1" />
-
 	  <!--<PackageReference Include="AspNetCore.HealthChecks.MySql" Version="2.2.0" />-->
 	  <PackageReference Include="AspNetCore.HealthChecks.SqLite" Version="2.2.0" />
 	  <PackageReference Include="AspNetCore.HealthChecks.Network" Version="2.2.1" />
