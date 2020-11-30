@@ -54,7 +54,7 @@ namespace zAppDev.DotNet.Framework.Identity
 
             if (Store is UserStore storeImp)
             {
-                return storeImp.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey).Result;
+                return storeImp.FindByLoginAsync(loginInfo.LoginProvider, loginInfo.ProviderKey).GetAwaiter().GetResult();
             }
             return null;
         }
@@ -64,7 +64,7 @@ namespace zAppDev.DotNet.Framework.Identity
             var user = FindById(username);
             if (user == null) return null;
 
-            var pass = ValidatePasswordAsync(user, password).Result;
+            var pass = ValidatePasswordAsync(user, password).GetAwaiter().GetResult();
 
             return (pass.Succeeded) ? user : null;
         }
@@ -75,7 +75,7 @@ namespace zAppDev.DotNet.Framework.Identity
             {
                 return null;
             }
-            return base.FindByIdAsync(userId).Result;
+            return base.FindByIdAsync(userId).GetAwaiter().GetResult();
         }
 
         public Model.IdentityUser FindByName(string userName)
@@ -84,7 +84,7 @@ namespace zAppDev.DotNet.Framework.Identity
             {
                 return null;
             }
-            return base.FindByNameAsync(userName).Result;
+            return base.FindByNameAsync(userName).GetAwaiter().GetResult();
         }
 
         public async Task<string> GeneratePasswordResetTokenAsync(string userId)
@@ -114,7 +114,7 @@ namespace zAppDev.DotNet.Framework.Identity
                     user.User.RemoveClients(client);
                 }
                 user.CurrentClientId = null;
-                return UpdateAsync(user).Result;
+                return UpdateAsync(user).GetAwaiter().GetResult();
             }
             catch (Exception x)
             {
@@ -134,7 +134,7 @@ namespace zAppDev.DotNet.Framework.Identity
                 user.User.RemoveClients(client);
             }
             user.CurrentClientId = null;
-            return UpdateAsync(user).Result;
+            return UpdateAsync(user).GetAwaiter().GetResult();
         }
 
         public IdentityResult SignInClient(string username, string clientKey, string userHostAddress, string sessionId)
@@ -166,7 +166,7 @@ namespace zAppDev.DotNet.Framework.Identity
                 {
                     client.ConnectedOn = DateTime.UtcNow;
                 }
-                var result = UpdateAsync(user).Result;
+                var result = UpdateAsync(user).GetAwaiter().GetResult();
                 //var repo = new Repository();
                 //repo.SaveApplicationClient(client);
                 user.CurrentClientId = client.Id.ToString();
@@ -209,7 +209,7 @@ namespace zAppDev.DotNet.Framework.Identity
             {
                 client.ConnectedOn = DateTime.UtcNow;
             }
-            var result = this.UpdateAsync(user).Result;
+            var result = this.UpdateAsync(user).GetAwaiter().GetResult();
             user.CurrentClientId = client.Id.ToString();
             return result;
         }
@@ -225,7 +225,7 @@ namespace zAppDev.DotNet.Framework.Identity
             var externalLogin = user.User.Logins.FirstOrDefault(x => x.ProviderKey == loginInfo.ProviderKey && x.LoginProvider == loginInfo.LoginProvider);
             if (externalLogin == null)
             {
-                return this.AddLoginAsync(user, new UserLoginInfo(loginInfo.LoginProvider, loginInfo.ProviderKey, loginInfo.ProviderDisplayName)).Result;
+                return this.AddLoginAsync(user, new UserLoginInfo(loginInfo.LoginProvider, loginInfo.ProviderKey, loginInfo.ProviderDisplayName)).GetAwaiter().GetResult();
             }
             return null;
         }
