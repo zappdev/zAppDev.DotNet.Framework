@@ -2,6 +2,7 @@
 using System.Web;
 #else
 using Microsoft.AspNetCore.Http;
+using zAppDev.DotNet.Framework.Utilities;
 #endif
 
 
@@ -21,7 +22,8 @@ namespace zAppDev.DotNet.Framework.Modules.AppLib
 #if NETFRAMEWORK
             _httpContext.Session.Add(key, value);
 #else
-            _httpContext.Session.Set(key, Utilities.BinarySerializer.Serialize(value));
+            var jsonString = new Serializer<object>().ToJson(value);
+            _httpContext.Session.Set(key, Utilities.BinarySerializer.Serialize(jsonString));
 #endif
         }
 
@@ -32,7 +34,9 @@ namespace zAppDev.DotNet.Framework.Modules.AppLib
 #else
             var result = _httpContext.Session.Get(key);
             if(result == null) return null;
-            return Utilities.BinarySerializer.Desserialize(result);
+            var jsonString = Utilities.BinarySerializer.Deserialize(result) as string;
+
+            return new Serializer<object>().FromJson(jsonString);
 #endif
         }
 

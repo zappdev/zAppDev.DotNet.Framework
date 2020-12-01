@@ -17,7 +17,7 @@ namespace zAppDev.DotNet.Framework.Utilities
             }
         }
 
-        public static object Desserialize(byte[] bytes)
+        public static object Deserialize(byte[] bytes)
         {
             if (bytes == null)
                 return default;
