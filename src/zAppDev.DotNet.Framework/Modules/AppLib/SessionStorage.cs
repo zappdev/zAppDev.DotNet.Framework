@@ -31,6 +31,7 @@ namespace zAppDev.DotNet.Framework.Modules.AppLib
             return _httpContext.Session[key];
 #else
             var result = _httpContext.Session.Get(key);
+            if(result == null) return null;
             return Utilities.BinarySerializer.Desserialize(result);
 #endif
         }
