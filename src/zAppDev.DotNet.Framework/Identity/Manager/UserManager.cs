@@ -32,7 +32,7 @@ namespace zAppDev.DotNet.Framework.Identity
             {
                 return null;
             }
-            return base.FindByIdAsync(userId).Result;
+            return base.FindByIdAsync(userId).GetAwaiter().GetResult();
         }
 
 
@@ -42,7 +42,7 @@ namespace zAppDev.DotNet.Framework.Identity
             {
                 return null;
             }
-            return base.FindByNameAsync(userName).Result;
+            return base.FindByNameAsync(userName).GetAwaiter().GetResult();
         }
 
         public static UserManager Create(IdentityFactoryOptions<UserManager> options, IOwinContext context)
