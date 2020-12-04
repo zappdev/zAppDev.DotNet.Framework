@@ -112,6 +112,8 @@
     <PackageReference Include="EPPlus" Version="4.5.2.1" />
     <PackageReference Include="log4net" Version="2.0.8" />
     <PackageReference Include="MySql.Data" Version="8.0.19" />
+    <PackageReference Include="PdfSharp.MigraDoc.Standard" Version="1.51.15" />
+    <PackageReference Include="PDFSharp.Standard" Version="1.51.15" />
     <PackageReference Include="Ubiety.Dns.Core" Version="2.3.0" />
     <PackageReference Include="ncrontab" Version="3.3.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
@@ -213,7 +215,6 @@
     <PackageReference Include="WebApiContrib.Core" Version="2.2.1" />
     <PackageReference Include="RSG.Promise.Core" Version="3.0.0" />
     <PackageReference Include="PdfSharp.MigraDoc.Standard" Version="1.51.12" />
-    <PackageReference Include="PDFSharp.Standard" Version="1.51.12" />
     <PackageReference Include="S22.Imap.Core" Version="3.6.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="2.10.0" />
     <PackageReference Include="System.CodeDom" Version="4.5.0" />
