@@ -247,7 +247,6 @@
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="2.2.0" />
     <PackageReference Include="MQTTnet.AspNetCore" Version="3.0.8" />
-    <PackageReference Include="PDFSharp.Standard" Version="1.51.*" />
     <PackageReference Include="RSG.Promise.Core" Version="3.0.0" />
     <PackageReference Include="PdfSharp.MigraDoc.Standard" Version="1.51.15" />
     <PackageReference Include="PDFSharp.Standard" Version="1.51.15" />
@@ -261,7 +260,6 @@
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />    
     <PackageReference Include="VerbalExpressions-netstandard16" Version="0.2.0" />
     <PackageReference Include="WebApiContrib.Core" Version="2.2.1" />
-
 
 	  <PackageReference Include="AspNetCore.HealthChecks.System" Version="2.2.1" />
 	  <PackageReference Include="AspNetCore.HealthChecks.SqlServer" Version="2.2.1" />
