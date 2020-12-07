@@ -1,7 +1,7 @@
 ﻿#if NETFRAMEWORK
 #else
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
+//using Microsoft.AspNetCore.Http.Internal; queen
 using Microsoft.AspNetCore.Routing;
 using System.Collections.Generic;
 using System.IO;
@@ -73,10 +73,14 @@ namespace zAppDev.DotNet.Framework.Mvc.API
                 context.Request.Method == HttpMethod.Delete.Method ||
                 context.Request.Method == HttpMethod.Put.Method)
             {
+                context.Request.EnableBuffering();
+#if NETCOREAPP2_2
+                //context.Request.EnableRewind();
+#elif NETCOREAPP3_1
+                //  context.Request.EnableBuffering();
+#endif
 
-                context.Request.EnableRewind();
-
-                 using (var stream = new StreamReader(context.Request.Body,encoding: Encoding.UTF8,detectEncodingFromByteOrderMarks: true, bufferSize: 1024, leaveOpen: true))
+                using (var stream = new StreamReader(context.Request.Body,encoding: Encoding.UTF8,detectEncodingFromByteOrderMarks: true, bufferSize: 1024, leaveOpen: true))
                  {
                      postBody = stream.ReadToEnd();
                      context.Request.Body.Seek(0, SeekOrigin.Begin);

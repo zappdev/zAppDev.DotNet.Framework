@@ -50,7 +50,7 @@ namespace zAppDev.DotNet.Framework.Identity
                 || string.IsNullOrWhiteSpace(username)) return false;
 
             var signInManager = GetSignInManager();
-            var user = signInManager.UserManager.FindByNameAsync(username).Result;
+            var user = signInManager.UserManager.FindByNameAsync(username).GetAwaiter().GetResult();
             if (user == null) return false;
 
             signInManager.SignInAsync(user, true, true).Wait();
@@ -726,14 +726,14 @@ namespace zAppDev.DotNet.Framework.Identity
                 throw new ApplicationException("External Login Failure: External Login Info was null!");
             }
             // Sign in the user with this external login provider if the user already has a login
-            var success = LinkExternalAccount(loginInfo.Result);
+            var success = LinkExternalAccount(loginInfo.GetAwaiter().GetResult());
             return success;
         }
 
         public static bool ExternalSignIn(ExternalLoginInfo loginInfo, bool isPersistent)
         {
             var result = GetSignInManager().ExternalSignInAsync(loginInfo, isPersistent);
-            return HandleLoginResult(result.Result, loginInfo);
+            return HandleLoginResult(result.GetAwaiter().GetResult(), loginInfo);
         }
 
         private static bool HandleLoginResult(SignInStatus result, string username)
@@ -797,11 +797,11 @@ namespace zAppDev.DotNet.Framework.Identity
         public static ApplicationUserExternalProfile GetExternalProfile()
         {
             var profile = new ApplicationUserExternalProfile();
-            var loginInfo = GetSignInManager().AuthenticationManager.GetExternalLoginInfoAsync();
+            var loginInfo = GetSignInManager().AuthenticationManager.GetExternalLoginInfoAsync()?.GetAwaiter().GetResult();
             var claims = new List<Claim>();
-            if (loginInfo != null && loginInfo.Result != null)
+            if (loginInfo != null)
             {
-                var info = loginInfo.Result;
+                var info = loginInfo;
                 claims = info.ExternalIdentity?.Claims?.ToList();
                 profile.Provider = info.Login.LoginProvider;
                 profile.Email = info.Email;

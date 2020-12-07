@@ -52,7 +52,7 @@ namespace zAppDev.DotNet.Framework.Identity
                 || string.IsNullOrWhiteSpace(username)) return false;
 
             var signInManager = GetSignInManager();
-            var user = signInManager.UserManager.FindByNameAsync(username).Result; 
+            var user = signInManager.UserManager.FindByNameAsync(username).GetAwaiter().GetResult(); 
             if (user == null) return false;
 
             signInManager.SignInAsync(user, true).Wait();
@@ -65,14 +65,14 @@ namespace zAppDev.DotNet.Framework.Identity
                 || string.IsNullOrWhiteSpace(username)) return false;
 
             var signInManager = GetSignInManager();
-            var result = signInManager.PasswordSignInAsync(username, password, isPersistent, true).Result;
+            var result = signInManager.PasswordSignInAsync(username, password, isPersistent, true).GetAwaiter().GetResult();
             return HandleLoginResult(result, username);
         }
 
         private static void SignIn(ExternalLoginInfo loginInfo, bool isPersistent)
         {
             var signInManager = GetSignInManager();
-            var result = signInManager.ExternalLoginSignInAsync(loginInfo.LoginProvider, loginInfo.ProviderKey, isPersistent).Result;
+            var result = signInManager.ExternalLoginSignInAsync(loginInfo.LoginProvider, loginInfo.ProviderKey, isPersistent).GetAwaiter().GetResult();
             var loggedIn = HandleLoginResult(result, loginInfo);
             if (!loggedIn)
             {
@@ -267,7 +267,7 @@ namespace zAppDev.DotNet.Framework.Identity
         public static string CreateUser(CustomUserManager manager, ApplicationUser appUser, string password)
         {
             var user = new Model.IdentityUser(appUser);
-            var result = manager.CreateAsync(user, password).Result;
+            var result = manager.CreateAsync(user, password).GetAwaiter().GetResult();
             return result.Succeeded ? null : result.Errors.First().Description;
         }
 
@@ -300,7 +300,7 @@ namespace zAppDev.DotNet.Framework.Identity
 
         public static IEnumerable<string> CreateAndLoginUser(string username, string email, string name, string userClass = null)
         {
-            var info = GetSignInManager().GetExternalLoginInfoAsync().Result;
+            var info = GetSignInManager().GetExternalLoginInfoAsync().GetAwaiter().GetResult();
 
             if (info == null)
             {
@@ -316,11 +316,11 @@ namespace zAppDev.DotNet.Framework.Identity
             var user = GetIdentityUser(username, email, name, userClass);
             AddClaimsToUser(user, claims);
 
-            var result = manager.CreateAsync(user).Result;
+            var result = manager.CreateAsync(user).GetAwaiter().GetResult();
 
             if (result.Succeeded)
             {
-                result = manager.AddLoginAsync(user, externalLoginInfo).Result;
+                result = manager.AddLoginAsync(user, externalLoginInfo).GetAwaiter().GetResult();
                 if (result.Succeeded)
                 {
                     ServiceLocator.Current.GetInstance<IMiniSessionService>().CommitChanges();
@@ -341,7 +341,7 @@ namespace zAppDev.DotNet.Framework.Identity
             appUser = null;
 
             var manager = GetUserManager();
-            var loginInfo = GetSignInManager().GetExternalLoginInfoAsync().Result;
+            var loginInfo = GetSignInManager().GetExternalLoginInfoAsync().GetAwaiter().GetResult();
 
             if (loginInfo == null)
             {
@@ -367,7 +367,7 @@ namespace zAppDev.DotNet.Framework.Identity
                 // If the external login is not associated with the currently logged in User -> associate
                 // Apply Xsrf check when linking
 
-                loginInfo = GetSignInManager().GetExternalLoginInfoAsync(XsrfKey).Result;
+                loginInfo = GetSignInManager().GetExternalLoginInfoAsync(XsrfKey).GetAwaiter().GetResult();
                 if (loginInfo == null)
                 {
                     errors = new[] { "No External Login information found." };
@@ -375,7 +375,7 @@ namespace zAppDev.DotNet.Framework.Identity
                 }
 
                 var identityUser = manager.Find(loginInfo);
-                var addLoginResult = manager.AddLoginAsync(identityUser, loginInfo).Result;
+                var addLoginResult = manager.AddLoginAsync(identityUser, loginInfo).GetAwaiter().GetResult();
                 if (addLoginResult.Succeeded)
                 {
                     // If successfully associated the user with the external login -> redirect to ReturnUrl
@@ -486,7 +486,7 @@ namespace zAppDev.DotNet.Framework.Identity
             if (applicationUser.IsTransient())
             {
                 var manager = GetUserManager();
-                var result = manager.CreateAsync(new Model.IdentityUser(applicationUser)).Result; //, ApplicationUser.PasswordHash);
+                var result = manager.CreateAsync(new Model.IdentityUser(applicationUser)).GetAwaiter().GetResult(); //, ApplicationUser.PasswordHash);
                 if (!result.Succeeded)
                 {
                     throw new ApplicationException($"Could not create User. {string.Join("\r\n", ReportErrors(result.Errors))}");
@@ -495,7 +495,7 @@ namespace zAppDev.DotNet.Framework.Identity
             else
             {
                 var manager = GetUserManager();
-                var result = manager.UpdateAsync(new Model.IdentityUser(applicationUser)).Result;
+                var result = manager.UpdateAsync(new Model.IdentityUser(applicationUser)).GetAwaiter().GetResult();
                 if (!result.Succeeded)
                 {
                     throw new ApplicationException($"Could not update User. {string.Join("\r\n", ReportErrors(result.Errors))}");
@@ -506,7 +506,7 @@ namespace zAppDev.DotNet.Framework.Identity
         public static string ChangePassword(ApplicationUser user, string currentPassword, string newPassword)
         {
             var manager = GetUserManager();
-            var result = manager.ChangePasswordAsync(GetIdentityUserByName(user.UserName), currentPassword, newPassword).Result;
+            var result = manager.ChangePasswordAsync(GetIdentityUserByName(user.UserName), currentPassword, newPassword).GetAwaiter().GetResult();
             return result.Succeeded ? null : result.Errors.First().Description;
         }
 
@@ -515,10 +515,10 @@ namespace zAppDev.DotNet.Framework.Identity
             var manager = GetUserManager();
             var identityUser = GetIdentityUserByName(user.UserName);
 
-            var result = manager.RemovePasswordAsync(identityUser).Result;
+            var result = manager.RemovePasswordAsync(identityUser).GetAwaiter().GetResult();
             if (result.Succeeded)
             {
-                result = manager.AddPasswordAsync(identityUser, newPassword).Result;
+                result = manager.AddPasswordAsync(identityUser, newPassword).GetAwaiter().GetResult();
             }
             return result.Succeeded ? null : result.Errors.First().Description;
         }
@@ -702,7 +702,7 @@ namespace zAppDev.DotNet.Framework.Identity
                 throw new ApplicationException("External Login Failure: External Login Info was null!");
             }
             // Sign in the user with this external login provider if the user already has a login
-            var success = LinkExternalAccount(loginInfo.Result);
+            var success = LinkExternalAccount(loginInfo.GetAwaiter().GetResult());
             return success;
         }
 
@@ -710,7 +710,7 @@ namespace zAppDev.DotNet.Framework.Identity
         {
             var result = GetSignInManager()
                 .ExternalLoginSignInAsync(loginInfo.LoginProvider, loginInfo.ProviderKey, isPersistent);
-            return HandleLoginResult(result.Result, loginInfo);
+            return HandleLoginResult(result.GetAwaiter().GetResult(), loginInfo);
         }
 
         private static bool HandleLoginResult(SignInResult result, string username)
@@ -810,11 +810,11 @@ namespace zAppDev.DotNet.Framework.Identity
         public static ApplicationUserExternalProfile GetExternalProfile()
         {
             var profile = new ApplicationUserExternalProfile();
-            var loginInfo = GetSignInManager().GetExternalLoginInfoAsync();
+            var loginInfo = GetSignInManager().GetExternalLoginInfoAsync()?.GetAwaiter().GetResult();
             var claims = new List<Claim>();
-            if (loginInfo != null && loginInfo.Result != null)
+            if (loginInfo != null)
             {
-                var info = loginInfo.Result;
+                var info = loginInfo;
                 claims = info.Principal?.Claims?.ToList();
                 profile.Provider = info.LoginProvider;
                 profile.Email = info.Principal.FindFirst(System.Security.Claims.ClaimTypes.Email).Value;

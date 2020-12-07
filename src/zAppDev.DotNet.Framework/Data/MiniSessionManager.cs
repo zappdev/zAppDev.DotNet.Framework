@@ -402,12 +402,21 @@ namespace zAppDev.DotNet.Framework.Data
             var factory = ServiceLocator.Current.GetInstance<ISessionFactory>();
             using (var manager = new MiniSessionService(factory))
             {
-                manager.OpenSessionWithTransaction();
-                UoWContext.Push(manager);
-                var result = action(manager);
-                UoWContext.Pop();
-                manager.CommitChanges();
-                return result;
+                bool popped = false;
+                try
+                {
+                    manager.OpenSessionWithTransaction();
+                    UoWContext.Push(manager);
+                    var result = action(manager);
+                    UoWContext.Pop();
+                    popped = true;
+                    manager.CommitChanges();
+                    return result;
+                }
+                finally
+                {
+                    if(!popped && UoWContext.Any()) UoWContext.Pop();
+                }
             }
         }
 
@@ -416,11 +425,20 @@ namespace zAppDev.DotNet.Framework.Data
             factory = factory ?? ServiceLocator.Current.GetInstance<ISessionFactory>();
             using (var manager = new MiniSessionService(factory))
             {
-                manager.OpenSessionWithTransaction();
-                UoWContext.Push(manager);
-                action(manager);
-                UoWContext.Pop();
-                manager.CommitChanges();
+                var popped = false;
+                try
+                {
+                    manager.OpenSessionWithTransaction();
+                    UoWContext.Push(manager);
+                    action(manager);
+                    UoWContext.Pop();
+                    popped = true;
+                    manager.CommitChanges();
+                }
+                finally
+                {
+                    if (!popped && UoWContext.Any()) UoWContext.Pop();
+                }
             }
         }
 

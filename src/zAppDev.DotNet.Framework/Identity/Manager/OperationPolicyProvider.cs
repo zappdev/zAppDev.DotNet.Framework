@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Authorization;
 
 using zAppDev.DotNet.Framework.Identity.Model;
 
+
 namespace zAppDev.DotNet.Framework.Identity
 {
     public class ClaimsEqualityComparer : IEqualityComparer<Claim>
@@ -67,6 +68,18 @@ namespace zAppDev.DotNet.Framework.Identity
     {
         public Task<AuthorizationPolicy> GetDefaultPolicyAsync() =>
             Task.FromResult(new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build());
+
+        public Task<AuthorizationPolicy> GetFallbackPolicyAsync()
+        {
+
+            var result = new AuthorizationPolicyBuilder();
+            result = result.RequireAssertion(context =>
+            {
+                return true;
+            });
+
+            return Task.FromResult(result.Build());
+        }
 
         public Task<AuthorizationPolicy> GetPolicyAsync(string policyName)
         {

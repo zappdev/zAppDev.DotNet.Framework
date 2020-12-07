@@ -11,7 +11,7 @@ if ($null -ne $res)
     Copy-Item -Force -Confirm:$false "$srcBasePath\net472\zAppDev.DotNet.Framework.dll" "$dstBasePath"
 
     Write-Host "Update netcoreapp2.2"
-    Copy-Item -Force -Confirm:$false "$srcBasePath\netcoreapp2.2\zAppDev.DotNet.Framework.dll" "$dstBasePath\Core"
+    Copy-Item -Force -Confirm:$false "$srcBasePath\netcoreapp3.1\zAppDev.DotNet.Framework.dll" "$dstBasePath\Core"
 
     Write-Host "Update netstandard2.0"
     Copy-Item -Force -Confirm:$false "$srcBasePath\netstandard2.0\zAppDev.DotNet.Framework.dll" "$dstBasePath\Standard"
