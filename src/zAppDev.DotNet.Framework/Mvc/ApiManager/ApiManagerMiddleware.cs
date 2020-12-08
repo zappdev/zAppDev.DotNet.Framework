@@ -37,6 +37,8 @@ namespace zAppDev.DotNet.Framework.Middleware
 
         public async Task Invoke(HttpContext context)
         {
+            context.Request.EnableBuffering();
+
             ServiceLocator.SetLocatorProvider(_serviceProvider);
 
             context.Items[HttpContextItemKeys.LogTimer] = Stopwatch.StartNew();
