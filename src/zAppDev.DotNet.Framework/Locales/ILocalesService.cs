@@ -17,5 +17,7 @@ namespace zAppDev.DotNet.Framework.Locales
         XmlDocument GetLocales(string formName, string lang = null);
         string GetResourceValue(string formName, string name, string lang = null, string fallback = "");
         XmlDocument PrepareResources(string form, string master, bool addGlobal = true);
+
+        void SetCurrentLanguage(string language);
     }
 }

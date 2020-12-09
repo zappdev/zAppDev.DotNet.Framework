@@ -13,6 +13,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Xml;
+using zAppDev.DotNet.Framework.Identity;
 using zAppDev.DotNet.Framework.Mvc.API;
 using zAppDev.DotNet.Framework.Utilities;
 
@@ -32,10 +33,13 @@ namespace zAppDev.DotNet.Framework.Locales
 
         public string DefaultLang { get; set; }
 
+        private string _currentLanguage { get; set; }
+
         public LocalesService(ILogger<LocalesService> logger, IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
+            _currentLanguage = GetCurrentLanguage();
         }
 
         public void ClearLocalesCache()
@@ -138,8 +142,18 @@ namespace zAppDev.DotNet.Framework.Locales
             }
         }
 
+        public void SetCurrentLanguage(string language)
+        {
+            _currentLanguage = language;
+        }
+
         public string GetResourceValue(string formName, string name, string lang = null, string fallback = "")
         {
+            //edwedwedw
+            if (lang == null)
+            {
+                lang = _currentLanguage;
+            }
             var formResources = GetLocalesAsDictionary(formName, lang);
             return formResources.ContainsKey(name)
                    ? formResources[name]
@@ -181,9 +195,13 @@ namespace zAppDev.DotNet.Framework.Locales
 
         private string GetCurrentLanguage()
         {
+            var cultureInfo = new CultureInfo((int)ProfileHelper.GetCurrentProfileLanguageLCID());
+            return string.IsNullOrWhiteSpace(cultureInfo?.Name)
+                   ? DefaultLang
+                   : cultureInfo.Name.ToLowerInvariant();
 
-            if (!_httpContextAccessor.HttpContext.Items.ContainsKey(HttpContextItemKeys.Culture)) return null;
-            return (_httpContextAccessor.HttpContext.Items[HttpContextItemKeys.Culture] as CultureInfo).Name.ToLowerInvariant();
+           if (!_httpContextAccessor.HttpContext.Items.ContainsKey(HttpContextItemKeys.Culture)) return null;
+           return (_httpContextAccessor.HttpContext.Items[HttpContextItemKeys.Culture] as CultureInfo).Name.ToLowerInvariant();
         }
     }
 
@@ -196,7 +214,7 @@ namespace zAppDev.DotNet.Framework.Locales
                 return new LocalesService(context.GetService<ILogger<LocalesService>>(), context.GetService<IHttpContextAccessor>())
                 {
                     DefaultLang = configuration.DefaultLang,
-                    AvailiableLanguages = configuration.AvailiableLanguages
+                    AvailiableLanguages = configuration.AvailiableLanguages, 
                 };
             });
         }
