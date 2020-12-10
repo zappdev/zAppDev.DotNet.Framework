@@ -82,7 +82,7 @@ namespace zAppDev.DotNet.Framework.Mvc.API
 
                 using (var stream = new StreamReader(context.Request.Body,encoding: Encoding.UTF8,detectEncodingFromByteOrderMarks: true, bufferSize: 1024, leaveOpen: true))
                  {
-                     postBody = stream.ReadToEnd();
+                     postBody = stream.ReadToEndAsync().Result;
                      context.Request.Body.Seek(0, SeekOrigin.Begin);
                  }
             }
