@@ -50,7 +50,11 @@ namespace zAppDev.DotNet.Framework.Logging
             ResponseTime = elapsed.TotalMilliseconds;
         }
 #else
-        public ExposedServiceMetadataStruct(HttpContext context, TimeSpan _elapsed)
+        public ExposedServiceMetadataStruct()
+        {
+
+        }
+        public ExposedServiceMetadataStruct(HttpContext context, TimeSpan _elapsed, string response)
         {
             URL = context.Request.Path.Value;
             Method = context.Request.Method;
@@ -66,12 +70,36 @@ namespace zAppDev.DotNet.Framework.Logging
             
             if(context.Items.ContainsKey(HttpContextItemKeys.RequestStartedOn)) RequestTimestamp = (DateTime) context.Items["RequestStartedOn"];
 
-            context.Response.Body.Seek(0, SeekOrigin.Begin);
-            string response = new StreamReader(context.Response.Body).ReadToEnd();
-            context.Response.Body.Seek(0, SeekOrigin.Begin);
+            //context.Response.Body.Seek(0, SeekOrigin.Begin);
+            //string response = new StreamReader(context.Response.Body).ReadToEnd();
+            //context.Response.Body.Seek(0, SeekOrigin.Begin);
             ResponseBody = response;
             ResponseCode = context.Response.StatusCode;
             ResponseTime = _elapsed.TotalMilliseconds;
+        }
+
+        public static async System.Threading.Tasks.Task<ExposedServiceMetadataStruct> GetMetadata(HttpContext context, TimeSpan _elapsed, string responseBody)
+        {
+            var response = new ExposedServiceMetadataStruct();
+            response.URL = context.Request.Path.Value;
+            response.Method = context.Request.Method;
+
+            string request = string.Empty;
+            if (context.Request.ContentLength != null)
+            {
+                context.Request.Body.Seek(0, SeekOrigin.Begin);
+                request = await new StreamReader(context.Request.Body).ReadToEndAsync();
+                context.Request.Body.Seek(0, SeekOrigin.Begin);
+            }
+            response.RequestBody = request;
+
+            if (context.Items.ContainsKey(HttpContextItemKeys.RequestStartedOn)) response.RequestTimestamp = (DateTime)context.Items["RequestStartedOn"];
+            
+            response.ResponseBody = responseBody;
+            response.ResponseCode = context.Response.StatusCode;
+            response.ResponseTime = _elapsed.TotalMilliseconds;
+
+            return response;
         }
 #endif
     }

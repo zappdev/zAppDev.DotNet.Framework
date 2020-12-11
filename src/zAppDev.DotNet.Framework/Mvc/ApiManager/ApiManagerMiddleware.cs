@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using zAppDev.DotNet.Framework.Logging;
 using zAppDev.DotNet.Framework.Mvc.API;
@@ -38,7 +39,7 @@ namespace zAppDev.DotNet.Framework.Middleware
         public async Task Invoke(HttpContext context)
         {
             context.Request.EnableBuffering();
-
+            
             ServiceLocator.SetLocatorProvider(_serviceProvider);
 
             context.Items[HttpContextItemKeys.LogTimer] = Stopwatch.StartNew();
@@ -48,10 +49,35 @@ namespace zAppDev.DotNet.Framework.Middleware
             context.Items[HttpContextItemKeys.ExposedServiceRequestId] = id;
             context.TraceIdentifier = id.ToString();
 
-            await _next(context);
+
+            Stream originalBody = context.Response.Body;
+            string responseBody = "";
+            try
+            {
+                using (var memStream = new MemoryStream())
+                {
+                    context.Response.Body = memStream;
+
+                    await _next(context);
+
+                    memStream.Position = 0;
+                    responseBody = await new StreamReader(memStream).ReadToEndAsync();
+
+                    memStream.Position = 0;
+                    await memStream.CopyToAsync(originalBody);
+                }
+
+            }
+            finally
+            {
+                context.Response.Body = originalBody;
+            }
+
+            //await _next(context);
+
             if (context.IsAllowPartialResponseEnabled())
                 CreateByVariableTypeDtoResponse(context);
-
+            
             var timer = (Stopwatch)context.Items[HttpContextItemKeys.LogTimer];
             timer.Stop();
             var _elapsed = timer.Elapsed;
@@ -64,7 +90,6 @@ namespace zAppDev.DotNet.Framework.Middleware
                 logEnabled = _logEnabled;
             }
             if (!context.IsLogEnabled() || !logEnabled) return;
-
             //IdentityHelper.LogAction(
             //    filterContext.ActionContext.ActionDescriptor.ControllerDescriptor.ControllerName,
             //    filterContext.ActionContext.ActionDescriptor.ActionName,
@@ -73,7 +98,8 @@ namespace zAppDev.DotNet.Framework.Middleware
 
             var logTimer = Stopwatch.StartNew();
 
-            var metadataStruct = new ExposedServiceMetadataStruct(context, _elapsed);
+            //var metadataStruct = new ExposedServiceMetadataStruct(context, _elapsed, responseBody);
+            var metadataStruct = await ExposedServiceMetadataStruct.GetMetadata(context, _elapsed, responseBody);
 
             if (!(bool)context.Items[HttpContextItemKeys.RequestIsLogged])
             {
