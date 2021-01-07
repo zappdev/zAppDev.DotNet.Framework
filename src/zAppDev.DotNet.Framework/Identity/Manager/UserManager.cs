@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Specialized;
 using System.Linq;
 
 using log4net;
@@ -24,6 +25,33 @@ namespace zAppDev.DotNet.Framework.Identity
 
         public UserManager(MiniSessionManager sessionManager) : base(new UserStore(sessionManager))
         {
+        }
+
+        public static void ReadPasswordPolicyFromConfiguration(NameValueCollection appSettings)
+        {
+            var settingsGroup = "PasswordPolicy";
+
+            //Set some default values if the configuration is not correct 
+            PasswordPolicyConfig.RequireDigit = true;
+            PasswordPolicyConfig.RequiredLength = 6;
+            PasswordPolicyConfig.RequireLowercase = true;
+            PasswordPolicyConfig.RequireNonLetterOrDigit = true;
+            PasswordPolicyConfig.RequireUppercase = true;
+
+            if (bool.TryParse(appSettings[$"{settingsGroup}:RequireDigit"], out bool requireDigit))
+                PasswordPolicyConfig.RequireDigit = requireDigit;
+
+            if (int.TryParse(appSettings[$"{settingsGroup}:RequiredLength"], out int requiredLength))
+                PasswordPolicyConfig.RequiredLength = requiredLength;
+
+            if (bool.TryParse(appSettings[$"{settingsGroup}:RequireLowercase"], out bool requireLowercase))
+                PasswordPolicyConfig.RequireLowercase = requireLowercase;
+
+            if (bool.TryParse(appSettings[$"{settingsGroup}:RequireNonLetterOrDigit"], out bool requireNonLetterOrDigit))
+                PasswordPolicyConfig.RequireNonLetterOrDigit = requireNonLetterOrDigit;
+
+            if (bool.TryParse(appSettings[$"{settingsGroup}:RequireUppercase"], out bool requireUppercase))
+                PasswordPolicyConfig.RequireUppercase = requireUppercase;
         }
 
         public IdentityUser FindById(string userId)

@@ -234,12 +234,34 @@ namespace zAppDev.DotNet.Framework.Identity
 
     public static class ServiceCollectionExtensions
     {
-        public static void AddIdentityManager(this IServiceCollection services, IConfiguration configuration, PasswordPolicyConfig passwordPolicy = null, ExternalLoginConfig externalLoginConfig = null)
+        private static PasswordPolicyConfig ReadPasswordPolicyFromConfiguration(IConfiguration configuration)
         {
-            if (passwordPolicy == null)
-            {
-                passwordPolicy = new PasswordPolicyConfig();
-            }
+            var passwordPolicy = new PasswordPolicyConfig();
+            passwordPolicy.RequireDigit = true;
+            passwordPolicy.RequiredLength = 6;
+            passwordPolicy.RequireLowercase = true;
+            passwordPolicy.RequireNonLetterOrDigit = true;
+            passwordPolicy.RequireUppercase = true;
+
+            //configuration.GetValue("configuration:appSettings:add:JWTKey:value", "MIksRlTn0KG6nmjW*fzq*FYTY0RifkNQE%QTqdfS81CgNEGtUmMCY5XEgPTSL&28"
+
+            if (bool.TryParse(configuration.GetValue("configuration:appSettings:add:PasswordPolicy:RequireDigit:value", "true"), out bool requireDigit))
+                passwordPolicy.RequireDigit = requireDigit;
+            if (int.TryParse(configuration.GetValue("configuration:appSettings:add:PasswordPolicy:RequiredLength:value", "6"), out int requiredLength))
+                passwordPolicy.RequiredLength = requiredLength;
+            if (bool.TryParse(configuration.GetValue("configuration:appSettings:add:PasswordPolicy:RequireLowercase:value", "true"), out bool requireLowercase))
+                passwordPolicy.RequireLowercase = requireLowercase;
+
+            if (bool.TryParse(configuration.GetValue("configuration:appSettings:add:PasswordPolicy:RequireNonLetterOrDigit:value", "true"), out bool requireNonLetterOrDigit))
+                passwordPolicy.RequireNonLetterOrDigit = requireNonLetterOrDigit;
+            if (bool.TryParse(configuration.GetValue("configuration:appSettings:add:PasswordPolicy:RequireUppercase:value", "true"), out bool requireUppercase))
+                passwordPolicy.RequireUppercase = requireUppercase;
+
+            return passwordPolicy;
+        }
+        public static void AddIdentityManager(this IServiceCollection services, IConfiguration configuration, ExternalLoginConfig externalLoginConfig = null)
+        {
+            var passwordPolicy = ReadPasswordPolicyFromConfiguration(configuration); 
 
             services.Configure<CookiePolicyOptions>(options =>
             {
