@@ -38,8 +38,8 @@ namespace zAppDev.DotNet.Framework.Mvc
         public string EvenColor { get; set; }
         public string OddColor { get; set; }
         public string AggregateColor { get; set; }
-        public string CsvSeperator { get; internal set; }
-        public bool CsvAddHeder { get; internal set; }
+        public string CsvSeperator { get; set; }
+        public bool CsvDontAddHeder { get; set; }
 
         public static System.Drawing.Color GetColorFromRGB(string rgb)
         {
@@ -1069,14 +1069,31 @@ namespace zAppDev.DotNet.Framework.Mvc
         {
             var builder = new StringBuilder(items.Count * 100);
 
-            if (Options.CsvAddHeder)
+            if (string.IsNullOrWhiteSpace(Options.CsvSeperator))
+            {
+                Options.CsvSeperator = ",";
+            }
+
+            if (!Options.CsvDontAddHeder)
             {
                 builder.AppendLine(string.Join(Options.CsvSeperator, Options.ColumnInfo.Select(c => c.Caption)));
             }
 
             for (var i = 0; i < items.Count; i++)
             {
-                builder.AppendLine(string.Join(Options.CsvSeperator, items.Select((idx, col) => GetCellValue(idx, Options.ColumnInfo[col], false))));
+                for (int j = 0; j < Options.ColumnInfo.Count; j++)
+                {
+                    var cellValue = GetCellValue(items[i], Options.ColumnInfo[j], false);
+
+                    if (j == Options.ColumnInfo.Count - 1)
+                    {
+                        builder.AppendLine(cellValue + "");
+                    }
+                    else
+                    {
+                        builder.Append(cellValue + Options.CsvSeperator);
+                    }
+                }
             }
 
             var randomFolderName = Guid.NewGuid().ToString();

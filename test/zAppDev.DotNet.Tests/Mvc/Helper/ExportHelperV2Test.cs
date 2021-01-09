@@ -25,7 +25,7 @@ namespace zAppDev.DotNet.Framework.Tests.Data
                 Type = ExportHelper.Type.CSV,
                 Filename = "nemo",
                 CsvSeperator = ",",
-                CsvAddHeder = true
+                CsvDontAddHeder = false
             };
 
             var exportHelper = new ExportHelperV2<TempClassToExport>(exportOptions,
