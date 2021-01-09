@@ -12,6 +12,7 @@ using System.ComponentModel;
 
 using UnitType = MigraDoc.DocumentObjectModel.UnitType;
 using zAppDev.DotNet.Framework.Identity;
+using System.Text;
 
 #if NETFRAMEWORK
 using System.Web.Mvc;
@@ -37,6 +38,8 @@ namespace zAppDev.DotNet.Framework.Mvc
         public string EvenColor { get; set; }
         public string OddColor { get; set; }
         public string AggregateColor { get; set; }
+        public string CsvSeperator { get; internal set; }
+        public bool CsvAddHeder { get; internal set; }
 
         public static System.Drawing.Color GetColorFromRGB(string rgb)
         {
@@ -1058,7 +1061,35 @@ namespace zAppDev.DotNet.Framework.Mvc
             return filePath;
         }
 
-#endregion
+        #endregion
+
+        #region CSV Exporting
+
+        public string ExportToCSV(List<T> items)
+        {
+            var builder = new StringBuilder(items.Count * 100);
+
+            if (Options.CsvAddHeder)
+            {
+                builder.AppendLine(string.Join(Options.CsvSeperator, Options.ColumnInfo.Select(c => c.Caption)));
+            }
+
+            for (var i = 0; i < items.Count; i++)
+            {
+                builder.AppendLine(string.Join(Options.CsvSeperator, items.Select((idx, col) => GetCellValue(idx, Options.ColumnInfo[col], false))));
+            }
+
+            var randomFolderName = Guid.NewGuid().ToString();
+            var randomPath = Path.Combine(Path.GetTempPath(), randomFolderName);
+            if (Directory.Exists(randomPath)) Directory.Delete(randomPath, true);
+            Directory.CreateDirectory(randomPath);
+            var filePath = Path.Combine(randomPath, Options.Filename + ".csv");
+
+            File.WriteAllText(filePath, builder.ToString());
+            return filePath;
+        }
+
+        #endregion
 
         private object GetCellValue(T item, ColumnOptionsV2 columnOptions, bool applyFormatting = true)
         {
@@ -1117,6 +1148,8 @@ namespace zAppDev.DotNet.Framework.Mvc
                     return ExportToPDF(items, aggregators, _pdfOvverideFunction);
                 case ExportHelper.Type.WORD:
                     throw new Exception("Word export is not implemented yet");
+                case ExportHelper.Type.CSV:
+                    return ExportToCSV(items);
                 default:
                     throw new Exception("Invalid export type!");
             }

@@ -46,7 +46,8 @@ namespace zAppDev.DotNet.Framework.Mvc
         {
             WORD,
             PDF,
-            EXCEL
+            EXCEL,
+            CSV
         }
 
         public enum Range
