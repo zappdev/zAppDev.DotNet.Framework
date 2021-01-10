@@ -1067,11 +1067,11 @@ namespace zAppDev.DotNet.Framework.Mvc
 
         public string ExportToCSV(List<T> items)
         {
-            var builder = new StringBuilder(items.Count * 100);
+            var builder = new StringBuilder(items.Count * Options.ColumnInfo.Count * 15);
 
             if (string.IsNullOrWhiteSpace(Options.CsvSeperator))
             {
-                Options.CsvSeperator = ",";
+                Options.CsvSeperator = ";";
             }
 
             if (!Options.CsvDontAddHeder)
