@@ -230,7 +230,8 @@ namespace zAppDev.DotNet.Framework.Mvc
 #region Excel Exporting
 
         //Simple Export
-        public string ExportToExcel(List<T> items, List<AggregatorInfo<T>> aggregators)
+        //Queen123
+        public string ExportToExcel(List<T> items, List<AggregatorInfo<T>> aggregators, Func<OfficeOpenXml.ExcelPackage, object> _excelOverrideFunction = null)
         {
             _totalColumns = Options.ColumnInfo.Count + (aggregators.Any() ? 1 : 0);
             _writtenHeaders = false;
@@ -309,12 +310,13 @@ namespace zAppDev.DotNet.Framework.Mvc
                 outputTable.AutoFitColumns(); //Autofit columns to contents
                 SetExcelGridLines(ws, new ExcelTableRange { FromRow = 1, FromColumn = 1, ToRow = currentLine, ToColumn = _totalColumns }, Options.IncludeGridLines);
 
-                return SaveExcelFile(p, Options.Filename);
+                //QUeen123
+                return SaveExcelFile(p, Options.Filename, _excelOverrideFunction);
             }
         }
 
         //Grouped Export
-        public string ExportToExcel(GroupTree<T> groups, GroupTree<T> aggregators, Func<T, ActionResult> postProcessAction = null)
+        public string ExportToExcel(GroupTree<T> groups, GroupTree<T> aggregators, Func<T, ActionResult> postProcessAction = null, Func<OfficeOpenXml.ExcelPackage, object> _excelOverrideAction = null)
         {
             _totalColumns = Options.ColumnInfo.Count + (aggregators.Aggregates.Any(a => a.Column != "__Count") ? 1 : 0);
             _writtenHeaders = false;
@@ -333,7 +335,7 @@ namespace zAppDev.DotNet.Framework.Mvc
                 outputTable.AutoFitColumns(); //Autofit columns to contents
                 SetExcelGridLines(ws, new ExcelTableRange { FromRow = 1, FromColumn = 1, ToRow = currentLine, ToColumn = _totalColumns }, Options.IncludeGridLines);
 
-                return SaveExcelFile(p, Options.Filename);
+                return SaveExcelFile(p, Options.Filename, _excelOverrideAction);
             }
         }
 
@@ -551,8 +553,14 @@ namespace zAppDev.DotNet.Framework.Mvc
             }
         }
 
-        private string SaveExcelFile(ExcelPackage package, string filename)
+        //Queen123
+        private string SaveExcelFile(ExcelPackage package, string filename, Func<OfficeOpenXml.ExcelPackage, object> _excelOverrideFunction = null)
         {
+            if (_excelOverrideFunction != null)
+            {
+                _excelOverrideFunction?.Invoke(package);
+            }
+
             var randomFolderName = Guid.NewGuid().ToString();
             var randomPath = Path.Combine(Path.GetTempPath(), randomFolderName);
             if (Directory.Exists(randomPath)) Directory.Delete(randomPath, true);
@@ -1154,13 +1162,16 @@ namespace zAppDev.DotNet.Framework.Mvc
             return result.ToLocalTime();
         }
 
+        //Queen
         public string Export(List<T> items, List<AggregatorInfo<T>> aggregators,
-            Func<MigraDoc.DocumentObjectModel.Document, MigraDoc.DocumentObjectModel.Tables.Table, object> _pdfOvverideFunction = null)
+            Func<MigraDoc.DocumentObjectModel.Document, MigraDoc.DocumentObjectModel.Tables.Table, object> _pdfOvverideFunction = null, 
+            Func<OfficeOpenXml.ExcelPackage, object> _excelOverrideFunction = null)
         {
             switch (Options.Type)
             {
                 case ExportHelper.Type.EXCEL:
-                    return ExportToExcel(items, aggregators);
+                    //QUeen123
+                    return ExportToExcel(items, aggregators, _excelOverrideFunction);
                 case ExportHelper.Type.PDF:
                     return ExportToPDF(items, aggregators, _pdfOvverideFunction);
                 case ExportHelper.Type.WORD:
@@ -1172,13 +1183,15 @@ namespace zAppDev.DotNet.Framework.Mvc
             }
         }
 
+        //Queen123
         public string Export(GroupTree<T> groups, GroupTree<T> aggregators, Func<T, ActionResult> postProcessAction = null,
-            Func<MigraDoc.DocumentObjectModel.Document, MigraDoc.DocumentObjectModel.Tables.Table, object> _pdfOvverideFunction = null)
+            Func<MigraDoc.DocumentObjectModel.Document, MigraDoc.DocumentObjectModel.Tables.Table, object> _pdfOvverideFunction = null, 
+            Func<OfficeOpenXml.ExcelPackage, object> _excelOverrideFunction = null)
         {
             switch (Options.Type)
             {
                 case ExportHelper.Type.EXCEL:
-                    return ExportToExcel(groups, aggregators, postProcessAction);
+                    return ExportToExcel(groups, aggregators, postProcessAction, _excelOverrideFunction);
                 case ExportHelper.Type.PDF:
                     return ExportToPDF(groups, aggregators, postProcessAction,_pdfOvverideFunction);
                 case ExportHelper.Type.WORD:
