@@ -33,12 +33,21 @@ namespace zAppDev.DotNet.Framework.Modules.AppLib
             return _httpContext.Session[key];
 #else
             var result = _httpContext.Session.Get(key);
+           
             if(result == null) return null;
             var jsonString = Utilities.BinarySerializer.Deserialize(result) as string;
 
             return new Serializer<object>().FromJson(jsonString);
 #endif
         }
+
+#if NETFRAMEWORK
+#else
+        public bool ContainsKey(string key)
+        {
+            return _httpContext.Session.Get(key) != null;
+        }
+#endif
 
         public void Remove(string key)
         {
