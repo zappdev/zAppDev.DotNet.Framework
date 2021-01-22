@@ -27,9 +27,20 @@ namespace zAppDev.DotNet.Framework.IoT.Mqtt
     { 
         public static void UseMqttWebsocketBroker(this IApplicationBuilder app, IConfiguration configuration)
         {
+#if NET5_0
+            app.UseEndpoints(endpoints => {
+                endpoints.MapConnectionHandler<MqttConnectionHandler>("/mqtt", options =>
+                {
+                    options.WebSockets.SubProtocolSelector = MQTTnet.AspNetCore.ApplicationBuilderExtensions.SelectSubProtocol;
+                });
+            });
+#else
             app.UseConnections(c => c.MapConnectionHandler<MqttConnectionHandler>("/mqtt", options => {
                 options.WebSockets.SubProtocolSelector = MQTTnet.AspNetCore.ApplicationBuilderExtensions.SelectSubProtocol;
             }));
+#endif
+
+
 
             var _logger = app.ApplicationServices.GetRequiredService<ILogger<MqttServer>>();
 
