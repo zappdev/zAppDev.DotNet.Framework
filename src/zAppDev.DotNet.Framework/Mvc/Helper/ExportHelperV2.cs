@@ -349,7 +349,7 @@ namespace zAppDev.DotNet.Framework.Mvc
                 groupedColumns.Add(group.Column.Name.ToLower());
             }
 
-            var groupColumnInfo = Options.ColumnInfo.SingleOrDefault(c => c.Name.ToLower() == group.Column.Name.ToLower());
+            var groupColumnInfo = Options.ColumnInfo.SingleOrDefault(c => (c.Name.ToLower() == group.Column.Name.ToLower()) || (c.Name.Replace(".","").ToLower() == group.Column.Name.ToLower()));
 
             if (group.SubGroups.Any())
             {
@@ -728,70 +728,72 @@ namespace zAppDev.DotNet.Framework.Mvc
 
             var ungroupedColumns = Options.ColumnInfo.Where(c => !Options.GroupInfo.Contains(c.Name.ToLower())).ToList();
 
+            if (!_writtenHeaders)
+            {
+                foreach (var groupedColumn in groupedColumns)
+                {
+                    //Calculate the column width analogy
+                    var columnInfoWidth = Options.ColumnInfo.SingleOrDefault(c => c?.Name?.ToLower() == groupedColumn?.ToLower())?.Width ?? DEFAULT_PDF_COLUMN_SIZE;
+                    var columnWidth = MigraDoc.DocumentObjectModel.Unit.FromMillimeter(columnInfoWidth *
+                                                                                       _availablePDFWidthInMillimeter.Millimeter /
+                                                                                       _totalPDFColumnWidth);
+                    table.AddColumn(columnWidth);
+                }
+                foreach (var ungroupedColumn in ungroupedColumns)
+                {
+                    var columnInfoWidth = Options.ColumnInfo.SingleOrDefault(c => c?.Name?.ToLower() == ungroupedColumn?.Name.ToLower())?.Width ?? DEFAULT_PDF_COLUMN_SIZE;
+                    var columnWidth = MigraDoc.DocumentObjectModel.Unit.FromMillimeter(columnInfoWidth *
+                                                                                       _availablePDFWidthInMillimeter.Millimeter /
+                                                                                       _totalPDFColumnWidth);
+                    table.AddColumn(columnWidth);
+                }
+                if (Options.ColumnInfo.Count < _totalColumns)
+                {
+                    //Calculate the column width analogy
+                    var columnWidth = MigraDoc.DocumentObjectModel.Unit.FromMillimeter(AGGREGATOR_PDF_COLUMN_SIZE *
+                                                                                       _availablePDFWidthInMillimeter.Millimeter /
+                                                                                       _totalPDFColumnWidth);
+                    table.AddColumn(columnWidth);
+                }
+
+                //Create the header of the table
+                var headerRow = table.AddRow();
+                headerRow.HeadingFormat = true;
+                headerRow.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
+                headerRow.VerticalAlignment = MigraDoc.DocumentObjectModel.Tables.VerticalAlignment.Center;
+                headerRow.Format.Font.Bold = true;
+                headerRow.Shading.Color = HeaderMigraDocColor;
+
+                for (var i = 0; i < groupedColumns.Count; i++)
+                {
+                    headerRow.Cells[i].Column.LeftPadding = _headerRowLeftPadding;
+                    headerRow.Cells[i].Column.RightPadding = _headerRowRightPadding;
+                    var headerCaption = Options.ColumnInfo.SingleOrDefault(c => c?.Name?.ToLower() == groupedColumns[i]?.ToLower())?.Caption;
+                    var adjustedValue = AdjustIfTooWideToFitInPDFCell(headerRow.Cells[i], headerCaption);
+                    headerRow.Cells[i].AddParagraph(adjustedValue);
+                    SetParagraphFormatting(headerRow.Cells[i].Format);
+                }
+                for (var i = 0; i < ungroupedColumns.Count; i++)
+                {
+                    headerRow.Cells[groupedColumns.Count + i].Column.LeftPadding = _headerRowLeftPadding;
+                    headerRow.Cells[groupedColumns.Count + i].Column.RightPadding = _headerRowRightPadding;
+                    var headerCaption = Options.ColumnInfo.SingleOrDefault(c => c?.Name?.ToLower() == ungroupedColumns[i]?.Name.ToLower())?.Caption;
+                    var adjustedValue = AdjustIfTooWideToFitInPDFCell(headerRow.Cells[groupedColumns.Count + i], headerCaption);
+                    headerRow.Cells[groupedColumns.Count + i].AddParagraph(adjustedValue);
+                    SetParagraphFormatting(headerRow.Cells[groupedColumns.Count + i].Format);
+                }
+                if (Options.ColumnInfo.Count < _totalColumns)
+                {
+                    headerRow.Cells[_totalColumns - 1].AddParagraph(BaseViewPageBase<object>.GetResourceValue("GlobalResources", "RES_DATALIST_EXPORTV2_Totals"));
+                    SetParagraphFormatting(headerRow.Cells[_totalColumns - 1].Format);
+                }
+
+                _writtenHeaders = true;
+            }
+
             foreach (var item in group.Items)
             {
-                if (!_writtenHeaders)
-                {
-                    foreach (var groupedColumn in groupedColumns)
-                    {
-                        //Calculate the column width analogy
-                        var columnInfoWidth = Options.ColumnInfo.SingleOrDefault(c => c?.Name?.ToLower() == groupedColumn?.ToLower())?.Width ?? DEFAULT_PDF_COLUMN_SIZE;
-                        var columnWidth = MigraDoc.DocumentObjectModel.Unit.FromMillimeter(columnInfoWidth *
-                                                                                           _availablePDFWidthInMillimeter.Millimeter /
-                                                                                           _totalPDFColumnWidth);
-                        table.AddColumn(columnWidth);
-                    }
-                    foreach (var ungroupedColumn in ungroupedColumns)
-                    {
-                        var columnInfoWidth = Options.ColumnInfo.SingleOrDefault(c => c?.Name?.ToLower() == ungroupedColumn?.Name.ToLower())?.Width ?? DEFAULT_PDF_COLUMN_SIZE;
-                        var columnWidth = MigraDoc.DocumentObjectModel.Unit.FromMillimeter(columnInfoWidth *
-                                                                                           _availablePDFWidthInMillimeter.Millimeter /
-                                                                                           _totalPDFColumnWidth);
-                        table.AddColumn(columnWidth);
-                    }
-                    if (Options.ColumnInfo.Count < _totalColumns)
-                    {
-                        //Calculate the column width analogy
-                        var columnWidth = MigraDoc.DocumentObjectModel.Unit.FromMillimeter(AGGREGATOR_PDF_COLUMN_SIZE *
-                                                                                           _availablePDFWidthInMillimeter.Millimeter /
-                                                                                           _totalPDFColumnWidth);
-                        table.AddColumn(columnWidth);
-                    }
-
-                    //Create the header of the table
-                    var headerRow = table.AddRow();
-                    headerRow.HeadingFormat = true;
-                    headerRow.Format.Alignment = MigraDoc.DocumentObjectModel.ParagraphAlignment.Center;
-                    headerRow.VerticalAlignment = MigraDoc.DocumentObjectModel.Tables.VerticalAlignment.Center;
-                    headerRow.Format.Font.Bold = true;
-                    headerRow.Shading.Color = HeaderMigraDocColor;
-
-                    for (var i = 0; i < groupedColumns.Count; i++)
-                    {
-                        headerRow.Cells[i].Column.LeftPadding = _headerRowLeftPadding;
-                        headerRow.Cells[i].Column.RightPadding = _headerRowRightPadding;
-                        var headerCaption = Options.ColumnInfo.SingleOrDefault(c => c?.Name?.ToLower() == groupedColumns[i]?.ToLower())?.Caption;
-                        var adjustedValue = AdjustIfTooWideToFitInPDFCell(headerRow.Cells[i], headerCaption);
-                        headerRow.Cells[i].AddParagraph(adjustedValue);
-                        SetParagraphFormatting(headerRow.Cells[i].Format);
-                    }
-                    for (var i = 0; i < ungroupedColumns.Count; i++)
-                    {
-                        headerRow.Cells[groupedColumns.Count + i].Column.LeftPadding = _headerRowLeftPadding;
-                        headerRow.Cells[groupedColumns.Count + i].Column.RightPadding = _headerRowRightPadding;
-                        var headerCaption = Options.ColumnInfo.SingleOrDefault(c => c?.Name?.ToLower() == ungroupedColumns[i]?.Name.ToLower())?.Caption;
-                        var adjustedValue = AdjustIfTooWideToFitInPDFCell(headerRow.Cells[groupedColumns.Count + i], headerCaption);
-                        headerRow.Cells[groupedColumns.Count + i].AddParagraph(adjustedValue);
-                        SetParagraphFormatting(headerRow.Cells[groupedColumns.Count + i].Format);
-                    }
-                    if (Options.ColumnInfo.Count < _totalColumns)
-                    {
-                        headerRow.Cells[_totalColumns - 1].AddParagraph(BaseViewPageBase<object>.GetResourceValue("GlobalResources", "RES_DATALIST_EXPORTV2_Totals"));
-                        SetParagraphFormatting(headerRow.Cells[_totalColumns - 1].Format);
-                    }
-
-                    _writtenHeaders = true;
-                }
+                
 
                 postProcessAction?.Invoke(item);
                 var itemRow = table.AddRow();
@@ -832,12 +834,14 @@ namespace zAppDev.DotNet.Framework.Mvc
                 }
                 else
                 {
+                    table.AddRow();
                     var groupCell = table.Rows[startingLine].Cells[groupedColumns.Count - 1];
                     var adjustedCellValue = AdjustIfTooWideToFitInPDFCell(groupCell, group.Key?.ToString() ?? "");
 
                     groupCell.AddParagraph(adjustedCellValue);
                     SetParagraphFormatting(groupCell.Format);
                     groupCell.Format.Font.Bold = true;
+                    currentLine++;
                 }
             }
 
