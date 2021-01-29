@@ -40,9 +40,13 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers.DatabaseUtilities
             return command;
         }//end GetDbCommand()
 
-        public static DbCommand GetDbCommand(this IDatabaseManager databaseManager, DbConnection dbConnection, string command)
+        public static DbCommand GetDbCommand(this IDatabaseManager databaseManager, DbConnection dbConnection, string command,DatabaseServerType databaseServerType = DatabaseServerType.None)
         {
-            switch (databaseManager.DatabaseServerType)
+            if(databaseServerType == DatabaseServerType.None)
+            {
+                databaseServerType = databaseManager.DatabaseServerType;
+            }
+            switch (databaseServerType)
             {
                 case DatabaseServerType.MSSQL:
                     return new SqlCommand(command, dbConnection as SqlConnection);

@@ -46,7 +46,7 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
             return RunSqlQuery(query, parameters, null, connectionString);
         }//end RunSqlQuery
 
-        public List<Dictionary<string, object>> RunSqlQuery(string query, Dictionary<string, object> parameters = null, int? timeOut = null, string connectionString = null)
+        public List<Dictionary<string, object>> RunSqlQuery(string query, Dictionary<string, object> parameters = null, int? timeOut = null, string connectionString = null, DatabaseServerType databaseServerType = DatabaseServerType.None)
         {
             var results = new List<Dictionary<string, object>>();
 
@@ -54,12 +54,12 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
             {
                 connectionString = ConnectionString;
             }
-
+            
             using (var conn = this.GetDatabaseConnection(connectionString))
             {
                 conn.Open();
-
-                using (var command = this.GetDbCommand(conn, query))
+                
+                using (var command = this.GetDbCommand(conn, query, databaseServerType))
                 {
                     command.CommandType = System.Data.CommandType.Text;
                     command.CommandTimeout = CommonUtilities.GetCommandTimeout(timeOut);

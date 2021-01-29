@@ -6,6 +6,7 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
 {
     public enum DatabaseServerType
     {
+        None,
         SQLite,
         MSSQL,
         MariaDB
@@ -29,7 +30,7 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
         DatabaseServerType GetDatabaseServerType();
 
         List<Dictionary<string, object>> RunSqlQuery(string query, Dictionary<string, object> parameters, string connectionString);
-        List<Dictionary<string, object>> RunSqlQuery(string query, Dictionary<string, object> parameters = null, int? timeOut = null, string connectionString = null);
+        List<Dictionary<string, object>> RunSqlQuery(string query, Dictionary<string, object> parameters = null, int? timeOut = null, string connectionString = null, DatabaseServerType databaseServerType = DatabaseServerType.None);
         List<T> RunSqlQuery<T>(string query, Dictionary<string, object> parameters = null, int? timeOut = null, string connectionString = null);
         List<Dictionary<string, object>> RunStoredProcedure(string procedureName, string connectionString);
         List<Dictionary<string, object>> RunStoredProcedure(string procedureName, Dictionary<string, object> parameters = null, string connectionString = null, List<string> outParams = null);
