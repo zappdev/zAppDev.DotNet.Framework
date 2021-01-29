@@ -14,30 +14,31 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 using zAppDev.DotNet.Framework.Identity.Model;
+using zAppDev.DotNet.Framework.Identity;
 
-namespace zAppDev.DotNet.Framework.Identity
+namespace zAppDev.DotNet.Framework.IdentityServer.Services
 {
 
-    public class CustomUserManager : ZappDevUserManager
+    public class IdentityServerUserManager : ZappDevUserManager
     {
         private static ConcurrentDictionary<Guid, ApplicationClient> _clients = new ConcurrentDictionary<Guid, ApplicationClient>();
 
-        public CustomUserManager(
-            IUserStore<Model.IdentityUser> store,
+        public IdentityServerUserManager(
+            IUserStore<Identity.Model.IdentityUser> store,
             IOptions<IdentityOptions> optionsAccessor,
-            IPasswordHasher<Model.IdentityUser> passwordHasher,
-            IEnumerable<IUserValidator<Model.IdentityUser>> userValidators,
-            IEnumerable<IPasswordValidator<Model.IdentityUser>> passwordValidators,
+            IPasswordHasher<Identity.Model.IdentityUser> passwordHasher,
+            IEnumerable<IUserValidator<Identity.Model.IdentityUser>> userValidators,
+            IEnumerable<IPasswordValidator<Identity.Model.IdentityUser>> passwordValidators,
             ILookupNormalizer keyNormalizer,
             IdentityErrorDescriber errors,
             IServiceProvider services,
-            ILogger<CustomUserManager> logger) :
+            ILogger<ZappDevUserManager> logger) :
             base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
         {
 
         }
 
-        public override Model.IdentityUser Find(ExternalLoginInfo loginInfo)
+        public override Identity.Model.IdentityUser Find(ExternalLoginInfo loginInfo)
         {
             if (!SupportsUserLogin)
                 throw new ApplicationException("UserManager don't support user login");
@@ -49,17 +50,17 @@ namespace zAppDev.DotNet.Framework.Identity
             return null;
         }
 
-        public override Model.IdentityUser Find(string username, string password)
+        public override Identity.Model.IdentityUser Find(string username, string password)
         {
             var user = FindById(username);
             if (user == null) return null;
 
             var pass = ValidatePasswordAsync(user, password).GetAwaiter().GetResult();
 
-            return (pass.Succeeded) ? user : null;
+            return pass.Succeeded ? user : null;
         }
 
-        public override Model.IdentityUser FindById(string userId)
+        public override Identity.Model.IdentityUser FindById(string userId)
         {
             if (string.IsNullOrEmpty(userId))
             {
@@ -68,7 +69,7 @@ namespace zAppDev.DotNet.Framework.Identity
             return base.FindByIdAsync(userId).GetAwaiter().GetResult();
         }
 
-        public override Model.IdentityUser FindByName(string userName)
+        public override Identity.Model.IdentityUser FindByName(string userName)
         {
             if (string.IsNullOrEmpty(userName))
             {
@@ -90,7 +91,7 @@ namespace zAppDev.DotNet.Framework.Identity
             return await ResetPasswordAsync(user, key, password);
         }
 
-        public override IdentityResult SignOutClient(Model.IdentityUser user, string clientKey)
+        public override IdentityResult SignOutClient(Identity.Model.IdentityUser user, string clientKey)
         {
             try
             {
@@ -116,7 +117,7 @@ namespace zAppDev.DotNet.Framework.Identity
             }
         }
 
-        public override IdentityResult SignOutClientById(Model.IdentityUser user, int clientId)
+        public override IdentityResult SignOutClientById(Identity.Model.IdentityUser user, int clientId)
         {
             var client = user.User.Clients.FirstOrDefault(c => c.Id == clientId);
             if (client != null)
@@ -132,7 +133,7 @@ namespace zAppDev.DotNet.Framework.Identity
             return SignInClient(FindByName(username), clientKey, userHostAddress, sessionId);
         }
 
-        public override IdentityResult SignInClient(Model.IdentityUser user, string clientKey, string userHostAddress, string sessionId)
+        public override IdentityResult SignInClient(Identity.Model.IdentityUser user, string clientKey, string userHostAddress, string sessionId)
         {
             if (string.IsNullOrEmpty(clientKey))
             {
@@ -165,7 +166,7 @@ namespace zAppDev.DotNet.Framework.Identity
             }
             catch (Exception e)
             {
-                LogManager.GetLogger(typeof(CustomUserManager)).Error($"SignInClient for user: '{user?.Id}' failed", e);
+                LogManager.GetLogger(typeof(IdentityServerUserManager)).Error($"SignInClient for user: '{user?.Id}' failed", e);
                 return null;
             }
         }
@@ -199,7 +200,7 @@ namespace zAppDev.DotNet.Framework.Identity
             {
                 client.ConnectedOn = DateTime.UtcNow;
             }
-            var result = this.UpdateAsync(user).GetAwaiter().GetResult();
+            var result = UpdateAsync(user).GetAwaiter().GetResult();
             user.CurrentClientId = client.Id.ToString();
             return result;
         }
@@ -221,6 +222,5 @@ namespace zAppDev.DotNet.Framework.Identity
         }
         #endregion
     }
-
 }
 #endif

@@ -18,6 +18,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zAppDev.DotNet.Framework", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zAppDev.DotNet.Framework.Configurations", "src\zAppDev.DotNet.Framework.Configurations\zAppDev.DotNet.Framework.Configurations.csproj", "{C1253614-8DC0-473C-B8CF-F31BDDD86E66}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "zAppDev.DotNet.Framework.IdentityServer", "src\zAppDev.DotNet.Framework.IdentityServer\zAppDev.DotNet.Framework.IdentityServer.csproj", "{4AB23043-807C-4C2D-8550-BBABEB423677}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +38,10 @@ Global
 		{C1253614-8DC0-473C-B8CF-F31BDDD86E66}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C1253614-8DC0-473C-B8CF-F31BDDD86E66}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C1253614-8DC0-473C-B8CF-F31BDDD86E66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AB23043-807C-4C2D-8550-BBABEB423677}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AB23043-807C-4C2D-8550-BBABEB423677}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AB23043-807C-4C2D-8550-BBABEB423677}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AB23043-807C-4C2D-8550-BBABEB423677}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -44,6 +50,7 @@ Global
 		{1D0D042C-7B1A-4F86-A7C2-4435929BDB72} = {880E5AD8-9ACD-4941-B7EB-27AFE355B14C}
 		{19DE82E3-127E-44DA-BDCC-AA8DFD37B24E} = {A33C3486-DA10-4CD4-8146-26A128275620}
 		{C1253614-8DC0-473C-B8CF-F31BDDD86E66} = {A33C3486-DA10-4CD4-8146-26A128275620}
+		{4AB23043-807C-4C2D-8550-BBABEB423677} = {A33C3486-DA10-4CD4-8146-26A128275620}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {79E5869A-D5D9-46DA-97A9-2093AEB430E5}

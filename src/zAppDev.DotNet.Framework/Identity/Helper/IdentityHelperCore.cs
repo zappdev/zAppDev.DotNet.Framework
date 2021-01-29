@@ -32,11 +32,11 @@ namespace zAppDev.DotNet.Framework.Identity
 
         public static bool AdminCanResetPassword = true;
 
-        public static CustomUserManager GetUserManager(HttpContext context = null)
+        public static ZappDevUserManager GetUserManager(HttpContext context = null)
         {
             context = context ?? Web.GetContext();
 
-            return context.RequestServices.GetRequiredService<CustomUserManager>();
+            return context.RequestServices.GetRequiredService<ZappDevUserManager>();
         }
 
         public static SignInManager<Model.IdentityUser> GetSignInManager(HttpContext context = null)
@@ -264,7 +264,7 @@ namespace zAppDev.DotNet.Framework.Identity
             return CreateUser(manager, appUser, password);
         }
 
-        public static string CreateUser(CustomUserManager manager, ApplicationUser appUser, string password)
+        public static string CreateUser(ZappDevUserManager manager, ApplicationUser appUser, string password)
         {
             var user = new Model.IdentityUser(appUser);
             var result = manager.CreateAsync(user, password).GetAwaiter().GetResult();
@@ -639,7 +639,7 @@ namespace zAppDev.DotNet.Framework.Identity
             }
         }
 
-        private static Model.IdentityUser CreateLocalUserFromNltm(ClaimsPrincipal incomingPrincipal, ILog log, string name, CustomUserManager manager)
+        private static Model.IdentityUser CreateLocalUserFromNltm(ClaimsPrincipal incomingPrincipal, ILog log, string name, ZappDevUserManager manager)
         {
             log.DebugFormat("Identity {0}, does not have local login. Creating...", name);
             var id = incomingPrincipal.FindFirstValue(System.Security.Claims.ClaimTypes.PrimarySid);
