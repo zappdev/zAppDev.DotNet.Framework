@@ -58,7 +58,7 @@ namespace zAppDev.DotNet.Framework.Identity
 
             });
 
-            services.AddCustomIdentity<Model.IdentityUser, IdentityRole>(options =>
+            services.AddCustomIdentity<Model.IdentityUser, IdentityRole>(configuration, options =>
             {
                 // Password settings.
                 options.Password.RequireDigit = passwordPolicy.RequireDigit;
@@ -129,7 +129,7 @@ namespace zAppDev.DotNet.Framework.Identity
             services.AddSingleton<IAuthorizationPolicyProvider, OperationPolicyProvider>();
             services.AddSingleton<IAuthorizationHandler, OperationAuthorizationHandler>();
 
-            //services.AddAuthentication(IISDefaults.AuthenticationScheme);
+            // services.AddAuthentication(IISDefaults.AuthenticationScheme);
         }
     }
 
@@ -137,6 +137,7 @@ namespace zAppDev.DotNet.Framework.Identity
     {
         public static IdentityBuilder AddCustomIdentity<TUser, TRole>(
             this IServiceCollection services,
+            IConfiguration configuration,
             Action<IdentityOptions> setupAction)
             where TUser : class
             where TRole : class
@@ -149,8 +150,11 @@ namespace zAppDev.DotNet.Framework.Identity
             })
             .AddCookie(IdentityConstants.ApplicationScheme, o =>
             {
+                var authenticationCookieName = configuration.GetValue("configuration:appSettings:add:AuthenticationCookieName:value", "AspNetCore");
+
                 // Cookie authentication settings
                 o.Cookie.Name = IdentityConstants.ApplicationScheme;
+                o.Cookie.Name = $".{authenticationCookieName}.{IdentityConstants.ApplicationScheme}";
                 o.LoginPath = new PathString("/SignInPage/Load");
                 o.ReturnUrlParameter = "returnUrl";
                 o.LogoutPath = new PathString("/Login/Logout");

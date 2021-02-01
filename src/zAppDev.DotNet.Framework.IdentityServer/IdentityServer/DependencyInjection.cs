@@ -27,7 +27,7 @@ namespace zAppDev.DotNet.Framework.IdentityServer.IdentityServer
             var identityServerConfiguration = new IdentityServerConfiguration
             {
                 Authority = configuration.GetValue("configuration:appSettings:add:IdentityServer:Authority:value", ""),
-                AuthenticationCookieName = configuration.GetValue("configuration:appSettings:add:AuthenticationCookieName:value", ""),
+                AuthenticationCookieName = configuration.GetValue("configuration:appSettings:add:AuthenticationCookieName:value", "AspNetCore"),
                 ClientId = configuration.GetValue("configuration:appSettings:add:IdentityServer:ClientId:value", ""),
                 ClientSecret = configuration.GetValue("configuration:appSettings:add:IdentityServer:ClientSecret:value", ""),
                 JWTKey = key,
