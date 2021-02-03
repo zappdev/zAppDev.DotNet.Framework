@@ -80,7 +80,7 @@ namespace zAppDev.DotNet.Framework.Identity
                 .AddRoles<IdentityRole>()
                 .AddRoleStore<RoleStore<IdentityRole>>()
                 .AddUserStore<UserStore>()
-                .AddUserManager<ZappDevUserManager>()
+                .AddUserManager<CustomUserManager>()
                 .AddDefaultTokenProviders();
 
             var key = EncodingUtilities.StringToByteArray(configuration.GetValue("configuration:appSettings:add:JWTKey:value", "MIksRlTn0KG6nmjW*fzq*FYTY0RifkNQE%QTqdfS81CgNEGtUmMCY5XEgPTSL&28"), "ascii");
