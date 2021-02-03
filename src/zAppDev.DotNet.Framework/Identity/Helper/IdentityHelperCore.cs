@@ -271,7 +271,7 @@ namespace zAppDev.DotNet.Framework.Identity
             return result.Succeeded ? null : result.Errors.First().Description;
         }
 
-        private static Model.IdentityUser GetIdentityUser(string username, string email, string name, string userClass = null)
+        public static Model.IdentityUser GetIdentityUser(string username, string email, string name, string userClass = null)
         {
             var defaultUser = new Model.IdentityUser(new ApplicationUser { UserName = username, Email = email, Name = name });
 

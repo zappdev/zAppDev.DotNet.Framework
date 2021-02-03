@@ -15,29 +15,47 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using zAppDev.DotNet.Framework.IdentityServer.Configuration;
 using zAppDev.DotNet.Framework.IdentityServer.Services;
 using zAppDev.DotNet.Framework.Identity;
+using System.Linq;
+using System.Threading.Tasks;
+using zAppDev.DotNet.Framework.Data;
+using System.Security.Claims;
+using System.Collections.Generic;
+using zAppDev.DotNet.Framework.Hubs;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 
 namespace zAppDev.DotNet.Framework.IdentityServer.IdentityServer
 {
     public static class ServiceCollectionExtensions
     {
-        private static IdentityServerConfiguration ReadIdentityServerConfigurationFromConfiguration(IConfiguration configuration)
+        private static IIdentityServerConfiguration ReadIdentityServerConfigurationFromConfiguration(IConfiguration configuration,
+                                                                                                     IIdentityServerConfiguration identityServerConfiguration = null)
         {
+            if (identityServerConfiguration == null)
+            {
+                identityServerConfiguration = new IdentityServerConfiguration();
+            }
+
             var key = EncodingUtilities.StringToByteArray(configuration.GetValue("configuration:appSettings:add:JWTKey:value", "MIksRlTn0KG6nmjW*fzq*FYTY0RifkNQE%QTqdfS81CgNEGtUmMCY5XEgPTSL&28"), "ascii");
 
-            var identityServerConfiguration = new IdentityServerConfiguration
-            {
-                Authority = configuration.GetValue("configuration:appSettings:add:IdentityServer:Authority:value", ""),
-                AuthenticationCookieName = configuration.GetValue("configuration:appSettings:add:AuthenticationCookieName:value", "AspNetCore"),
-                ClientId = configuration.GetValue("configuration:appSettings:add:IdentityServer:ClientId:value", ""),
-                ClientSecret = configuration.GetValue("configuration:appSettings:add:IdentityServer:ClientSecret:value", ""),
-                JWTKey = key,
-            };
+            var scopes = configuration.GetValue("configuration:appSettings:add:IdentityServer:Scope:value", "")
+                                      .Split(",")
+                                      .Select(scope => scope.Trim())
+                                      .Where(scope => !string.IsNullOrEmpty(scope))
+                                      .ToList();
+
+            identityServerConfiguration.Authority = configuration.GetValue("configuration:appSettings:add:IdentityServer:Authority:value", "");
+            identityServerConfiguration.AuthenticationCookieName = configuration.GetValue("configuration:appSettings:add:AuthenticationCookieName:value", "AspNetCore");
+            identityServerConfiguration.ClientId = configuration.GetValue("configuration:appSettings:add:IdentityServer:ClientId:value", "");
+            identityServerConfiguration.Scopes = scopes;
+            identityServerConfiguration.ClientSecret = configuration.GetValue("configuration:appSettings:add:IdentityServer:ClientSecret:value", "");
+            identityServerConfiguration.JWTKey = key;
 
             return identityServerConfiguration;
         }
-        public static void AddIdentityServerManager(this IServiceCollection services, IConfiguration configuration)
+        public static void AddIdentityServerManager(this IServiceCollection services, IConfiguration configuration, IIdentityServerConfiguration identityServerConfiguration)
         {
-            var identityServerConfiguration = ReadIdentityServerConfigurationFromConfiguration(configuration);
+            identityServerConfiguration = ReadIdentityServerConfigurationFromConfiguration(configuration, identityServerConfiguration);
 
             services.AddSingleton<IIdentityServerConfiguration>(identityServerConfiguration);
 
@@ -49,17 +67,18 @@ namespace zAppDev.DotNet.Framework.IdentityServer.IdentityServer
 
             });
 
-            services.AddCustomIdentityServerAuthentication<Identity.Model.IdentityUser, IdentityRole>(identityServerConfiguration, 
+            services.AddCustomIdentityServerAuthentication<Identity.Model.IdentityUser, IdentityRole>(
+                identityServerConfiguration,
                 options =>
                 {
 
                 })
-                .AddRoles<IdentityRole>()
-                .AddRoleStore<RoleStore<IdentityRole>>()
-                .AddUserStore<UserStore>()
-                .AddUserManager<CustomUserManager>()
-                .AddDefaultTokenProviders();
-           
+                    .AddRoles<IdentityRole>()
+                    .AddRoleStore<RoleStore<IdentityRole>>()
+                    .AddUserStore<UserStore>()
+                    .AddUserManager<IdentityServerUserManager>()
+                    .AddDefaultTokenProviders();
+
             services.AddTransient<ZappDevUserManager, IdentityServerUserManager>();
             services.AddTransient<SignInManager<Identity.Model.IdentityUser>>();
 
@@ -73,7 +92,7 @@ namespace zAppDev.DotNet.Framework.IdentityServer.IdentityServer
     {
         public static IdentityBuilder AddCustomIdentityServerAuthentication<TUser, TRole>(
             this IServiceCollection services,
-            IdentityServerConfiguration identityServerConfiguration,
+            IIdentityServerConfiguration identityServerConfiguration,
             Action<IdentityOptions> setupAction)
             where TUser : class
             where TRole : class
@@ -87,7 +106,7 @@ namespace zAppDev.DotNet.Framework.IdentityServer.IdentityServer
                 .AddCookie(IdentityConstants.ApplicationScheme, o =>
                 {
                     o.Cookie.Name = $".{identityServerConfiguration.AuthenticationCookieName}.{IdentityConstants.ApplicationScheme}";
-                    o.LoginPath = new PathString("/SignInPage/Load");
+                    o.LoginPath = new PathString("/IdentityServer/ChallengeIdentity/HomePage/Render/HomePage/Render");
                     o.ReturnUrlParameter = "returnUrl";
                     o.LogoutPath = new PathString("/Login/Logout");
                     o.AccessDeniedPath = new PathString("/Unauthorized/Render");
@@ -100,9 +119,88 @@ namespace zAppDev.DotNet.Framework.IdentityServer.IdentityServer
 
                     options.ClientId = identityServerConfiguration.ClientId;
                     options.ClientSecret = identityServerConfiguration.ClientSecret;
+
+                    options.GetClaimsFromUserInfoEndpoint = true;
+
+                    foreach (var scope in identityServerConfiguration.Scopes)
+                        options.Scope.Add(scope);
+
                     options.ResponseType = "code";
+                    options.ResponseMode = "query";
 
                     options.SaveTokens = true;
+
+                    //options.Events.OnAuthorizationCodeReceived = (context) => {
+                    //    return Task.CompletedTask;
+                    //};
+
+                    options.Events.OnTicketReceived = async (context) =>
+                    {
+                        var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<IdentityServerUserManager>>();
+                        var manager = context.HttpContext.RequestServices.GetRequiredService<ZappDevUserManager>();
+
+                        var username = context.Principal.FindFirst(identityServerConfiguration.UsernameClaim);
+
+                        if (username != null)
+                        {
+                            var user = manager.FindByName(username.Value);
+
+                            var email = (string.IsNullOrEmpty(identityServerConfiguration.EmailClaim))
+                                    ? "" : context.Principal.FindFirst(identityServerConfiguration.EmailClaim)?.Value ?? "";
+                            var name = (string.IsNullOrEmpty(identityServerConfiguration.NameClaim))
+                                ? "" : context.Principal.FindFirst(identityServerConfiguration.NameClaim)?.Value ?? "";
+
+                            if (user != null)
+                            {
+                                // Update information from Identity Server
+                                if (string.IsNullOrEmpty(identityServerConfiguration.NameClaim))
+                                {
+                                    user.User.Name = name;
+                                }
+                                if (string.IsNullOrEmpty(identityServerConfiguration.EmailClaim)) 
+                                {
+                                    user.User.Email = email;
+                                    user.Email = email;                                    
+                                }
+                                await manager.UpdateAsync(user);
+                                context.HttpContext.RequestServices.GetRequiredService<IMiniSessionService>().CommitChanges();
+                                logger.LogInformation("Local user updated successfully! ");
+                            }
+                            else
+                            {
+                                // Create local user
+                                user = IdentityHelper.GetIdentityUser(username.Value, email, name, identityServerConfiguration.UserClass);
+
+                                var result = await manager.CreateAsync(user);
+
+                                if (result.Succeeded)
+                                {
+                                    context.HttpContext.RequestServices.GetRequiredService<IMiniSessionService>().CommitChanges();
+                                    identityServerConfiguration?.ExternalUserCreating(user.User);
+                                    logger.LogInformation("Local user created successfully!");
+                                } 
+                                else
+                                {
+                                    logger.LogInformation($"Local user not created! Errors:\t{string.Join(Environment.NewLine, result.Errors.Select(e => e.Description))}");
+                                }
+                            }
+                            
+                            if (context.Principal.Identity is ClaimsIdentity claimIdentity) 
+                            {
+                                claimIdentity.AddClaim(new Claim(ClaimTypes.Name, user.UserName));
+                                claimIdentity.AddClaim(new Claim(ClaimTypes.Email, user.User.Email));
+                            }
+                        } 
+                        else
+                        {
+                            logger.LogInformation("Username is empty!");
+                        }
+                    };
+
+                    //options.Events.OnTokenResponseReceived = (context) => {
+                    //    return Task.CompletedTask;
+                    //};
+                    //options.CallbackPath = new PathString("/IdentityServer/HandleSuccess");
                 })
                 .AddJwtBearer(options =>
                 {
@@ -123,6 +221,7 @@ namespace zAppDev.DotNet.Framework.IdentityServer.IdentityServer
             // Hosting doesn't add IHttpContextAccessor by default
             services.AddHttpContextAccessor();
             // Identity services
+
             services.TryAddScoped<IUserValidator<TUser>, UserValidator<TUser>>();
             services.TryAddScoped<IPasswordValidator<TUser>, PasswordValidator<TUser>>();
             services.TryAddScoped<IPasswordHasher<TUser>, PasswordHasher<TUser>>();
@@ -138,7 +237,7 @@ namespace zAppDev.DotNet.Framework.IdentityServer.IdentityServer
             services.TryAddScoped<IUserConfirmation<TUser>, DefaultUserConfirmation<TUser>>();
 
 #elif NET5_0
-            services.TryAddScoped<IUserConfirmation<TUser>, DefaultUserConfirmation<TUser>>(); 
+            services.TryAddScoped<IUserConfirmation<TUser>, DefaultUserConfirmation<TUser>>();
 #endif
             services.TryAddScoped<UserManager<TUser>>();
             services.TryAddScoped<SignInManager<TUser>>();
