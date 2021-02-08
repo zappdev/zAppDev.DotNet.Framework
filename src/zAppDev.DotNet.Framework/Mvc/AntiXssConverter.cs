@@ -49,7 +49,7 @@ namespace zAppDev.DotNet.Framework.Mvc
             var str = value?.ToString();
             if (Utilities.StringContainsHtml(str))
             {
-                writer.WriteValue(HttpUtility.HtmlDecode(str));
+                writer.WriteValue(HttpUtility.HtmlEncode(str));
             }
             else
             {
