@@ -28,6 +28,18 @@ namespace zAppDev.DotNet.Framework.IdentityServer.IdentityServer
 {
     public static class ServiceCollectionExtensions
     {
+        private static void CheckSameSite(HttpContext httpContext, CookieOptions options)
+        {
+            if (options.SameSite == SameSiteMode.None)
+            {
+#if NETCOREAPP3_1
+                options.SameSite = SameSiteMode.Unspecified;
+#elif NET5_0
+                options.SameSite = SameSiteMode.Unspecified;
+#endif
+            }
+        }
+
         private static IIdentityServerConfiguration ReadIdentityServerConfigurationFromConfiguration(IConfiguration configuration,
                                                                                                      IIdentityServerConfiguration identityServerConfiguration = null)
         {
@@ -63,7 +75,15 @@ namespace zAppDev.DotNet.Framework.IdentityServer.IdentityServer
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
                 options.CheckConsentNeeded = context => false;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
+#if NETCOREAPP3_1
+                options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
+#elif NET5_0
+                options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
+#endif
+                options.OnAppendCookie = cookieContext =>
+                    CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
+                options.OnDeleteCookie = cookieContext =>
+                    CheckSameSite(cookieContext.Context, cookieContext.CookieOptions);
 
             });
 
@@ -115,6 +135,13 @@ namespace zAppDev.DotNet.Framework.IdentityServer.IdentityServer
                 })
                 .AddOpenIdConnect("oidc", options =>
                 {
+#if NETCOREAPP3_1
+                    options.CorrelationCookie.SameSite = SameSiteMode.Unspecified;
+
+#elif NET5_0
+                    options.CorrelationCookie.SameSite = SameSiteMode.Unspecified;
+#endif
+
                     options.Authority = identityServerConfiguration.Authority;
 
                     options.ClientId = identityServerConfiguration.ClientId;
