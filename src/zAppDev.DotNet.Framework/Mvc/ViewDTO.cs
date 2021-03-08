@@ -97,6 +97,8 @@ namespace zAppDev.DotNet.Framework.Mvc
         CALENDAR_REFRESH,
         SET_DIRTY,
         DOWNLOAD,
-        ImageRefresh
+        ImageRefresh,
+        SET_AUTH_TOKEN,
+        UNSET_AUTH_TOKEN
     }
 }
