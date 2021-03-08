@@ -54,9 +54,9 @@ namespace zAppDev.DotNet.Framework.Identity
             var user = FindById(username);
             if (user == null) return null;
 
-            var pass = ValidatePasswordAsync(user, password).GetAwaiter().GetResult();
+            var pass = CheckPasswordAsync(user, password).GetAwaiter().GetResult();
 
-            return (pass.Succeeded) ? user : null;
+            return (pass) ? user : null;
         }
 
         public override Model.IdentityUser FindById(string userId)
