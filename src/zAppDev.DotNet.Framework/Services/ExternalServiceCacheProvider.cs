@@ -47,8 +47,8 @@ namespace zAppDev.DotNet.Framework.Services
         private static ICacheManager<object> Instance
         {
             get
-            {
-                return ServiceLocator.Current.GetInstance<ICacheManager<object>>("ExternalServiceCache");
+            {  
+                return ServiceLocator.Current.GetInstance<ICacheManager<object>>("AppCache");
             }
         }
 
