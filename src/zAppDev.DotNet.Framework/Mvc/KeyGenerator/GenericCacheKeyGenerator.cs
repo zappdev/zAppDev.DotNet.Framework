@@ -38,6 +38,7 @@ namespace zAppDev.DotNet.Framework.Services
             {
                 var uri = new Uri(_serviceOptions.Url);
                 queryString = uri.Query;
+                if (string.IsNullOrWhiteSpace(queryString)) queryString = uri.PathAndQuery;
             }
             catch (Exception)
             {
