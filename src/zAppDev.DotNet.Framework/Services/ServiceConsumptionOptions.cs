@@ -24,6 +24,9 @@ namespace zAppDev.DotNet.Framework.Services
         public bool IsCachingEnabled { get; set; }
         public bool IgnoreNullValues { get; set; } = true;
 
+        public string ProxyAddress { get; set; }
+        public string ProxyUser { get; set; }
+        public string ProxyPassword { get; set; }
 
         /// <summary>
         /// Name of the invoked API. E.g. "BlogAPI"

@@ -347,6 +347,18 @@ namespace zAppDev.DotNet.Framework.Services
         {
             var handler = new HttpClientHandler();
 
+            if (!string.IsNullOrWhiteSpace(options.ProxyAddress))
+            {
+                handler.Proxy = new WebProxy()
+                {
+                    Address = new Uri(options.ProxyAddress)
+                };
+
+                if (!string.IsNullOrWhiteSpace(options.ProxyUser))
+                {
+                    handler.Proxy.Credentials = new NetworkCredential(options.ProxyUser, options.ProxyPassword);
+                }
+            }
 
             if (options.SecurityType == RestSecurityType.BasicAuth)
             {
