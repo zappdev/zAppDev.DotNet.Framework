@@ -196,7 +196,7 @@ namespace zAppDev.DotNet.Framework.IdentityServer.IdentityServer
                             else
                             {
                                 // Create local user
-                                user = IdentityHelper.GetIdentityUser(username.Value, email, name, identityServerConfiguration.UserClass);
+                                user = IdentityHelper.GetIdentityUser(username.Value, email, name, Type.GetType(identityServerConfiguration.UserClass));
 
                                 var result = await manager.CreateAsync(user);
 

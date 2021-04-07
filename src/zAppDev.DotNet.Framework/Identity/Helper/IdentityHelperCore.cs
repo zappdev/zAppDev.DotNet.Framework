@@ -271,17 +271,17 @@ namespace zAppDev.DotNet.Framework.Identity
             return result.Succeeded ? null : result.Errors.First().Description;
         }
 
-        public static Model.IdentityUser GetIdentityUser(string username, string email, string name, string userClass = null)
+        public static Model.IdentityUser GetIdentityUser(string username, string email, string name, Type userClass = null)
         {
             var defaultUser = new Model.IdentityUser(new ApplicationUser { UserName = username, Email = email, Name = name });
 
             try
             {
-                if (!string.IsNullOrWhiteSpace(userClass) && userClass != "ApplicationUser")
+                if (userClass != null && userClass != typeof(ApplicationUser))
                 {
-                    var classType = Type.GetType($@"zAppDevRegistry.BO.{userClass}");
+                    //var classType = Type.GetType($@"zAppDevRegistry.BO.{userClass}");
 
-                    var unwrappedUser = Activator.CreateInstance(classType) as ApplicationUser;
+                    var unwrappedUser = Activator.CreateInstance(userClass) as ApplicationUser;
                     if (unwrappedUser != null)
                     {
                         unwrappedUser.UserName = username;
@@ -298,7 +298,7 @@ namespace zAppDev.DotNet.Framework.Identity
             return defaultUser;
         }
 
-        public static IEnumerable<string> CreateAndLoginUser(string username, string email, string name, string userClass = null)
+        public static IEnumerable<string> CreateAndLoginUser(string username, string email, string name, Type userClass = null)
         {
             var info = GetSignInManager().GetExternalLoginInfoAsync().GetAwaiter().GetResult();
 
@@ -310,7 +310,7 @@ namespace zAppDev.DotNet.Framework.Identity
             return CreateAndLoginUser(username, email, name, info.Principal.Claims, info, userClass);
         }
 
-        public static string[] CreateAndLoginUser(string username, string email, string name, IEnumerable<Claim> claims, ExternalLoginInfo externalLoginInfo, string userClass = null)
+        public static string[] CreateAndLoginUser(string username, string email, string name, IEnumerable<Claim> claims, ExternalLoginInfo externalLoginInfo, Type userClass = null)
         {
             var manager = GetUserManager();
             var user = GetIdentityUser(username, email, name, userClass);
