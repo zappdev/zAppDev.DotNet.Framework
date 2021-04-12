@@ -25,6 +25,7 @@ namespace zAppDev.DotNet.Framework.Services
         public bool IgnoreNullValues { get; set; } = true;
 
         public string ProxyAddress { get; set; }
+        public int ProxyPort { get; set; }
         public string ProxyUser { get; set; }
         public string ProxyPassword { get; set; }
 

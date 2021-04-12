@@ -349,10 +349,12 @@ namespace zAppDev.DotNet.Framework.Services
 
             if (!string.IsNullOrWhiteSpace(options.ProxyAddress))
             {
-                handler.Proxy = new WebProxy()
-                {
-                    Address = new Uri(options.ProxyAddress)
-                };
+                log4net.LogManager.GetLogger(typeof(RestServiceConsumer))
+                    .Info($"Using Proxy. Address: {options.ProxyAddress}, port: {options.ProxyPort}, user: {options.ProxyUser}, has pass: {!string.IsNullOrWhiteSpace(options.ProxyPassword)}");
+
+                handler.Proxy = options.ProxyPort > 0 ? 
+                    new WebProxy(options.ProxyAddress, options.ProxyPort) : 
+                    new WebProxy(options.ProxyAddress);
 
                 if (!string.IsNullOrWhiteSpace(options.ProxyUser))
                 {
