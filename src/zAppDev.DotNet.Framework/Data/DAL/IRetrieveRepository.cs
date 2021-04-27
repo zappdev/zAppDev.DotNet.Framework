@@ -9,7 +9,7 @@ namespace zAppDev.DotNet.Framework.Data.DAL
 {
     public interface IRetrieveRepository
     {
-        T GetById<T>(object id, bool throwIfNotFound = true) where T : class;
+        T GetById<T>(object id, bool throwIfNotFound = true, bool checkAccess = true) where T : class;
         List<T> Get<T>(Expression<Func<T, bool>> predicate, bool cacheQuery = true);
         List<T> Get<T>(Expression<Func<T, bool>> predicate,
                        int startRowIndex,
