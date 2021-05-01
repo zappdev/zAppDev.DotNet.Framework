@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data.Common;
+using System.Threading.Tasks;
 using zAppDev.DotNet.Framework.Data.DatabaseManagers.AccessLogManager;
 
 namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
@@ -28,6 +29,13 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
         void ExportDBSchema(NHibernate.Cfg.Configuration nHibernateConfiguration);
 
         DatabaseServerType GetDatabaseServerType();
+
+        Task<List<Dictionary<string, object>>> RunSqlQueryAsync(string query, Dictionary<string, object> parameters, string connectionString);
+
+        Task<List<Dictionary<string, object>>> RunSqlQueryAsync(
+            string query, Dictionary<string, object> parameters = null,
+            int? timeOut = null, string connectionString = null,
+            DatabaseServerType databaseServerType = DatabaseServerType.None);
 
         List<Dictionary<string, object>> RunSqlQuery(string query, Dictionary<string, object> parameters, string connectionString);
         List<Dictionary<string, object>> RunSqlQuery(string query, Dictionary<string, object> parameters = null, int? timeOut = null, string connectionString = null, DatabaseServerType databaseServerType = DatabaseServerType.None);

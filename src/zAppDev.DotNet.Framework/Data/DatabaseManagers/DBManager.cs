@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Threading.Tasks;
 using zAppDev.DotNet.Framework.Data.DatabaseManagers.DatabaseUtilities;
 using zAppDev.DotNet.Framework.Utilities;
 
@@ -40,6 +41,61 @@ namespace zAppDev.DotNet.Framework.Data.DatabaseManagers
         public virtual void CreateSchemas() { }
 
         //public virtual void ExportDBCreationSchema() { }
+
+        public async Task<List<Dictionary<string, object>>> RunSqlQueryAsync(string query, Dictionary<string, object> parameters, string connectionString)
+        {
+            return await RunSqlQueryAsync(query, parameters: parameters, connectionString: connectionString);
+        }
+
+        public async Task<List<Dictionary<string, object>>> RunSqlQueryAsync(
+            string query, Dictionary<string, object> parameters = null, 
+            int? timeOut = null, string connectionString = null, 
+            DatabaseServerType databaseServerType = DatabaseServerType.None)
+        {
+            var results = new List<Dictionary<string, object>>();
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                connectionString = ConnectionString;
+            }
+
+            using (var conn = this.GetDatabaseConnection(connectionString))
+            {
+                conn.Open();
+
+                using (var command = this.GetDbCommand(conn, query, databaseServerType))
+                {
+                    command.CommandType = System.Data.CommandType.Text;
+                    command.CommandTimeout = CommonUtilities.GetCommandTimeout(timeOut);
+
+                    if (parameters != null)
+                    {
+                        foreach (var p in parameters)
+                        {
+                            command.Parameters.Add(this.GetDbParameter(p.Key, p.Value));
+                        }
+                    }
+
+                    using (var rdr = await command.ExecuteReaderAsync())
+                    {
+                        while (await rdr.ReadAsync())
+                        {
+                            var result = new Dictionary<string, object>();
+
+                            for (var i = 0; i < rdr.FieldCount; i++)
+                            {
+                                var columnName = rdr.GetName(i);
+                                result.Add(columnName, rdr[columnName]);
+                            }
+
+                            results.Add(result);
+                        }
+                    }
+                }
+
+                return results;
+            }
+        }
 
         public List<Dictionary<string, object>> RunSqlQuery(string query, Dictionary<string, object> parameters, string connectionString)
         {
