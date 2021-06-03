@@ -154,47 +154,19 @@ namespace zAppDev.DotNet.Framework.Services
                                 {
                                     log4net.LogManager.GetLogger(typeof(RestServiceConsumer)).Error(jsonSerialized);
                                 }
-                                //response = client.PostAsJsonAsync("", options.Data).Result;
                                 break;
 
                             case PostType.XML:
-                                var xml = new zAppDev.DotNet.Framework.Utilities.Serializer<object>().ToXml(options.Data, true);
+                                var xml = options.Data?.GetType() == typeof(string) ? options.Data as string :
+                                    new Utilities.Serializer<object>().ToXml(options.Data, true);
+
                                 var httpContent = new StringContent(xml, Encoding.UTF8, "application/xml");
                                 resultBag.HttpResponseMessage = client.PostAsync("", httpContent).Result;
                                 break;
                             default:
-                                /*
-                                                                    HttpContent content
-                                                                        = new FormUrlEncodedContent(
-                                                                            ConvertNameValueCollectionToKeyValuePair(
-                                                                                HttpUtility.ParseQueryString(options.Data + "")));
-                                                                    response = client.PostAsync("", content).Result;
-                                    */
                                 resultBag.HttpResponseMessage = client.PostAsync("", PrepareFormData(options)).Result;
-                                //response = client.PostAsync("", options.Data).Result;
                                 break;
                         }
-                        /*var str = JsonConvert.SerializeObject(options.Data);
-
-                    var logger = LogManager.GetLogger(typeof (RestServiceConsumer));
-                    if (str == "\"" + options.Data + "\"")
-                    {
-
-                        logger.Debug("POSTing as FORM");
-                        logger.DebugFormat("because: {0} == {1}", str, "\"" + options.Data + "\"");
-
-                        HttpContent content
-                            = new FormUrlEncodedContent(
-                                ConvertNameValueCollectionToKeyValuePair(
-                                    HttpUtility.ParseQueryString(options.Data.ToString())));
-                        response = client.PostAsync("", content).Result;
-                    }
-                    else
-                    {
-                        logger.Debug("POSTing as JSON");
-
-                        response = client.PostAsJsonAsync("", options.Data).Result;
-                    }*/
 
                         break;
                     case RestHTTPVerb.PUT:
@@ -216,7 +188,7 @@ namespace zAppDev.DotNet.Framework.Services
                         }
                         break;
 #else
-                        throw new NotImplementedException("InnerConsume not implement for .Net Core");
+                        throw new NotImplementedException("InnerConsume for PUT not implement for .Net Core");
 #endif
                     case RestHTTPVerb.DELETE:
                         resultBag.HttpResponseMessage = client.DeleteAsync("").Result;
@@ -225,16 +197,16 @@ namespace zAppDev.DotNet.Framework.Services
                         throw new ApplicationException("Uknown Http Verb: " + options.Verb);
                 }
             
-                if (options.SecurityType == RestSecurityType.OAuth2 && resultBag.HttpResponseMessage.StatusCode == HttpStatusCode.Unauthorized && retries == 0)
+                if (options.SecurityType == RestSecurityType.OAuth2 && 
+                    resultBag.HttpResponseMessage.StatusCode == HttpStatusCode.Unauthorized && retries == 0)
                 {                    
                     return new OAuth2InvalidToken();
                 }
                     
                 if (resultBag.HttpResponseMessage.IsSuccessStatusCode)
                 {
-
                     var setCookieHeader =
- resultBag.HttpResponseMessage.Headers.FirstOrDefault(a => a.Key?.ToLower() == "set-cookie");
+                        resultBag.HttpResponseMessage.Headers.FirstOrDefault(a => a.Key?.ToLower() == "set-cookie");
                     if (Utilities.Web.GetContext() != null && setCookieHeader.Value != null && setCookieHeader.Value.Any())
                     {
                         Utilities.Web.GetContext().Items["ServiceAuthCookie"] = setCookieHeader;
@@ -291,41 +263,10 @@ namespace zAppDev.DotNet.Framework.Services
                         return stringResult;
                     }
 
-
-                    /*switch (options.Type)
-                    {
-                        case RestResultType.STRING:
-                            return response.Content.ReadAsStringAsync().Result;
-                        case RestResultType.JSON:
-                            object convertedJson;
-                            var stream = response.Content.ReadAsStreamAsync().Result;
-                            try
-                            {
-                                convertedJson = response.Content.ReadAsAsync<T>().Result;
-                            }
-                            catch
-                            {
-                                stream.Seek(0, SeekOrigin.Begin);
-                                convertedJson = response.Content.ReadAsAsync<string>().Result;
-                            }
-                            return convertedJson;
-                        case RestResultType.XML:
-                            var s = response.Content.ReadAsStringAsync().Result;
-                            if (typeof (T) == typeof (string))
-                            {
-                                return s;
-                            }
-                            var stringReader = new StringReader(s);
-                            var serializer = new XmlSerializer(typeof (T));
-                            return (T) serializer.Deserialize(stringReader);
-
-                    }*/
                     return default(T);
                 }
 
-
                 throw new ApplicationException($"{(int)resultBag.HttpResponseMessage.StatusCode} ({resultBag.HttpResponseMessage.ReasonPhrase})");
-
             }
         }
 
